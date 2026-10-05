@@ -1,0 +1,1372 @@
+WEBVTT
+
+00:00:00.020 --> 00:00:03.940
+Okay, here we go. How about this one? Any good? This one?
+
+00:00:03.940 --> 00:00:09.340
+I like this one. This one goes on and do it. Sorry, I'm dithering.
+
+00:00:09.340 --> 00:00:22.840
+This is a video all about how you take a full color image like this and turn it into a purely black and white image.
+
+00:00:22.840 --> 00:00:28.880
+None of this gray scale ridiculousness. And a while ago I did a video which was like self-referential
+
+00:00:28.880 --> 00:00:33.960
+text where the text would describe how many pixels are in that image of the text.
+
+00:00:33.960 --> 00:00:40.200
+and there was a deleted scene about what happens when you go all white or all black using a threshold.
+
+00:00:40.200 --> 00:00:42.600
+So let's go full black and white.
+
+00:00:42.600 --> 00:00:47.400
+What we can do is just pick some threshold and above that level of gray we go
+
+00:00:47.400 --> 00:00:52.280
+by the white and below it we go black and that's what the slider over here is indicating.
+
+00:00:52.280 --> 00:00:55.400
+I mean that's not part of the frame I'm putting that on afterwards.
+
+00:00:55.400 --> 00:01:00.360
+In fact the count up here for the number of black pixels and white pixels not part of the image
+
+00:01:00.360 --> 00:01:02.360
+although spoiler, that's where we're going.
+
+00:01:02.360 --> 00:01:05.280
+The idea with the shot was to demonstrate the difference
+
+00:01:05.280 --> 00:01:07.960
+between black and white, like real black and white,
+
+00:01:07.960 --> 00:01:09.480
+and what people call black and white.
+
+00:01:09.480 --> 00:01:10.880
+There's actually grayscale,
+
+00:01:10.880 --> 00:01:12.520
+and I had a lot of fun put the code together,
+
+00:01:12.520 --> 00:01:14.280
+we rented that, and then we cut it.
+
+00:01:14.280 --> 00:01:16.600
+Because you know, sometimes you put a lot of effort in
+
+00:01:16.600 --> 00:01:18.680
+for the luxury of cutting it out of the edit,
+
+00:01:18.680 --> 00:01:20.280
+and it was already a very full video.
+
+00:01:20.280 --> 00:01:23.840
+A video I love underperformed on YouTube,
+
+00:01:23.840 --> 00:01:25.240
+what are you gonna do?
+
+00:01:25.240 --> 00:01:26.680
+I liked making it.
+
+00:01:26.680 --> 00:01:28.160
+And so we took that scene out,
+
+00:01:28.160 --> 00:01:29.280
+but it always kind of stuck with me.
+
+00:01:29.280 --> 00:01:31.280
+I was like, you know what, there is something in that.
+
+00:01:31.280 --> 00:01:35.880
+How do you take an image and make it pure, black or white
+
+00:01:35.880 --> 00:01:37.920
+and keep as much information as possible?
+
+00:01:37.920 --> 00:01:39.560
+We can try it on this shot as well.
+
+00:01:39.560 --> 00:01:41.200
+So here it is.
+
+00:01:41.200 --> 00:01:45.040
+Okay, if you did naive 50% threshold,
+
+00:01:45.040 --> 00:01:45.960
+it looks like this.
+
+00:01:45.960 --> 00:01:48.720
+Super dark, you can still kind of make me out,
+
+00:01:48.720 --> 00:01:52.800
+but we've lost basically everything from the background
+
+00:01:52.800 --> 00:01:57.040
+and the classic log perception of darkness, I guess,
+
+00:01:57.040 --> 00:01:58.840
+because if we got to 75% it looks like this.
+
+00:01:58.840 --> 00:02:01.920
+It's just, it's just, the lamp is the only thing
+
+00:02:01.920 --> 00:02:03.480
+that survives at 75%.
+
+00:02:03.480 --> 00:02:05.080
+And this is 25%.
+
+00:02:05.080 --> 00:02:08.440
+So now the bottom 25% of brightness
+
+00:02:08.440 --> 00:02:10.280
+from zero to 255 goes down to black,
+
+00:02:10.280 --> 00:02:11.760
+everything else goes to white.
+
+00:02:11.760 --> 00:02:14.200
+You get some detail on my face.
+
+00:02:14.200 --> 00:02:16.720
+There's a little bit up over there,
+
+00:02:17.680 --> 00:02:18.800
+but we're losing a lot there.
+
+00:02:18.800 --> 00:02:21.360
+My head is just banishing into the wall.
+
+00:02:21.360 --> 00:02:22.800
+I played around for a while.
+
+00:02:22.800 --> 00:02:27.560
+This specific shot, I think 35% is the best threshold.
+
+00:02:27.560 --> 00:02:30.380
+that's keeping a decent amount of detail here.
+
+00:02:30.380 --> 00:02:33.620
+You can still kind of see the football's not bad,
+
+00:02:33.620 --> 00:02:35.420
+but like look how severe the shadow is.
+
+00:02:35.420 --> 00:02:37.320
+And this thing, it looks like there's an object there.
+
+00:02:37.320 --> 00:02:39.940
+That's just the shadow of this.
+
+00:02:39.940 --> 00:02:43.300
+The point is if you're trying to get detail
+
+00:02:43.300 --> 00:02:44.580
+and you've only got black or white
+
+00:02:44.580 --> 00:02:47.340
+and a single threshold where you're rounding one way or the other,
+
+00:02:47.340 --> 00:02:50.140
+very hard to keep like fine detail
+
+00:02:50.140 --> 00:02:52.180
+and darker detail, all that kind of jazz.
+
+00:02:52.180 --> 00:02:54.180
+And it gets even worse,
+
+00:02:54.180 --> 00:02:57.780
+where we to go somewhere that's much more visually interesting.
+
+00:02:57.780 --> 00:03:01.020
+Such as this, there's some detail.
+
+00:03:01.020 --> 00:03:04.740
+Now we think the best threshold for this scene is 28.
+
+00:03:05.740 --> 00:03:07.100
+That's what you're looking at right now.
+
+00:03:07.100 --> 00:03:09.940
+Everything below 28% brightness is going to black,
+
+00:03:09.940 --> 00:03:11.220
+the bulb is going to white.
+
+00:03:11.220 --> 00:03:13.100
+It's the best we could do to kind of keep the detail
+
+00:03:13.100 --> 00:03:14.780
+in the front of the church over there
+
+00:03:14.780 --> 00:03:17.060
+and you can still see some detail in my face,
+
+00:03:17.060 --> 00:03:21.740
+but the top of my head is indistinguishable from the sky.
+
+00:03:21.740 --> 00:03:24.060
+The fire has gone on the church.
+
+00:03:24.060 --> 00:03:28.260
+To get that back, we tried a threshold of 40 there.
+
+00:03:28.260 --> 00:03:31.820
+There's better, but now we've lost so much other details.
+
+00:03:31.820 --> 00:03:33.980
+So we think 28 is the best.
+
+00:03:33.980 --> 00:03:38.860
+However, what if we weren't applying the same threshold
+
+00:03:38.860 --> 00:03:41.760
+to every pixel, but we mix it up a little?
+
+00:03:41.760 --> 00:03:44.260
+And the result looks like this.
+
+00:03:44.260 --> 00:03:47.820
+Okay, so there's a lot of static noise going on,
+
+00:03:47.820 --> 00:03:49.980
+but there's definitely more detail.
+
+00:03:49.980 --> 00:03:51.860
+And check it out, you can see me
+
+00:03:51.860 --> 00:03:53.500
+and you can see the spire.
+
+00:03:53.500 --> 00:03:55.980
+And you can see basically everything.
+
+00:03:55.980 --> 00:03:58.780
+So somehow by applying randomness,
+
+00:03:58.780 --> 00:04:01.380
+we've put noise into the shot,
+
+00:04:01.380 --> 00:04:03.580
+we've managed to preserve more detail.
+
+00:04:03.580 --> 00:04:06.620
+So compare this to when we had the 28 threshold,
+
+00:04:06.620 --> 00:04:07.460
+the best from before.
+
+00:04:07.460 --> 00:04:10.780
+So over on this side, let's say, random noise.
+
+00:04:10.780 --> 00:04:13.500
+Over here, 28 threshold.
+
+00:04:13.500 --> 00:04:14.340
+Huh?
+
+00:04:14.340 --> 00:04:16.660
+Look at this, terrible.
+
+00:04:16.660 --> 00:04:18.380
+Different type of terrible.
+
+00:04:18.380 --> 00:04:20.220
+Other actually, we moved the camera around.
+
+00:04:20.220 --> 00:04:22.380
+So the spire goes in and out.
+
+00:04:22.380 --> 00:04:26.100
+You can see that, you know, we're able to keep that separate
+
+00:04:26.100 --> 00:04:27.740
+from the sky by using randomness,
+
+00:04:27.740 --> 00:04:29.540
+and we can't do that with a threshold,
+
+00:04:29.540 --> 00:04:31.380
+at least without losing everything else.
+
+00:04:31.380 --> 00:04:33.980
+So what's the deal with random noise giving us detail
+
+00:04:33.980 --> 00:04:36.420
+back into our black and white image?
+
+00:04:36.420 --> 00:04:38.620
+Well, first of all, I just wanna tell you one thing
+
+00:04:38.620 --> 00:04:40.220
+you don't actually need to know.
+
+00:04:40.220 --> 00:04:43.620
+If we zoom right in on this image down to the pixel level,
+
+00:04:43.620 --> 00:04:48.460
+these individual pixels are actually little groups
+
+00:04:48.460 --> 00:04:50.100
+of four by four pixels.
+
+00:04:50.100 --> 00:04:53.660
+because what I did, I scaled everything down to one K
+
+00:04:53.660 --> 00:04:57.780
+because we filmed at 4K, I go to a quarter of the resolution,
+
+00:04:57.780 --> 00:05:00.260
+then I do all the processing, the black and whiteing,
+
+00:05:00.260 --> 00:05:02.200
+and then we pop it back out again to 4K
+
+00:05:02.200 --> 00:05:05.260
+and we do that with a kind of hard edge nearest neighbor.
+
+00:05:05.260 --> 00:05:08.060
+Technique, which means what look like pixels
+
+00:05:08.060 --> 00:05:10.420
+are actually little four by four groups of pixels.
+
+00:05:10.420 --> 00:05:13.820
+But if I did this with true pixels in 4K,
+
+00:05:13.820 --> 00:05:17.340
+by the time we're done, if you're watching it on an HDTV,
+
+00:05:17.340 --> 00:05:18.900
+you're watching it on a phone,
+
+00:05:18.900 --> 00:05:20.460
+it would all just blur together.
+
+00:05:20.460 --> 00:05:23.260
+So that's why the two pixels aren't real pixels,
+
+00:05:23.260 --> 00:05:24.780
+but you should better see them.
+
+00:05:24.780 --> 00:05:27.180
+You need to know, but I just thought it'd be fun to share.
+
+00:05:27.180 --> 00:05:28.740
+Speaking of things you need to know,
+
+00:05:28.740 --> 00:05:30.780
+you need to know this video sponsored by Jane Street,
+
+00:05:30.780 --> 00:05:32.460
+because their Academy of Math and Programming
+
+00:05:32.460 --> 00:05:34.100
+is now accepting applications.
+
+00:05:34.100 --> 00:05:35.860
+More about that at the end of the video
+
+00:05:35.860 --> 00:05:36.900
+in the description below.
+
+00:05:37.900 --> 00:05:38.980
+Let's talk about the noise.
+
+00:05:38.980 --> 00:05:41.860
+What the random thresholds are achieving
+
+00:05:41.860 --> 00:05:44.300
+is taking some of the pixels in light regions
+
+00:05:44.300 --> 00:05:46.660
+and pushing them dark when they shouldn't be
+
+00:05:46.660 --> 00:05:49.140
+and taking some pixels in the dark regions
+
+00:05:49.140 --> 00:05:50.420
+and pushing them light.
+
+00:05:50.420 --> 00:05:53.900
+And that's happening random or rather proportional
+
+00:05:53.900 --> 00:05:57.700
+to how far from being light or dark each pixel is.
+
+00:05:57.700 --> 00:06:02.020
+And what that's doing is giving us, well, shades of gray.
+
+00:06:02.020 --> 00:06:04.940
+Because if you had to come up with gray scale coloring
+
+00:06:04.940 --> 00:06:07.660
+from scratch using only black and white,
+
+00:06:07.660 --> 00:06:10.660
+you'd put together like a palette of grays like this
+
+00:06:10.660 --> 00:06:13.660
+where you've got more or fewer black pixels in each one.
+
+00:06:13.660 --> 00:06:16.540
+So as you kind of lean back and blur your eyes,
+
+00:06:16.540 --> 00:06:18.940
+They become different amounts of gray.
+
+00:06:18.940 --> 00:06:21.500
+And what the random thresholds are doing
+
+00:06:21.500 --> 00:06:23.040
+is basically this,
+
+00:06:23.040 --> 00:06:25.060
+but in an ad hoc fashion.
+
+00:06:25.060 --> 00:06:27.920
+Because the brighter or darker a region is,
+
+00:06:27.920 --> 00:06:31.540
+the moral fewer pixels get pushed in the wrong direction.
+
+00:06:31.540 --> 00:06:33.020
+So we're basically hitting all these
+
+00:06:33.020 --> 00:06:34.980
+in between combinations.
+
+00:06:34.980 --> 00:06:37.940
+The only issue is random noise is, of course,
+
+00:06:37.940 --> 00:06:39.860
+doing that randomly.
+
+00:06:39.860 --> 00:06:41.920
+If only there was another way,
+
+00:06:41.920 --> 00:06:44.020
+we could do it systematically.
+
+00:06:44.020 --> 00:06:45.220
+New location,
+
+00:06:45.220 --> 00:06:47.540
+where we're gonna try a new filter,
+
+00:06:47.540 --> 00:06:50.940
+which looks like this, it's not bad.
+
+00:06:50.940 --> 00:06:54.420
+I mean my head a little bit disappears into that building,
+
+00:06:54.420 --> 00:06:56.460
+but we're keeping like, look at the detail
+
+00:06:56.460 --> 00:06:57.820
+on the hanging basket.
+
+00:06:57.820 --> 00:06:59.980
+And the background is not bad,
+
+00:06:59.980 --> 00:07:04.380
+but it does have that weird kind of old school newspaper feel
+
+00:07:04.380 --> 00:07:07.940
+and that's because it's based on a repeating pattern.
+
+00:07:07.940 --> 00:07:10.940
+Any dithering scheme that uses repeated pattern,
+
+00:07:10.940 --> 00:07:14.020
+like what we just saw, is called ordered dithering.
+
+00:07:14.020 --> 00:07:19.020
+Specifically, I was using a 2x2 Bayer-ordered dithering,
+
+00:07:19.240 --> 00:07:21.620
+which gives you five different shades of gray.
+
+00:07:21.620 --> 00:07:23.940
+Well, you get all white and all black,
+
+00:07:23.940 --> 00:07:25.340
+and then you get three in the middle
+
+00:07:25.340 --> 00:07:29.600
+where you color in one, two, or three black pixels.
+
+00:07:29.600 --> 00:07:32.460
+And that's it, that's your whole spectrum.
+
+00:07:32.460 --> 00:07:33.540
+That kinda works.
+
+00:07:33.540 --> 00:07:36.380
+You just take that, have it as a repeating tile
+
+00:07:36.380 --> 00:07:38.500
+over the entire size of your image,
+
+00:07:38.500 --> 00:07:41.100
+and then use that as your series of filters.
+
+00:07:41.100 --> 00:07:43.420
+And the way you can get it to gradually step up
+
+00:07:43.420 --> 00:07:46.860
+you just set them as different thresholds and it works.
+
+00:07:46.860 --> 00:07:49.860
+But the point is they turn on in that order.
+
+00:07:49.860 --> 00:07:54.500
+But what if we don't want just a two by two repeating pattern?
+
+00:07:54.500 --> 00:07:56.980
+Oh, well, you can go so much better.
+
+00:07:56.980 --> 00:08:01.660
+In fact, Bayer dithering works for any two to the end
+
+00:08:01.660 --> 00:08:03.380
+by two to the end grid.
+
+00:08:03.380 --> 00:08:04.460
+Allow me to demonstrate.
+
+00:08:04.460 --> 00:08:06.660
+The secret as such to Bayer dithering
+
+00:08:06.660 --> 00:08:09.180
+is the order in which the pixels flip from black to white
+
+00:08:09.180 --> 00:08:10.580
+or vice versa.
+
+00:08:10.580 --> 00:08:13.460
+And they fire off in a very specific order
+
+00:08:13.460 --> 00:08:15.260
+as an area gets brighter and brighter.
+
+00:08:15.260 --> 00:08:16.940
+The first one to go is the top left,
+
+00:08:16.940 --> 00:08:19.620
+that one there flips first, that's picks number one.
+
+00:08:19.620 --> 00:08:22.260
+As we get brighter, then number two fires,
+
+00:08:22.260 --> 00:08:23.380
+then number three,
+
+00:08:23.380 --> 00:08:26.300
+and finally we fill it in with number four.
+
+00:08:26.300 --> 00:08:27.940
+You might be thinking for a two by two grade,
+
+00:08:27.940 --> 00:08:30.460
+there's not a lot of ways to do it differently.
+
+00:08:30.460 --> 00:08:32.780
+But if you ever think about it, you could do it wrong.
+
+00:08:32.780 --> 00:08:35.740
+If you fired one and then two underneath,
+
+00:08:35.740 --> 00:08:38.500
+the moment you go up into a slightly brighter shade of gray,
+
+00:08:38.500 --> 00:08:40.900
+you get weird vertical lines appearing.
+
+00:08:40.900 --> 00:08:42.700
+And you don't want vertical horizontal lines,
+
+00:08:42.700 --> 00:08:44.260
+which is why we go diagonal
+
+00:08:44.260 --> 00:08:46.700
+and then a corner and then the other diagonal
+
+00:08:46.700 --> 00:08:49.620
+by staggering the order in which we go from white to black
+
+00:08:49.620 --> 00:08:50.740
+or black to white.
+
+00:08:50.740 --> 00:08:52.700
+You are less likely to get weird patterns.
+
+00:08:52.700 --> 00:08:56.340
+And it's better when you look at it with your human eyeballs
+
+00:08:56.340 --> 00:08:59.180
+and you kind of average it out into a gray.
+
+00:08:59.180 --> 00:09:01.620
+Things get more complicated though
+
+00:09:01.620 --> 00:09:04.060
+when we go to a bigger grid size.
+
+00:09:04.060 --> 00:09:07.420
+Bayer dithering works for any two to the end grid.
+
+00:09:07.420 --> 00:09:10.020
+So you can basically double it each time to get the next one up.
+
+00:09:10.020 --> 00:09:13.000
+And what you do is you imagine this as being
+
+00:09:13.000 --> 00:09:15.020
+like four lots of the previous ones.
+
+00:09:15.020 --> 00:09:18.020
+There's one there, another one there, another one there.
+
+00:09:18.020 --> 00:09:21.500
+And then you do the same pattern recursively
+
+00:09:21.500 --> 00:09:22.780
+as you scale it up.
+
+00:09:22.780 --> 00:09:26.160
+So of these subgrids, you always do them in that order.
+
+00:09:26.160 --> 00:09:27.860
+This one, then that one, then that one, then that one.
+
+00:09:27.860 --> 00:09:31.260
+And then within each one, you do them in this order.
+
+00:09:31.260 --> 00:09:34.820
+So for example, we're gonna do top left for all of them first
+
+00:09:34.820 --> 00:09:35.660
+in this order.
+
+00:09:35.660 --> 00:09:42.100
+we do top left there, one, top left there, two, and then three, and then four. And now
+
+00:09:42.100 --> 00:09:49.100
+we come down to here and we do them in this order. So there's five, six, seven, eight.
+
+00:09:49.100 --> 00:09:56.260
+Now we're going to do that one in all of them in that order. So that's now nine, ten,
+
+00:09:56.260 --> 00:10:03.260
+11, 12 and finally 13, 14, 15, 16.
+
+00:10:04.620 --> 00:10:07.140
+And you could repeat this and do an 8 by 8,
+
+00:10:07.140 --> 00:10:08.860
+or a 16 by 16 and so on.
+
+00:10:08.860 --> 00:10:10.980
+It's a fantastic little recursive algorithm.
+
+00:10:10.980 --> 00:10:13.900
+And if you turn the pixels on and off in this order,
+
+00:10:13.900 --> 00:10:18.140
+you get a fantastic range of shades of gray.
+
+00:10:18.980 --> 00:10:20.980
+But what would that look like?
+
+00:10:20.980 --> 00:10:22.540
+Back out in the real world.
+
+00:10:22.540 --> 00:10:24.620
+Welcome back to the scene from before.
+
+00:10:24.620 --> 00:10:28.420
+we're still in the 2x2 Bayer filter
+
+00:10:28.420 --> 00:10:31.760
+and just take a little note of what you can and can't see.
+
+00:10:31.760 --> 00:10:32.600
+And ready?
+
+00:10:32.600 --> 00:10:34.620
+Here's the 4x4.
+
+00:10:34.620 --> 00:10:36.020
+Isn't that special?
+
+00:10:36.020 --> 00:10:37.780
+You can see these bricks.
+
+00:10:37.780 --> 00:10:38.620
+Ready?
+
+00:10:38.620 --> 00:10:39.620
+Okay, back to 2x2.
+
+00:10:39.620 --> 00:10:40.620
+They gone.
+
+00:10:40.620 --> 00:10:42.140
+4x4, they're back.
+
+00:10:42.140 --> 00:10:43.980
+You can see all the brickwork over here.
+
+00:10:43.980 --> 00:10:46.180
+Look at the background and my face.
+
+00:10:46.180 --> 00:10:48.380
+In fact, if we do, we'll do a split screen
+
+00:10:48.380 --> 00:10:49.940
+as soon as this car comes through.
+
+00:10:49.940 --> 00:10:51.100
+You ought to do it now.
+
+00:10:51.100 --> 00:10:52.060
+I'm over here.
+
+00:10:52.060 --> 00:10:53.940
+This is the 2x2 side
+
+00:10:53.940 --> 00:10:56.460
+where that car is just driven through.
+
+00:10:56.460 --> 00:10:59.420
+Ah, look at the emotion you can see now.
+
+00:10:59.420 --> 00:11:01.140
+And if you're thinking, well hang on,
+
+00:11:01.140 --> 00:11:04.220
+if the 4x4 is this good, imagine the 8x8.
+
+00:11:04.220 --> 00:11:06.260
+But here's the 8x8.
+
+00:11:06.260 --> 00:11:07.500
+It's the same.
+
+00:11:07.500 --> 00:11:08.820
+Here's 16.
+
+00:11:08.820 --> 00:11:11.300
+Above a point, it doesn't make a big difference.
+
+00:11:11.300 --> 00:11:12.820
+So for this scene at the resolution,
+
+00:11:12.820 --> 00:11:16.540
+we're using the 4x4, what a winner.
+
+00:11:16.540 --> 00:11:17.620
+So there's your two options.
+
+00:11:17.620 --> 00:11:19.460
+Use completely random thresholds
+
+00:11:19.460 --> 00:11:20.900
+and get a nice organic look,
+
+00:11:20.900 --> 00:11:23.820
+but maybe not as many nice separations
+
+00:11:23.820 --> 00:11:25.380
+of grays as we would like.
+
+00:11:25.380 --> 00:11:28.140
+Or you use something ordered like Bayer Dithering,
+
+00:11:28.140 --> 00:11:30.100
+you get loads of nice distinct grays,
+
+00:11:30.100 --> 00:11:34.060
+but you get a weird repeating newspaper-esque lock.
+
+00:11:34.060 --> 00:11:36.060
+Are you only two options of a fraud?
+
+00:11:36.060 --> 00:11:39.500
+It's not like there's some fantastic third option
+
+00:11:39.500 --> 00:11:41.340
+in the middle, with the best of both.
+
+00:11:41.340 --> 00:11:42.460
+Of course there is.
+
+00:11:42.460 --> 00:11:44.340
+It's called blue noise.
+
+00:11:44.340 --> 00:11:46.900
+Instead of using pure random noise,
+
+00:11:46.900 --> 00:11:50.860
+you can use blue noise and you get much better grays.
+
+00:11:50.860 --> 00:11:53.460
+And here's blue noise out in the wild.
+
+00:11:53.460 --> 00:11:55.500
+You don't even know what this scene looks like.
+
+00:11:55.500 --> 00:11:57.180
+All you can see is this dithered version,
+
+00:11:57.180 --> 00:11:58.260
+but it's not bad.
+
+00:11:58.260 --> 00:11:59.560
+Look at the posts.
+
+00:11:59.560 --> 00:12:02.920
+The posts like you can see they get darker as you go back.
+
+00:12:02.920 --> 00:12:05.780
+You can almost make out there's like brickwork and tiles.
+
+00:12:05.780 --> 00:12:07.620
+Just have a look at what detail you can get.
+
+00:12:07.620 --> 00:12:11.020
+We can also compare this to pure random.
+
+00:12:11.020 --> 00:12:12.580
+Actually, we can do our split screen again.
+
+00:12:12.580 --> 00:12:15.460
+So I'm blue, blue noise on this side,
+
+00:12:16.420 --> 00:12:18.780
+random noise on this side, or come with me,
+
+00:12:18.780 --> 00:12:21.500
+round over here, past producing a call with the bounce,
+
+00:12:21.500 --> 00:12:23.620
+because it makes so much difference
+
+00:12:23.620 --> 00:12:25.700
+once we've did it the shot.
+
+00:12:25.700 --> 00:12:28.060
+There's a tree, there you go.
+
+00:12:28.060 --> 00:12:30.020
+Blue noise and random noise.
+
+00:12:30.020 --> 00:12:30.980
+You be the judge.
+
+00:12:30.980 --> 00:12:32.460
+Right, we all love blue noise,
+
+00:12:32.460 --> 00:12:33.740
+but what actually is it?
+
+00:12:33.740 --> 00:12:37.140
+And how does it differ from true random noise?
+
+00:12:37.140 --> 00:12:39.140
+If we were to extract our random thresholds
+
+00:12:39.140 --> 00:12:41.060
+for every pixel and just visualize them
+
+00:12:41.060 --> 00:12:43.140
+going from white to black, it would look like this.
+
+00:12:43.140 --> 00:12:43.980
+There you go.
+
+00:12:43.980 --> 00:12:46.940
+It's just standard random noise.
+
+00:12:46.940 --> 00:12:51.220
+Blue noise looks like this subtly different.
+
+00:12:51.220 --> 00:12:55.900
+So in the true random, your brain is doing human brain things.
+
+00:12:55.900 --> 00:12:57.220
+It's looking for patterns.
+
+00:12:57.220 --> 00:13:00.340
+You might be spotting some threads or filaments in there
+
+00:13:00.340 --> 00:13:02.580
+because real random noise clumps.
+
+00:13:02.580 --> 00:13:04.500
+Like you're gonna have hotspots and cold spots
+
+00:13:04.500 --> 00:13:08.660
+at every different scale, whereas blue random noise.
+
+00:13:08.660 --> 00:13:11.300
+That's a lot more like, it was like remember when,
+
+00:13:11.300 --> 00:13:13.780
+well some of you might remember when the iPod shuffle came out
+
+00:13:13.780 --> 00:13:16.460
+and it was true random and everyone got upset
+
+00:13:16.460 --> 00:13:17.420
+because they're occasionally here
+
+00:13:17.420 --> 00:13:18.940
+the same song twice in a row.
+
+00:13:18.940 --> 00:13:20.700
+Yes, because that's randomness.
+
+00:13:20.700 --> 00:13:23.220
+you get every possible string and arrangement
+
+00:13:23.220 --> 00:13:25.460
+in there somewhere, including things repeating,
+
+00:13:25.460 --> 00:13:28.340
+which is why you get like bright spots and dark spots.
+
+00:13:28.340 --> 00:13:30.900
+All people wanted was a shuffle,
+
+00:13:30.900 --> 00:13:34.460
+and blue noise is much closer to being a shuffle.
+
+00:13:34.460 --> 00:13:36.340
+You don't just put things in randomly,
+
+00:13:36.340 --> 00:13:40.540
+you make sure, on average, they're all roughly evenly spaced.
+
+00:13:40.540 --> 00:13:43.540
+It's nicely distributed noise.
+
+00:13:43.540 --> 00:13:45.780
+And you can see that if we blur them both,
+
+00:13:45.780 --> 00:13:48.300
+because if we blur blue noise on a small,
+
+00:13:48.300 --> 00:13:50.340
+like let's say five pixel radius,
+
+00:13:50.340 --> 00:13:53.220
+it goes totally gray, whereas true noise,
+
+00:13:53.220 --> 00:13:55.860
+you can still see hotspots and cold spots.
+
+00:13:55.860 --> 00:13:57.620
+There's still some structure in there
+
+00:13:57.620 --> 00:14:00.260
+because white noise has structure
+
+00:14:00.260 --> 00:14:02.620
+at every frequency, it's white, it's called white noise,
+
+00:14:02.620 --> 00:14:05.060
+whereas blue noise only has variation
+
+00:14:05.060 --> 00:14:06.700
+on very small distances.
+
+00:14:06.700 --> 00:14:08.380
+High frequency, like blue.
+
+00:14:08.380 --> 00:14:13.380
+You also get different color, audio noise,
+
+00:14:13.900 --> 00:14:14.700
+not going near that.
+
+00:14:14.700 --> 00:14:15.940
+I'm pretty sure it's the same thing,
+
+00:14:15.940 --> 00:14:19.780
+but the point is this is not pseudo-random,
+
+00:14:19.780 --> 00:14:23.160
+but it's not true random, it's blue random
+
+00:14:23.160 --> 00:14:25.540
+and it looks a lot better.
+
+00:14:25.540 --> 00:14:27.100
+There's some blue noise, amazing.
+
+00:14:27.100 --> 00:14:28.820
+It's just incredible detail,
+
+00:14:28.820 --> 00:14:30.460
+but you don't get a repeating pattern.
+
+00:14:30.460 --> 00:14:32.700
+And the reason you get the best of both worlds
+
+00:14:32.700 --> 00:14:35.100
+is it is still pretty random,
+
+00:14:35.100 --> 00:14:39.500
+but also it has that same property of Bayer dithering
+
+00:14:39.500 --> 00:14:41.780
+whereas the pixels turn on,
+
+00:14:41.780 --> 00:14:43.220
+the order in which they turn on
+
+00:14:43.220 --> 00:14:44.540
+is very evenly distributed.
+
+00:14:44.540 --> 00:14:46.060
+So if I take this blue noise
+
+00:14:46.060 --> 00:14:48.460
+and I cycle it all away from completely black
+
+00:14:48.460 --> 00:14:52.420
+to completely white and see when the different parts of the filter turn on and,
+
+00:14:52.420 --> 00:14:59.340
+guess, turn off, you'll see at the extremes it's just a bunch of points fairly evenly distributed,
+
+00:14:59.340 --> 00:15:00.500
+but yet randomish.
+
+00:15:00.500 --> 00:15:05.580
+In fact, if we pause it there, if you talk about humans, arrange themselves in a room randomly
+
+00:15:05.580 --> 00:15:11.020
+that end up standing a bit like this because humans would think random means evenly distributed,
+
+00:15:11.020 --> 00:15:12.420
+but a bit offset.
+
+00:15:12.420 --> 00:15:13.420
+It's not a grid.
+
+00:15:13.420 --> 00:15:14.900
+And that's exactly what we get here.
+
+00:15:14.900 --> 00:15:19.900
+Blue noise is what humans think true noise is,
+
+00:15:20.580 --> 00:15:23.660
+but it's not, it's blue noise.
+
+00:15:23.660 --> 00:15:25.020
+If you're thinking, come on Matt,
+
+00:15:25.020 --> 00:15:28.740
+what about the dithering system you came up with?
+
+00:15:28.740 --> 00:15:31.940
+Well, who has to think I'm gonna come up with a course I did
+
+00:15:31.940 --> 00:15:34.380
+and we'll talk about that in a moment,
+
+00:15:34.380 --> 00:15:36.580
+but first I wanna thank the sponsor of this video,
+
+00:15:36.580 --> 00:15:39.380
+Jane Street, because their AMP course
+
+00:15:39.380 --> 00:15:41.740
+is accepting applications now.
+
+00:15:41.740 --> 00:15:45.300
+AMP is Jane Streets' Academy of Math and Programming.
+
+00:15:45.300 --> 00:15:47.260
+It's for recent high school graduates
+
+00:15:47.260 --> 00:15:50.420
+who had some kind of barrier to their education,
+
+00:15:50.420 --> 00:15:54.700
+but they wanted pursue an education in math or computer science.
+
+00:15:54.700 --> 00:15:57.020
+AMP runs from the very end of June,
+
+00:15:57.020 --> 00:15:59.420
+right through to the very end of July, 2026.
+
+00:15:59.420 --> 00:16:00.660
+And over that month, the curriculum
+
+00:16:00.660 --> 00:16:02.500
+will focus on solving problems,
+
+00:16:02.500 --> 00:16:05.180
+involving things like mathematics, computer programming,
+
+00:16:05.180 --> 00:16:07.420
+game theory, and much more.
+
+00:16:07.420 --> 00:16:10.300
+Not only will Jane Streets cover your travel to New York City,
+
+00:16:10.300 --> 00:16:13.100
+accommodation, your food, and all fees associated with the costs.
+
+00:16:13.100 --> 00:16:17.800
+But if you make it onto AMP, they will also give you a $5,000 scholarship to help you
+
+00:16:17.800 --> 00:16:19.000
+further your education.
+
+00:16:19.000 --> 00:16:24.060
+To apply for AMP, you don't need any particular background in finance or coding.
+
+00:16:24.060 --> 00:16:28.660
+You just need to be intellectually curious and have a love of mathematics and computer
+
+00:16:28.660 --> 00:16:29.660
+science.
+
+00:16:29.660 --> 00:16:33.860
+The deadline for applying for AMP, if you are a high school student or you know a high school
+
+00:16:33.860 --> 00:16:37.340
+student and you can pass us on to them, is the 11th of March.
+
+00:16:37.340 --> 00:16:39.380
+So get onto it, it's a huge amount of fun.
+
+00:16:39.380 --> 00:16:41.540
+I go every year so you get to see me,
+
+00:16:41.540 --> 00:16:44.900
+I'm in Ezra Perk, I just love solving the sorts of puzzles
+
+00:16:44.900 --> 00:16:45.740
+that they have at app.
+
+00:16:45.740 --> 00:16:47.980
+In fact, they gave me one recently
+
+00:16:47.980 --> 00:16:49.620
+that I could ever go at.
+
+00:16:49.620 --> 00:16:52.180
+Imagine you're in a three game tennis competition
+
+00:16:52.180 --> 00:16:56.500
+where to be the champion, you have to win two consecutive games.
+
+00:16:56.500 --> 00:17:00.860
+Your opponents are Jenny, the best tennis player in the club,
+
+00:17:00.860 --> 00:17:02.820
+and Carla, who is less good.
+
+00:17:02.820 --> 00:17:05.860
+You either have to play Jenny, Carla, Jenny,
+
+00:17:05.860 --> 00:17:07.260
+or Carla, Jenny, Carla.
+
+00:17:07.260 --> 00:17:12.940
+your non-tennis challenges, which way around would give you the greatest probability of winning
+
+00:17:12.940 --> 00:17:14.340
+two consecutive games?
+
+00:17:14.340 --> 00:17:18.540
+I like this puzzle because there is kind of an intuitive way to look at it, but also
+
+00:17:18.540 --> 00:17:19.780
+you can just work it out.
+
+00:17:19.780 --> 00:17:20.780
+Which I did.
+
+00:17:20.780 --> 00:17:21.780
+Here's all my working.
+
+00:17:21.780 --> 00:17:22.780
+I had a lot of fun doing it.
+
+00:17:22.780 --> 00:17:25.980
+I hope seeing this really clears things up.
+
+00:17:25.980 --> 00:17:29.820
+All the puzzle details will also be in the description if you want to try.
+
+00:17:29.820 --> 00:17:32.060
+As will the details for applying to AMP.
+
+00:17:32.060 --> 00:17:33.060
+Thank you so much.
+
+00:17:33.060 --> 00:17:35.820
+I mean, I know this is not for everyone, but if you are that high school student or you
+
+00:17:35.820 --> 00:17:38.700
+you know someone who is, this could be a life-changing opportunity.
+
+00:17:38.700 --> 00:17:40.100
+So please do spread the word.
+
+00:17:40.100 --> 00:17:42.820
+Huge thanks to Jane Street for not only running AMP,
+
+00:17:42.820 --> 00:17:44.700
+but also sponsoring this video.
+
+00:17:44.700 --> 00:17:46.940
+And now for my dithering technique,
+
+00:17:46.940 --> 00:17:49.340
+because I first came across all of this
+
+00:17:49.340 --> 00:17:52.940
+and got obsessed by it when I watched a bunch of YouTube videos
+
+00:17:52.940 --> 00:17:55.980
+about the mass behind the video game,
+
+00:17:55.980 --> 00:17:58.140
+return of the Obradin.
+
+00:17:58.140 --> 00:18:01.140
+And in that game, everything is black and white-didded.
+
+00:18:01.140 --> 00:18:04.540
+Although within each shot, there's different types of dithering
+
+00:18:04.540 --> 00:18:07.580
+and you move around in 3D but the dithering works.
+
+00:18:07.580 --> 00:18:08.580
+It's just incredible.
+
+00:18:08.580 --> 00:18:10.860
+I will link to the videos I watch below
+
+00:18:10.860 --> 00:18:13.260
+if you wanna check them out, but just got me thinking,
+
+00:18:13.260 --> 00:18:15.860
+oh, you can come up with different types of dithering.
+
+00:18:15.860 --> 00:18:18.020
+In fact, they use new types of dithering
+
+00:18:18.020 --> 00:18:19.220
+for that video game.
+
+00:18:19.220 --> 00:18:20.920
+So I was like, well, I'm gonna do my own.
+
+00:18:20.920 --> 00:18:24.580
+But what could I possibly base Parker dithering on?
+
+00:18:24.580 --> 00:18:29.580
+Well, I thought what about the original Parker thing?
+
+00:18:30.300 --> 00:18:31.420
+I used to Parker Square.
+
+00:18:31.420 --> 00:18:34.900
+I used a three by three grid where that's 29%,
+
+00:18:34.900 --> 00:18:37.540
+1%, 47%, et cetera, thresholds.
+
+00:18:37.540 --> 00:18:40.060
+Now, is that a good way to do it?
+
+00:18:40.060 --> 00:18:40.900
+No.
+
+00:18:40.900 --> 00:18:43.380
+In fact, I'm now Parker Dithered.
+
+00:18:43.380 --> 00:18:46.220
+And you see, so the issue is,
+
+00:18:46.220 --> 00:18:49.140
+because we got some 1%ers here,
+
+00:18:49.140 --> 00:18:50.980
+they're like always white,
+
+00:18:50.980 --> 00:18:53.140
+because what's gonna get below 1%,
+
+00:18:53.140 --> 00:18:55.340
+so you always get this, if you zoom in,
+
+00:18:55.340 --> 00:18:58.100
+these little pair of diagonal pixels,
+
+00:18:58.100 --> 00:18:59.340
+it's just always on.
+
+00:18:59.340 --> 00:19:03.540
+But I think that adds a certain amount of fun texture to a scene.
+
+00:19:03.540 --> 00:19:05.180
+And it works outside as well.
+
+00:19:05.180 --> 00:19:06.780
+Check it out, there's the tree from before.
+
+00:19:06.780 --> 00:19:08.540
+That's not a bad amount of detail.
+
+00:19:08.540 --> 00:19:09.500
+If you come over here,
+
+00:19:09.500 --> 00:19:11.220
+other side of producers Nicole again.
+
+00:19:11.220 --> 00:19:12.420
+You can feel of this.
+
+00:19:12.420 --> 00:19:13.820
+There's your tiles up there.
+
+00:19:13.820 --> 00:19:16.300
+We've got the posts from before.
+
+00:19:16.300 --> 00:19:17.540
+That guy walking through?
+
+00:19:17.540 --> 00:19:18.940
+It's not bad.
+
+00:19:18.940 --> 00:19:21.700
+Even this shot isn't bad with the Parker filter, huh?
+
+00:19:21.700 --> 00:19:23.100
+We've got the spire.
+
+00:19:23.100 --> 00:19:25.580
+And I think that weird texture,
+
+00:19:25.580 --> 00:19:28.460
+nice moody element on the graveyard.
+
+00:19:29.340 --> 00:19:32.180
+And while we're here, thank you for visiting my Myspace page.
