@@ -1,0 +1,864 @@
+WEBVTT
+Kind: captions
+Language: en-GB
+
+00:00:00.000 --> 00:00:06.960
+Uh they say here we conjecture that there exists&nbsp;
+an orthogonal polygon of 46 unit squares that&nbsp;&nbsp;
+
+00:00:06.960 --> 00:00:15.280
+admits to fold these three boxes. So there's&nbsp;
+not people who watch my videos were able to&nbsp;&nbsp;
+
+00:00:15.280 --> 00:00:23.920
+disprove this conjecture as false and discover a&nbsp;
+whole new net that even the best mathematicians&nbsp;&nbsp;
+
+00:00:23.920 --> 00:00:38.160
+at MIT couldn't find. Ah it's so ridiculous.&nbsp;
+Welcome to this year's best breaking mass news.
+
+00:00:38.160 --> 00:00:44.720
+This video is sponsored by Jane Street's 2027&nbsp;
+paid internships. Applications open now. Way&nbsp;&nbsp;
+
+00:00:44.720 --> 00:00:51.920
+back at the end of uh the year of our Lord 2022,&nbsp;
+the smallest known net that could fold into three&nbsp;&nbsp;
+
+00:00:51.920 --> 00:01:00.080
+different cuboids had an area of 532. But people&nbsp;
+who watch these videos found a net with an area&nbsp;&nbsp;
+
+00:01:00.080 --> 00:01:09.600
+of 106. That's so much smaller. It's ridiculous.&nbsp;
+And I will explain the backstory. If you haven't&nbsp;&nbsp;
+
+00:01:09.600 --> 00:01:14.720
+seen the previous video, don't panic. Why this is&nbsp;
+amazing, what we're going to do next. But I need&nbsp;&nbsp;
+
+00:01:14.720 --> 00:01:22.560
+to say not AI found completely by humans. And&nbsp;
+I just want to put a little historical marker&nbsp;&nbsp;
+
+00:01:22.560 --> 00:01:31.440
+down right now in the middle of 2026 that in 2&nbsp;
+months we've gone from me making a video saying&nbsp;&nbsp;
+
+00:01:31.440 --> 00:01:38.240
+this is incredible a large language model found&nbsp;
+some maths to me having to say, "Oh my goodness,&nbsp;&nbsp;
+
+00:01:38.240 --> 00:01:44.400
+we found some maths that wasn't done&nbsp;
+by a large language model." You know,&nbsp;&nbsp;
+
+00:01:44.400 --> 00:01:48.880
+life moves fast. What we're talking&nbsp;
+about here. Oh, and hello new people.&nbsp;&nbsp;
+
+00:01:48.880 --> 00:01:52.720
+Thanks for sticking with me. Uh, nets that&nbsp;
+fold into multiple different boxes. This&nbsp;&nbsp;
+
+00:01:52.720 --> 00:01:58.640
+is the animated gift that started this whole&nbsp;
+thing. I always thought if you unfolded a box,&nbsp;&nbsp;
+
+00:01:58.640 --> 00:02:02.880
+a cuboid into a net, you fold the net&nbsp;
+back up, you get the same box back. No,&nbsp;&nbsp;
+
+00:02:02.880 --> 00:02:07.840
+you can have the same net that folds into multiple&nbsp;
+cuboids. And the smallest such one has an area&nbsp;&nbsp;
+
+00:02:07.840 --> 00:02:17.760
+of 22 squares and folds into these two boxes. But&nbsp;
+that's not the only one. Turns out there are 2,263
+
+00:02:17.760 --> 00:02:22.720
+of these 22 area nets that have that property.&nbsp;
+And so I thought just to mix it up because this&nbsp;&nbsp;
+
+00:02:22.720 --> 00:02:29.280
+is the second video now in apparently a series&nbsp;
+is I've got the website here that has all 2000&nbsp;&nbsp;
+
+00:02:29.280 --> 00:02:37.440
+look at them all all laid out in HTML or uh 2263&nbsp;
+of these nets. So I figure I'll pick one at random&nbsp;&nbsp;
+
+00:02:37.440 --> 00:02:43.200
+and I'll build two copies and we'll fold them into&nbsp;
+two different boxes. So, let's go with this one.&nbsp;&nbsp;
+
+00:02:43.200 --> 00:02:52.320
+That one. Let's do it. Oh, that's a fun one. So,&nbsp;
+the rule with these is that you don't have to cut&nbsp;&nbsp;
+
+00:02:52.320 --> 00:02:58.480
+any of the edges that line up in the net, but the&nbsp;
+corners aren't fixed. So, this next row is going&nbsp;&nbsp;
+
+00:02:58.480 --> 00:03:03.760
+to have I'll do these in stripes. It's going to&nbsp;
+have one there, but those corners aren't fused.&nbsp;&nbsp;
+
+00:03:03.760 --> 00:03:08.960
+But that's that's all going to work out. So, here&nbsp;
+we go. Maybe I can make both of them at the same&nbsp;&nbsp;
+
+00:03:08.960 --> 00:03:21.600
+time if I build them one on top of the other.&nbsp;
+[laughter] Uh, genius or foolish. Let's find out.
+
+00:03:21.600 --> 00:03:26.960
+Maybe this way is easier. There we are.&nbsp;
+Upside down. Two identical nets. Now I've&nbsp;&nbsp;
+
+00:03:26.960 --> 00:03:33.440
+just got to work out how to fold two copies&nbsp;
+of the same net into two different cuboids.&nbsp;&nbsp;
+
+00:03:33.440 --> 00:03:38.000
+Aka the easy bit. If I just start curling&nbsp;
+this up, it should just become a shape,&nbsp;&nbsp;
+
+00:03:38.000 --> 00:03:50.080
+right? This No. What if that was there? Oh, hang&nbsp;
+on. No. Yes. Ah, right. [music] That can go there.
+
+00:03:50.080 --> 00:03:55.920
+So, I'm not undoing and redoing anything. I'm just&nbsp;
+joining edges together [music] as if I was taping.&nbsp;&nbsp;
+
+00:03:55.920 --> 00:04:00.640
+But I learned last time that takes forever. As&nbsp;
+if I was taping a net together. [music] One by&nbsp;&nbsp;
+
+00:04:00.640 --> 00:04:13.200
+one by five. And that goes there. No, no. Oh, hang&nbsp;
+on. That would fit 1x 2x3. These both have an area&nbsp;&nbsp;
+
+00:04:13.200 --> 00:04:23.040
+of 22 and they can unfold into the same net. And&nbsp;
+they can do that 2263 different ways. And if you&nbsp;&nbsp;
+
+00:04:23.040 --> 00:04:27.840
+think about it, I mean, now now I've joined it up,&nbsp;
+you can't tell the difference between the original&nbsp;&nbsp;
+
+00:04:27.840 --> 00:04:33.360
+hinge joins and the new ones I've just made.&nbsp;
+But where I to want to undo this, I have so many&nbsp;&nbsp;
+
+00:04:33.360 --> 00:04:40.160
+choices about exactly which ones I undo until it's&nbsp;
+planer, until it's flat on the ground. And that's&nbsp;&nbsp;
+
+00:04:40.160 --> 00:04:45.760
+that's the combinatorics I get you. When you&nbsp;
+start undoing cuboids into their nets, you just&nbsp;&nbsp;
+
+00:04:45.760 --> 00:04:52.480
+have so many choices, which makes searching for&nbsp;
+these solutions both on one hand very difficult,&nbsp;&nbsp;
+
+00:04:52.480 --> 00:04:57.840
+but on the flip side, it means there can be&nbsp;
+a lot of them. There's over 2,000 of these.&nbsp;&nbsp;
+
+00:04:57.840 --> 00:05:03.840
+So the obvious next question is if you can find&nbsp;
+a net that folds into two different cuboids,&nbsp;&nbsp;
+
+00:05:03.840 --> 00:05:10.320
+is there a net that folds into three&nbsp;
+different cuboids? And for a very long time,&nbsp;&nbsp;
+
+00:05:10.320 --> 00:05:18.160
+ever since 2015, it was known that that was&nbsp;
+possible. But the smallest net ever found had&nbsp;&nbsp;
+
+00:05:18.160 --> 00:05:34.320
+an area of 532 squares. And last time I got&nbsp;
+three copies and I put them together. [music]
+
+00:05:34.320 --> 00:05:38.640
+You know what? I don't know if the people&nbsp;
+who wrote the paper would have ever bothered&nbsp;&nbsp;
+
+00:05:38.640 --> 00:05:45.200
+actually making these. So I very easily could&nbsp;
+be the first human who ever folded the same net&nbsp;&nbsp;
+
+00:05:45.200 --> 00:05:52.400
+into three distinct shapes only with orthogonal&nbsp;
+folds. I mean, conceivably someone else might&nbsp;&nbsp;
+
+00:05:52.400 --> 00:05:55.520
+have done it. The author's working on the&nbsp;
+paper or someone who read it since then,&nbsp;&nbsp;
+
+00:05:55.520 --> 00:06:02.320
+but that was a lot of faf. But now we have a&nbsp;
+brand new discovery of a much smaller net that&nbsp;&nbsp;
+
+00:06:02.320 --> 00:06:09.760
+does the job. So, forget these honestly things&nbsp;
+that fold into two different cuboids. We can fold&nbsp;&nbsp;
+
+00:06:09.760 --> 00:06:15.920
+into three different cuboids. And of course, we&nbsp;
+have to do it with an actual piece of paper. So,&nbsp;&nbsp;
+
+00:06:15.920 --> 00:06:25.280
+oh, here it comes. So here we have our newly&nbsp;
+discovered net. And while 106 squares is very&nbsp;&nbsp;
+
+00:06:25.280 --> 00:06:32.800
+small compared to the previous record holder,&nbsp;
+it is given we've printed these at a reasonable&nbsp;&nbsp;
+
+00:06:32.800 --> 00:06:40.320
+size. It is still a very big piece of paper. But&nbsp;
+don't worry, I'm, you know, if nothing but not&nbsp;&nbsp;
+
+00:06:40.320 --> 00:06:49.040
+dedicated to physically cutting these things out.&nbsp;
+Um, as dedicated as I am to ridiculous sight gags,&nbsp;&nbsp;
+
+00:06:49.040 --> 00:06:53.760
+I now have three identical copies. We brought the&nbsp;
+other two in off camera. And you can see they're&nbsp;&nbsp;
+
+00:06:53.760 --> 00:06:57.680
+they're all exactly the same. We've just done&nbsp;
+them in different colors. You can kind of tell&nbsp;&nbsp;
+
+00:06:57.680 --> 00:07:05.520
+them apart. And what I'm going to do is fold each&nbsp;
+one of these up differently to end up with three&nbsp;&nbsp;
+
+00:07:05.520 --> 00:07:11.040
+distinct cuboids. Actually, I'll put two of&nbsp;
+them down there. We'll do Let's do the green&nbsp;&nbsp;
+
+00:07:11.040 --> 00:07:21.280
+one first. And as is tradition, I'm [music] just&nbsp;
+going to tape it together. It's not perfect, FYI,&nbsp;&nbsp;
+
+00:07:21.280 --> 00:07:29.600
+just in case you were fooled by my incredible&nbsp;
+assembly. But there it is. There is the first&nbsp;&nbsp;
+
+00:07:29.600 --> 00:07:41.760
+of three cuboids. Oh no. This one has a real 1x 2&nbsp;
+by N vibe to it. Okay, I think that's the end. So,&nbsp;&nbsp;
+
+00:07:41.760 --> 00:07:46.560
+if I stick the end, I can turn around and go back&nbsp;
+the other way. And while I'm doing this, it's a&nbsp;&nbsp;
+
+00:07:46.560 --> 00:07:52.000
+good time to thank the sponsor of this video, Jane&nbsp;
+Street. So, they're a quantitive trading firm and&nbsp;&nbsp;
+
+00:07:52.000 --> 00:07:57.600
+applications for their internships next year,&nbsp;
+2027. Uh, the applications are now open. There&nbsp;&nbsp;
+
+00:07:57.600 --> 00:08:02.480
+aren't many prerequisites as well. Jane Street&nbsp;
+internships are just looking for people who are&nbsp;&nbsp;
+
+00:08:02.480 --> 00:08:07.360
+intellectually curious and enjoy collaborative&nbsp;
+problem solving. Oh, and at the moment with an&nbsp;&nbsp;
+
+00:08:07.360 --> 00:08:12.960
+extra focus on cutting edge machine learning&nbsp;
+applications, the applicants can be anywhere&nbsp;&nbsp;
+
+00:08:12.960 --> 00:08:20.160
+in the world. Last year we had interns from over&nbsp;
+117 different schools across 32 countries. And&nbsp;&nbsp;
+
+00:08:20.160 --> 00:08:25.440
+we're looking forward to similar numbers this year&nbsp;
+going between the Hong Kong, New York, London, and&nbsp;&nbsp;
+
+00:08:25.440 --> 00:08:32.640
+now Singapore offices. Oh. Um, yeah. And during&nbsp;
+your internship, you will be able to meaningfully&nbsp;&nbsp;
+
+00:08:32.640 --> 00:08:39.200
+contribute to projects as well as learning from&nbsp;
+their their highly enthusiastic, passionate staff&nbsp;&nbsp;
+
+00:08:39.200 --> 00:08:44.480
+that come from a very wide range of academic and&nbsp;
+industrial backgrounds. [snorts] And finally,&nbsp;&nbsp;
+
+00:08:44.480 --> 00:08:49.600
+you don't need any specific finance background.&nbsp;
+Most people at J Street started exactly where&nbsp;&nbsp;
+
+00:08:49.600 --> 00:08:54.160
+you were. They were just a curious individual&nbsp;
+who got hooked on one of the topics available&nbsp;&nbsp;
+
+00:08:54.160 --> 00:08:58.720
+at the internships. Be it quantitive trading,&nbsp;
+machine learning, software engineering, research,&nbsp;&nbsp;
+
+00:08:58.720 --> 00:09:04.560
+strategy, product, institutional sales, trading,&nbsp;
+and more. You name it, they cover it. I mean,&nbsp;&nbsp;
+
+00:09:04.560 --> 00:09:09.040
+as long as what you name pertains to quantitative&nbsp;
+trading. So, thank you so much to Jane Street for&nbsp;&nbsp;
+
+00:09:09.040 --> 00:09:14.320
+sponsoring this as well as so many of my other&nbsp;
+videos. If the internship sounds like something&nbsp;&nbsp;
+
+00:09:14.320 --> 00:09:18.480
+you would like to do or you know someone for&nbsp;
+whom it might be appropriate, please do send&nbsp;&nbsp;
+
+00:09:18.480 --> 00:09:23.920
+them the link that's in the description or scan&nbsp;
+the QR code that's on the screen right now.&nbsp;&nbsp;
+
+00:09:23.920 --> 00:09:35.280
+Thank you, Jane Street. Now, I better get back&nbsp;
+to paying attention to this ridiculous cuboid.
+
+00:09:35.280 --> 00:09:41.920
+Took a little more tape on the outside&nbsp;
+than I appreciate, but second cuboid. So,&nbsp;&nbsp;
+
+00:09:41.920 --> 00:09:49.760
+now we've got that one and that one. One more to&nbsp;
+go. Just by sheer luck of the draw. Technically,&nbsp;&nbsp;
+
+00:09:49.760 --> 00:10:00.560
+I've left the easy one till last&nbsp;
+for some definition of easy.
+
+00:10:00.560 --> 00:10:06.960
+Okay, [laughter] there. There it is. All right.&nbsp;
+I was about to say not my best taping work,&nbsp;&nbsp;
+
+00:10:06.960 --> 00:10:12.240
+but I am disproportionately proud of that&nbsp;
+because even though it looks a little bit janky,&nbsp;&nbsp;
+
+00:10:12.240 --> 00:10:16.240
+that was a tough folding tape. That might be&nbsp;
+the most complex one I've done on the channel,&nbsp;&nbsp;
+
+00:10:16.240 --> 00:10:23.120
+but there you are. That is uh 26 squares this&nbsp;
+way by one by one for a total surface area&nbsp;&nbsp;
+
+00:10:23.120 --> 00:10:32.480
+of 106. Uh back here, this one was 17 up and&nbsp;
+down by 2x 1 for a total surface area of 106.&nbsp;&nbsp;
+
+00:10:32.480 --> 00:10:39.280
+And then this one here, 8x 5x 1 for a total&nbsp;
+surface area, you can work this out yourself,&nbsp;&nbsp;
+
+00:10:39.280 --> 00:10:49.200
+of 106. So there you are. Three different cuboids&nbsp;
+all folded from exactly the same net. The shape&nbsp;&nbsp;
+
+00:10:49.200 --> 00:10:56.800
+that mathematicians couldn't find. The best&nbsp;
+they could do is 532. But you, and I mean&nbsp;&nbsp;
+
+00:10:56.800 --> 00:11:03.680
+literally you, people who watch these videos&nbsp;
+found this one. And as for how that happened,&nbsp;&nbsp;
+
+00:11:03.680 --> 00:11:10.400
+well, funny story. This is the 2013 paper that&nbsp;
+started our adventure. Common developments,&nbsp;&nbsp;
+
+00:11:10.400 --> 00:11:18.480
+which just means like nets that are the same of&nbsp;
+three inongruent, so three different orthogonal&nbsp;&nbsp;
+
+00:11:18.480 --> 00:11:22.880
+boxes, which I'll occasionally call boys and&nbsp;
+orthogonal just means right angles, well behaved,&nbsp;&nbsp;
+
+00:11:22.880 --> 00:11:26.640
+all that. I'm going to highlight Rahu, one of&nbsp;
+the authors. We're going to meet them a couple&nbsp;&nbsp;
+
+00:11:26.640 --> 00:11:31.120
+times. And everyone here is based at the Japan&nbsp;
+Advanced Institute of Science and Technology.&nbsp;&nbsp;
+
+00:11:31.120 --> 00:11:35.280
+And down here in the paper, uh there's the net.&nbsp;
+There it is. That's the one that I cut out and&nbsp;&nbsp;
+
+00:11:35.280 --> 00:11:42.640
+made last time. Area 532. This was the initial&nbsp;
+announcement of that net, the world record for&nbsp;&nbsp;
+
+00:11:42.640 --> 00:11:47.280
+a long time afterwards. And they raised the two&nbsp;
+questions that over a decade later we solved.&nbsp;&nbsp;
+
+00:11:47.280 --> 00:11:52.160
+Finding much smaller polygons would be future&nbsp;
+work. They were correct. And in particular,&nbsp;&nbsp;
+
+00:11:52.160 --> 00:11:57.520
+is there a common development of area 46 that can&nbsp;
+fold into three boxes? And they happen to give the&nbsp;&nbsp;
+
+00:11:57.520 --> 00:12:01.440
+sizes there. I just want to highlight down here.&nbsp;
+These are a lot of the characters you'll see&nbsp;&nbsp;
+
+00:12:01.440 --> 00:12:06.720
+repeating as well as the Japan Advanced Institute&nbsp;
+of Science and Technology. Uh you got the domains&nbsp;&nbsp;
+
+00:12:06.720 --> 00:12:11.520
+going on in here. In fact, we'll see Eric domain&nbsp;
+a bunch. They're all at MIT. That's the other&nbsp;&nbsp;
+
+00:12:11.520 --> 00:12:17.040
+major institution that's been heavily involved&nbsp;
+in this work. Oh, and here you go. This paper,&nbsp;&nbsp;
+
+00:12:17.040 --> 00:12:21.840
+there's Ruhigh kicking around. You've also got&nbsp;
+the domains. Very excited about that. And here's&nbsp;&nbsp;
+
+00:12:21.840 --> 00:12:30.560
+a deep standup mass cut. This is Zack. Zach is at&nbsp;
+MIT and they designed the paper clip monstrosity&nbsp;&nbsp;
+
+00:12:30.560 --> 00:12:37.280
+that Adam Savage and I struggled to build. The&nbsp;
+next major milestone was 2022 when I released a&nbsp;&nbsp;
+
+00:12:37.280 --> 00:12:41.760
+video on the subject. Now, a stand-up math video&nbsp;
+coming out is always a major historical event,&nbsp;&nbsp;
+
+00:12:41.760 --> 00:12:46.480
+but in this occasion, it's because I also reached&nbsp;
+out to a bunch of nerds. Shout out to Landon,&nbsp;&nbsp;
+
+00:12:46.480 --> 00:12:53.440
+Benjamin, and Stu, who all got heavily involved.&nbsp;
+But I just basically emailed all the viewers who&nbsp;&nbsp;
+
+00:12:53.440 --> 00:13:01.280
+previously had dramatically improved some code I'd&nbsp;
+written. It's true. A viewer says, "One of you,&nbsp;&nbsp;
+
+00:13:01.280 --> 00:13:07.600
+I'm holding you all collectively responsible,&nbsp;
+took some terrible Python code of mine and made&nbsp;&nbsp;
+
+00:13:07.600 --> 00:13:16.400
+it over 4 million% better, which is to say it&nbsp;
+achieved the same thing, but faster." Yeah,&nbsp;&nbsp;
+
+00:13:16.400 --> 00:13:22.080
+it jerks a lot of you. No, I'm kidding. I love&nbsp;
+I love my viewers who get uh unduly involved and&nbsp;&nbsp;
+
+00:13:22.080 --> 00:13:27.520
+so thanks to these three who really picked up the&nbsp;
+net idea and ran with it. We didn't find anything&nbsp;&nbsp;
+
+00:13:27.520 --> 00:13:32.640
+before my video came out. Afterwards, Michael&nbsp;
+got involved. They actually put a comment on my&nbsp;&nbsp;
+
+00:13:32.640 --> 00:13:37.360
+Patreon page saying that they had some ideas.&nbsp;
+I put them in touch with the others. They all&nbsp;&nbsp;
+
+00:13:37.360 --> 00:13:45.760
+started working on it in earnest. And then 2023,&nbsp;
+Michael did it. Michael just found a 106 area net.&nbsp;&nbsp;
+
+00:13:45.760 --> 00:13:51.760
+and they let me know by just emailing me a photo&nbsp;
+of it. So, this just appeared in my inbox a brand&nbsp;&nbsp;
+
+00:13:51.760 --> 00:13:58.160
+new bit of mathematics. No one to no one except&nbsp;
+for the small squad of nerds who watch my videos&nbsp;&nbsp;
+
+00:13:58.160 --> 00:14:05.040
+and me. I of course reached out to the folks at&nbsp;
+MIT and in 2024 MIT got involved and huge thanks&nbsp;&nbsp;
+
+00:14:05.040 --> 00:14:11.040
+to Alice, Jenny and Eric got involved, helped&nbsp;
+organize the process, contributed new ideas. Jenny&nbsp;&nbsp;
+
+00:14:11.040 --> 00:14:16.080
+particularly worked with Michael to tease out&nbsp;
+some extra aspects of the mathematics involved.&nbsp;&nbsp;
+
+00:14:16.080 --> 00:14:21.920
+And we also got Ruhigh. It's the whole it's the&nbsp;
+dream team, the super group of mathematicians&nbsp;&nbsp;
+
+00:14:21.920 --> 00:14:27.120
+because everyone had their actual you know real&nbsp;
+research to be doing and day jobs in the case of&nbsp;&nbsp;
+
+00:14:27.120 --> 00:14:33.440
+Michael. It took a while to work through all the&nbsp;
+mathematics. uh but by 2025 we had the paper being&nbsp;&nbsp;
+
+00:14:33.440 --> 00:14:37.440
+written up pretty much finished and then we had to&nbsp;
+look for a place to get it published conferences&nbsp;&nbsp;
+
+00:14:37.440 --> 00:14:43.760
+to go to and that's why in 2026 we are finally&nbsp;
+announcing this breakthrough discovery and by&nbsp;&nbsp;
+
+00:14:43.760 --> 00:14:49.600
+now you're probably thinking hang on a second&nbsp;
+how did we even find this now it wasn't just&nbsp;&nbsp;
+
+00:14:49.600 --> 00:14:54.160
+having more compute time and it wasn't just&nbsp;
+making the code more efficient although both&nbsp;&nbsp;
+
+00:14:54.160 --> 00:15:00.880
+those things did happen in fact those combined&nbsp;
+is we're able to disprove 46 so we now know there&nbsp;&nbsp;
+
+00:15:00.880 --> 00:15:06.000
+are no solutions with an area of 46. So we're&nbsp;
+moving the lower bound up. But on top of that,&nbsp;&nbsp;
+
+00:15:06.000 --> 00:15:14.560
+Michael had an extra insight into types of nets&nbsp;
+that are more likely to have this property. So&nbsp;&nbsp;
+
+00:15:14.560 --> 00:15:25.520
+we haven't done an exhaustive search at 106 or&nbsp;
+below that, but we have found 40 distinct nets all&nbsp;&nbsp;
+
+00:15:25.520 --> 00:15:31.760
+with an area of 106 that fold into three different&nbsp;
+cuboids. And well, what Michael realized is that a&nbsp;&nbsp;
+
+00:15:31.760 --> 00:15:41.600
+lot of the solutions are probably going to have a&nbsp;
+one by one by n and one by one by n's have certain&nbsp;&nbsp;
+
+00:15:41.600 --> 00:15:49.280
+properties in our final paper. Oh, and check out I&nbsp;
+mean there's a mass vengers if I've ever seen them&nbsp;&nbsp;
+
+00:15:49.280 --> 00:15:54.960
+assemble and polyomino nets is just saying squares&nbsp;
+joined together on the edges. No funny business.&nbsp;&nbsp;
+
+00:15:54.960 --> 00:16:00.400
+So you can see Michael's breakthrough down here in&nbsp;
+the official diagram announcing this net and you&nbsp;&nbsp;
+
+00:16:00.400 --> 00:16:04.960
+can see the different folding lines. So same net&nbsp;
+but you do subtly different folds for the three&nbsp;&nbsp;
+
+00:16:04.960 --> 00:16:08.960
+different cuboids. Here they are all overlaid.&nbsp;
+If you think about the folding that gives you&nbsp;&nbsp;
+
+00:16:08.960 --> 00:16:15.200
+the one by one by 26. You can see here there's&nbsp;
+always batches of four squares. Four squares.&nbsp;&nbsp;
+
+00:16:15.200 --> 00:16:21.360
+Four squares for every single horizontal row. And&nbsp;
+this diagram has exactly four squares in a row.&nbsp;&nbsp;
+
+00:16:21.360 --> 00:16:28.560
+And that's because each of these rolls up to form&nbsp;
+a little band. And there's, you know, 26 of these&nbsp;&nbsp;
+
+00:16:28.560 --> 00:16:34.640
+which forms a long tube. And then you got one at&nbsp;
+each end for the caps. It's a very neat insight.&nbsp;&nbsp;
+
+00:16:34.640 --> 00:16:39.760
+And we can show you how we built on this with&nbsp;
+a slightly less complicated but equivalent type&nbsp;&nbsp;
+
+00:16:39.760 --> 00:16:45.120
+of net. Okay. So, I'm just going to kind of hold&nbsp;
+this one together. This is a 1x3x5. There's its&nbsp;&nbsp;
+
+00:16:45.120 --> 00:16:51.520
+net. And if I unfold that, it also becomes a 1x&nbsp;
+one by n. And I and as I roll it up, you notice,&nbsp;&nbsp;
+
+00:16:51.520 --> 00:16:56.960
+wait a minute, as I'm rolling this, these are&nbsp;
+all four. These are all like bands of four. And&nbsp;&nbsp;
+
+00:16:56.960 --> 00:17:02.160
+that kind of makes sense because each one rolls&nbsp;
+all the way around uh the one by one by end. So&nbsp;&nbsp;
+
+00:17:02.160 --> 00:17:07.440
+each one just becomes another band this way and&nbsp;
+you go all the way along and then you get the end&nbsp;&nbsp;
+
+00:17:07.440 --> 00:17:13.520
+caps. And actually, if you unfold the net, that's&nbsp;
+kind of obvious. And we've got a colored in one.&nbsp;&nbsp;
+
+00:17:13.520 --> 00:17:20.000
+So, this was Michael's big insight is you end&nbsp;
+up with basically stacked rows of four, which&nbsp;&nbsp;
+
+00:17:20.000 --> 00:17:24.320
+I'll I'll fold them all out here. So, the single&nbsp;
+one at the top and then we've colored them four,&nbsp;&nbsp;
+
+00:17:24.320 --> 00:17:29.280
+four, four, four, four all the way down. And then&nbsp;
+when you roll that up into your one by one by N,&nbsp;&nbsp;
+
+00:17:29.280 --> 00:17:36.080
+all of these form colored stripes that go all&nbsp;
+the way around. But then if we do it the other&nbsp;&nbsp;
+
+00:17:36.080 --> 00:17:43.200
+way around, and this will take me a second&nbsp;
+to um fold it up in the other orientation.&nbsp;&nbsp;
+
+00:17:43.200 --> 00:17:48.480
+I'll make these files available. By the way,&nbsp;
+it's kind of f like it's not obvious where&nbsp;&nbsp;
+
+00:17:48.480 --> 00:17:54.960
+all the folds go as you may remember from when&nbsp;
+I was doing the um much more complicated. Oh,&nbsp;&nbsp;
+
+00:17:54.960 --> 00:18:02.880
+that goes out there. Uh 22 one earlier. There&nbsp;
+we go. That goes there. That goes there.
+
+00:18:08.880 --> 00:18:15.680
+Okay. So, I haven't taped it together, but you can&nbsp;
+see those stripes now go the other way around on&nbsp;&nbsp;
+
+00:18:15.680 --> 00:18:24.640
+the 1x 3x5. So, they've kind of each one combines&nbsp;
+and and goes goes around it that way there. So,&nbsp;&nbsp;
+
+00:18:24.640 --> 00:18:30.720
+the fact that we could reduce the search space&nbsp;
+from just any old combinations of squares stuck&nbsp;&nbsp;
+
+00:18:30.720 --> 00:18:36.240
+together to ones with these stripes that go in&nbsp;
+different directions meant that it was searchable&nbsp;&nbsp;
+
+00:18:36.240 --> 00:18:43.440
+and it meant that we were able to find this one.&nbsp;
+And with one extra insight and a matrix, we could&nbsp;&nbsp;
+
+00:18:43.440 --> 00:18:49.040
+find multitudes of these. Over here in the same&nbsp;
+paper, you can see where Michael gave the exact&nbsp;&nbsp;
+
+00:18:49.040 --> 00:18:54.160
+same example to show how the stripes when you got&nbsp;
+your one by one then align up into a different&nbsp;&nbsp;
+
+00:18:54.160 --> 00:19:00.720
+one. But that's not the only direction we took&nbsp;
+it. These nets were excluding the caps on either&nbsp;&nbsp;
+
+00:19:00.720 --> 00:19:05.680
+end. Every single row has four squares that forms&nbsp;
+a complete band all the way around the cuboid are&nbsp;&nbsp;
+
+00:19:05.680 --> 00:19:10.320
+called stacked nets. And we found a whole bunch&nbsp;
+of these specifically as well as the kind of&nbsp;&nbsp;
+
+00:19:10.320 --> 00:19:16.640
+canonical first one that was found. It turns out&nbsp;
+there were 15 of them. We found 15 common stacked&nbsp;&nbsp;
+
+00:19:16.640 --> 00:19:21.600
+nets. Now, a while ago, I promised 40. So, you're&nbsp;
+thinking, where are the other 25? Well, it turns&nbsp;&nbsp;
+
+00:19:21.600 --> 00:19:27.040
+out stack nets aren't the only option. Down here,&nbsp;
+we have, check this out, right? So, we still have&nbsp;&nbsp;
+
+00:19:27.040 --> 00:19:33.600
+the end caps, one of each. Every single row still&nbsp;
+has four squares, but now they're not contiguous.&nbsp;&nbsp;
+
+00:19:33.600 --> 00:19:40.160
+So, it can go down and come back up again. So&nbsp;
+there's still four squares here that will form a&nbsp;&nbsp;
+
+00:19:40.160 --> 00:19:46.800
+band, but it's not like before where they already&nbsp;
+start joined together. So it's a more complicated&nbsp;&nbsp;
+
+00:19:46.800 --> 00:19:52.320
+way of doing it. These are called simple phase&nbsp;
+nets. And these provided the other 25. And once&nbsp;&nbsp;
+
+00:19:52.320 --> 00:19:56.720
+you take out uh the ones that are equivalent&nbsp;
+because they're like, you know, symmetric, you&nbsp;&nbsp;
+
+00:19:56.720 --> 00:20:01.680
+know, they match up. So the 25 new nets were found&nbsp;
+for a total of 40. Now there's loads more in this&nbsp;&nbsp;
+
+00:20:01.680 --> 00:20:06.960
+paper, but I do want to um highlight this matrix.&nbsp;
+This may be one of my favorite things that came&nbsp;&nbsp;
+
+00:20:06.960 --> 00:20:13.600
+out of it. So if we go back to that simple phase&nbsp;
+um one here, you can see actually there are seven&nbsp;&nbsp;
+
+00:20:13.600 --> 00:20:19.200
+different possible options for each of the layers,&nbsp;
+right? So you got seven uh different arrangements&nbsp;&nbsp;
+
+00:20:19.200 --> 00:20:24.160
+of the four squares in a way such they can all&nbsp;
+join together to form a complete, you know,&nbsp;&nbsp;
+
+00:20:24.160 --> 00:20:30.400
+one piece net. And depending on what one you've&nbsp;
+got above, there are a number of different ones in&nbsp;&nbsp;
+
+00:20:30.400 --> 00:20:36.960
+different positions that you can put underneath.&nbsp;
+And so this matrix is keeping track for any one of&nbsp;&nbsp;
+
+00:20:36.960 --> 00:20:42.640
+those seven states above which ones can possibly&nbsp;
+go underneath it. And you got that little 16 out&nbsp;&nbsp;
+
+00:20:42.640 --> 00:20:48.080
+the front there. That's because the caps each&nbsp;
+have four options each for where they can go.&nbsp;&nbsp;
+
+00:20:48.080 --> 00:20:52.400
+So you can understand the space of all possible&nbsp;
+combinations of these seven different layers&nbsp;&nbsp;
+
+00:20:52.400 --> 00:20:57.680
+and the simple phase nets using this matrix.&nbsp;
+I don't get like lost in the weeds here. Um,&nbsp;&nbsp;
+
+00:20:57.680 --> 00:21:04.400
+but of course you got a matrix, you're going to&nbsp;
+have an igon value. And the iggon value gives us a&nbsp;&nbsp;
+
+00:21:04.400 --> 00:21:11.040
+sense of how fast the number of possible solutions&nbsp;
+grows as you have more layers. Just one more&nbsp;&nbsp;
+
+00:21:11.040 --> 00:21:16.000
+really nice bit of mathematics that came out in&nbsp;
+the process of putting together this this. I mean,&nbsp;&nbsp;
+
+00:21:16.000 --> 00:21:20.480
+I'm very proud of it. Phenomenal. And despite my&nbsp;
+trivial contribution, Michael should be very proud&nbsp;&nbsp;
+
+00:21:20.480 --> 00:21:26.400
+of this. Uh, what a paper. There is loads more&nbsp;
+lovely mathematics in the paper. So, of course,&nbsp;&nbsp;
+
+00:21:26.400 --> 00:21:31.360
+I will link to it in the description below, just&nbsp;
+below the link to the Jane Street internships. Do&nbsp;&nbsp;
+
+00:21:31.360 --> 00:21:36.560
+check those out. But what I love the most about&nbsp;
+the paper is if you look at the author list,&nbsp;&nbsp;
+
+00:21:36.560 --> 00:21:43.120
+everyone's here. The researchers from Japan, the&nbsp;
+researchers from MIT, the people who bully me by&nbsp;&nbsp;
+
+00:21:43.120 --> 00:21:49.040
+writing more efficient code and putting it in my&nbsp;
+YouTube comments. Uh, Michael with his big insight&nbsp;&nbsp;
+
+00:21:49.040 --> 00:21:55.440
+that he just put as a comment on Patreon. We got&nbsp;
+producer Nicole and we got me. I'm now a co-author&nbsp;&nbsp;
+
+00:21:55.440 --> 00:22:02.240
+on a paper with Eric Domain and it's thanks to the&nbsp;
+phenomenal community of people who you like you're&nbsp;&nbsp;
+
+00:22:02.240 --> 00:22:07.680
+great humans. You watch my videos and you get&nbsp;
+involved. Speaking of getting involved, we still&nbsp;&nbsp;
+
+00:22:07.680 --> 00:22:13.360
+got some open questions here, don't we? So, we&nbsp;
+now know that 106 is possible for three different&nbsp;&nbsp;
+
+00:22:13.360 --> 00:22:20.960
+cuboids. We know 46 is impossible. There's&nbsp;
+a bunch of numbers between those two values.&nbsp;&nbsp;
+
+00:22:20.960 --> 00:22:26.560
+probably like 59 of I'm not going to fence post&nbsp;
+that live. But I am going to challenge you,&nbsp;&nbsp;
+
+00:22:26.560 --> 00:22:33.600
+everyone watching this video. Can we find&nbsp;
+a smaller one than 106? It probably exists.&nbsp;&nbsp;
+
+00:22:33.600 --> 00:22:39.680
+Can we move the lower bound up some more? Almost&nbsp;
+certainly. So, please do get involved. And I mean,&nbsp;&nbsp;
+
+00:22:39.680 --> 00:22:48.800
+the big question is, is there a net that folds&nbsp;
+into four different cuboids? I mean, almost&nbsp;&nbsp;
+
+00:22:48.800 --> 00:22:56.480
+certainly yes. What size? We have no idea. When&nbsp;
+are we going to find it? Well, if we extrapolate&nbsp;&nbsp;
+
+00:22:56.480 --> 00:23:06.720
+from one data point, another four years. So,&nbsp;
+everyone get onto it and I'll see you in 2030.
+
