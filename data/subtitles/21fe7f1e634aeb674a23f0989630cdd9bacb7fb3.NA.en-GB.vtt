@@ -1,0 +1,671 @@
+WEBVTT
+Kind: captions
+Language: en-GB
+
+00:00:00.480 --> 00:00:05.920
+This is wrong. I mean, it's a spiralized&nbsp;
+hot dog, so it's wrong for lots of reasons.&nbsp;&nbsp;
+
+00:00:05.920 --> 00:00:11.040
+But according to Binging with Babish, this is&nbsp;
+the maximum possible surface area you can get&nbsp;&nbsp;
+
+00:00:11.040 --> 00:00:17.760
+when cooking a hot dog. And that is definitely&nbsp;
+wrong, and I can prove it mathematically. Hey,&nbsp;&nbsp;
+
+00:00:17.760 --> 00:00:21.600
+what's up guys and welcome back to Babish's&nbsp;
+Great American Hot Dog Adventure. So,&nbsp;&nbsp;
+
+00:00:21.600 --> 00:00:26.640
+without further ado, let's start doing things&nbsp;
+to sausage. First up, the spiralizer. Basically,&nbsp;&nbsp;
+
+00:00:26.640 --> 00:00:31.120
+we're impaling your sausage on a wooden skewer&nbsp;
+and then placing a single cut diagonally down&nbsp;&nbsp;
+
+00:00:31.120 --> 00:00:34.880
+the length of your sausage, making sure to&nbsp;
+cut all the way down to the skewer. Then,&nbsp;&nbsp;
+
+00:00:34.880 --> 00:00:39.200
+once your sausage has been spiralized, we're going&nbsp;
+to gently separate the layers, pulling it down the&nbsp;&nbsp;
+
+00:00:39.200 --> 00:00:42.960
+length [music] of the skewer until evenly spaced.&nbsp;
+Then, just to improve browning, we're going to hit&nbsp;&nbsp;
+
+00:00:42.960 --> 00:00:46.560
+it with a little bit of non-stick spray before&nbsp;
+heading out [music] to our preheated grill,&nbsp;&nbsp;
+
+00:00:46.560 --> 00:00:50.720
+where we're going to grill it up just like any&nbsp;
+other hot dog with one vital difference. I did the&nbsp;&nbsp;
+
+00:00:50.720 --> 00:01:02.240
+math and this has about 15,000% more surface area.&nbsp;
+15,000 15,000 15,000 [&nbsp;__&nbsp;] 15,000% increase. Now,&nbsp;&nbsp;
+
+00:01:02.240 --> 00:01:07.040
+I know a lot of you are going to say Babish is&nbsp;
+just joking around and it's comedic exaggeration,&nbsp;&nbsp;
+
+00:01:07.040 --> 00:01:12.320
+but no, I'm going to take it seriously. If this&nbsp;
+is our standard issue hot dog, which I'm going to&nbsp;&nbsp;
+
+00:01:12.320 --> 00:01:18.960
+approximate as a cylinder, we're going to ignore&nbsp;
+ignore the caps for now. And this is a spiralized&nbsp;&nbsp;
+
+00:01:18.960 --> 00:01:24.480
+hot dog where you still have all the same original&nbsp;
+surface area, but now you have the new exposed cut&nbsp;&nbsp;
+
+00:01:24.480 --> 00:01:30.960
+surface area. We can calculate the area of that&nbsp;
+internal cut. The reason we can do that is because&nbsp;&nbsp;
+
+00:01:30.960 --> 00:01:43.760
+this cut is a well-known mathematical&nbsp;
+shape. This, my friends, is a helicoid.
+
+00:01:43.760 --> 00:01:51.840
+If you swing a radial line all the way around&nbsp;
+360°, you get a nice flat disc. But we don't want&nbsp;&nbsp;
+
+00:01:51.840 --> 00:01:59.840
+that. We want a spiral. So, what we can do instead&nbsp;
+is add just a little bit of upwards movement as&nbsp;&nbsp;
+
+00:01:59.840 --> 00:02:06.800
+the radius goes around. So, now it's gradually&nbsp;
+spiraling up the axis. So, now, as well as the&nbsp;&nbsp;
+
+00:02:06.800 --> 00:02:12.480
+size of the radius, we can also mess around with&nbsp;
+how much it goes up and down the axis for each&nbsp;&nbsp;
+
+00:02:12.480 --> 00:02:17.680
+sweep. So, well, let's have a nice tight one like&nbsp;
+that. And then we continue to spin it around. And&nbsp;&nbsp;
+
+00:02:17.680 --> 00:02:24.480
+this mathematical surface is called the helicoid.&nbsp;
+Here we have our idealized theoretical hot dog&nbsp;&nbsp;
+
+00:02:24.480 --> 00:02:32.160
+represented by this cylinder. And if we want to do&nbsp;
+that spiral cut, sure enough, it's a helyco. Look&nbsp;&nbsp;
+
+00:02:32.160 --> 00:02:39.280
+at it go all the way along. And because of the way&nbsp;
+it hugs and kind of wraps around that central axis&nbsp;&nbsp;
+
+00:02:39.280 --> 00:02:45.360
+here, that's exactly how Babish did the cut. The&nbsp;
+knife rotates around the central skewer and forms&nbsp;&nbsp;
+
+00:02:45.360 --> 00:02:53.200
+this exact helicoid shape. All we need now is a&nbsp;
+formula to calculate its area. Back like when we&nbsp;&nbsp;
+
+00:02:53.200 --> 00:02:58.960
+just had the standard issue flat circle, you&nbsp;
+can calculate the area of the circle a couple&nbsp;&nbsp;
+
+00:02:58.960 --> 00:03:05.120
+ways. You could use the parametric equations&nbsp;
+for that entire surface. Or you could just use&nbsp;&nbsp;
+
+00:03:05.120 --> 00:03:12.000
+the function and you integrate across all 360°&nbsp;
+around and the radius all the way out. and you&nbsp;&nbsp;
+
+00:03:12.000 --> 00:03:17.920
+get your classic formula for the area of a disc.&nbsp;
+Okay, so now what we're going to do is just add&nbsp;&nbsp;
+
+00:03:17.920 --> 00:03:25.200
+in that extra dimension. So parametrically we've&nbsp;
+just got a third coordinate that scales up with&nbsp;&nbsp;
+
+00:03:25.200 --> 00:03:32.640
+whatever our ratio is for the distance up that&nbsp;
+it goes for every revolution around the axis. And&nbsp;&nbsp;
+
+00:03:32.640 --> 00:03:36.640
+ultimately we'll have to factor in how many times&nbsp;
+we go around. That's just part of the integration.&nbsp;&nbsp;
+
+00:03:36.640 --> 00:03:40.960
+You could use the parametric equations. You could&nbsp;
+do this integral. And if you do the integration,&nbsp;&nbsp;
+
+00:03:40.960 --> 00:03:46.640
+which you can do on your own time, you get&nbsp;
+this. I know it's not pretty. Integration very&nbsp;&nbsp;
+
+00:03:46.640 --> 00:03:50.800
+rarely is. I mean, there's a shine, an inverse&nbsp;
+shine in there. Look, I'm as angry as anyone,&nbsp;&nbsp;
+
+00:03:50.800 --> 00:03:56.080
+but the point is, if you put in the radius of&nbsp;
+your heliocoid, you put in the amount it goes&nbsp;&nbsp;
+
+00:03:56.080 --> 00:04:01.680
+up per revolution, the number of revolutions, you&nbsp;
+can exactly calculate its area. The one thing to&nbsp;&nbsp;
+
+00:04:01.680 --> 00:04:09.200
+bear in mind now is once we've done the helicoid&nbsp;
+cut down the hot dog, we actually stretch it out.&nbsp;&nbsp;
+
+00:04:09.200 --> 00:04:15.200
+And I'm just using this kind of hashing to show&nbsp;
+the open bits in the spiralized hot dog. And so&nbsp;&nbsp;
+
+00:04:15.200 --> 00:04:21.040
+now we've actually doubled the surface area.&nbsp;
+Now, as we enjoy the helicoid swooping by,&nbsp;&nbsp;
+
+00:04:21.040 --> 00:04:26.480
+you need to bear in mind because we've stretched&nbsp;
+it out. The original cut, there it goes, has been&nbsp;&nbsp;
+
+00:04:26.480 --> 00:04:32.000
+split into two surfaces. So, we've just got to&nbsp;
+double the number that comes out of the standard&nbsp;&nbsp;
+
+00:04:32.000 --> 00:04:38.320
+area formula. We can now put some numbers in using&nbsp;
+what I'm going to call the standard hot dog. Now,&nbsp;&nbsp;
+
+00:04:38.320 --> 00:04:43.120
+we had a close look at Babish's video. We think&nbsp;
+they're using a 6-in long hot dog, which is about&nbsp;&nbsp;
+
+00:04:43.120 --> 00:04:47.840
+an inch in diameter. Actually, doesn't really&nbsp;
+matter. As long as we're consistent, everything&nbsp;&nbsp;
+
+00:04:47.840 --> 00:04:54.160
+kind of cancels out. But, we are going to switch&nbsp;
+to metric. So, we're going to call that 152.4 mm&nbsp;&nbsp;
+
+00:04:54.160 --> 00:05:00.000
+long. And we're going to call it a radius of 12.7&nbsp;
+mm out from the exact center of that cylinder. And&nbsp;&nbsp;
+
+00:05:00.000 --> 00:05:07.280
+if you calculate the area, no cap, then that is&nbsp;
+a total of 121.6 cm squared area. That's what we&nbsp;&nbsp;
+
+00:05:07.280 --> 00:05:13.120
+start with. Now, when we go up to the spiralized&nbsp;
+one, we still have that same outer area that&nbsp;&nbsp;
+
+00:05:13.120 --> 00:05:19.040
+hasn't changed, but we get all this new internal&nbsp;
+area. That's the increase. And we can we can&nbsp;&nbsp;
+
+00:05:19.040 --> 00:05:25.520
+calculate that. We put the same numbers into that&nbsp;
+terrible helicoid formula from before. And you get&nbsp;&nbsp;
+
+00:05:25.520 --> 00:05:34.800
+an area of 140.6 cm squared, which is bigger.&nbsp;
+So, you do get a bigger increase in area than&nbsp;&nbsp;
+
+00:05:34.800 --> 00:05:45.360
+the original area. It's more than doubled. Has it&nbsp;
+gone up by 15,000%. No, it's gone up by 115.6%.
+
+00:05:45.360 --> 00:05:51.920
+So, I know we were all shocked. Uh, so&nbsp;
+it turns out off off by at least an order&nbsp;&nbsp;
+
+00:05:51.920 --> 00:05:56.960
+of magnitude. In a moment, I'm going to show&nbsp;
+you my alternative to the spiralized hot dog,&nbsp;&nbsp;
+
+00:05:56.960 --> 00:06:02.720
+and it is as horrifying as it is genius. No,&nbsp;
+no, no, no. Before that, I want to thank the&nbsp;&nbsp;
+
+00:06:02.720 --> 00:06:09.120
+sponsor of this video, Private Internet Access,&nbsp;
+a VPN, which much like you don't have to trust&nbsp;&nbsp;
+
+00:06:09.120 --> 00:06:14.960
+Babish's claims about a spiralized hot dog. You&nbsp;
+can check them for yourself. You don't have to&nbsp;&nbsp;
+
+00:06:14.960 --> 00:06:21.360
+trust their claims that they don't keep any logs&nbsp;
+of the traffic you put through their VPN. Now,&nbsp;&nbsp;
+
+00:06:21.360 --> 00:06:26.000
+some people are happy with the fact that in&nbsp;
+court when they've been asked to hand over logs,&nbsp;&nbsp;
+
+00:06:26.000 --> 00:06:30.960
+they haven't because they don't keep them.&nbsp;
+But if you really want to check for yourself,&nbsp;&nbsp;
+
+00:06:30.960 --> 00:06:36.480
+all of their code is on GitHub. It's open. You&nbsp;
+can go look at it. I mean, you probably won't,&nbsp;&nbsp;
+
+00:06:36.480 --> 00:06:42.400
+but other nerds have. And we know without any&nbsp;
+doubt. If you want maximum privacy, private&nbsp;&nbsp;
+
+00:06:42.400 --> 00:06:48.720
+internet access discount [music] code standup&nbsp;
+maths does not keep any logs. Although, actually,&nbsp;&nbsp;
+
+00:06:48.720 --> 00:06:54.400
+yeah, that code, I wonder if there's a way you&nbsp;
+could save some money on it. Yes, this whole time,&nbsp;&nbsp;
+
+00:06:54.400 --> 00:07:00.960
+Chef Matt has actually been I business Matt here&nbsp;
+to say, use the QR code on the screen now or the&nbsp;&nbsp;
+
+00:07:00.960 --> 00:07:07.360
+discount code standup mass for 86% off and you&nbsp;
+can get up to 4 months free. That works out to&nbsp;&nbsp;
+
+00:07:07.360 --> 00:07:12.000
+like a 57 a month. I mean, I think I'm paying&nbsp;
+more than that. I should use my own discount&nbsp;&nbsp;
+
+00:07:12.000 --> 00:07:16.560
+code. Huge thanks to Private Internet Access&nbsp;
+for sponsoring this video. Now, before we get&nbsp;&nbsp;
+
+00:07:16.560 --> 00:07:23.440
+to my suggestions for what's superior to a spiral,&nbsp;
+could you actually achieve 15,000% extra surface&nbsp;&nbsp;
+
+00:07:23.440 --> 00:07:29.760
+area with this method? Well, technically, yes.&nbsp;
+You just have to get thinner and thinner slices,&nbsp;&nbsp;
+
+00:07:29.760 --> 00:07:35.920
+as in like the increase per rotation gets smaller&nbsp;
+and smaller. Fun fact, it means in the limit,&nbsp;&nbsp;
+
+00:07:35.920 --> 00:07:40.960
+you can approximate the area of a helioid as&nbsp;
+just a series of discs. You're just basically&nbsp;&nbsp;
+
+00:07:40.960 --> 00:07:49.520
+adding up a whole bunch of circles. And were you&nbsp;
+to have 1,800 circles, that's how many rotations&nbsp;&nbsp;
+
+00:07:49.520 --> 00:07:57.120
+the knife would have to do. Yeah, you would have&nbsp;
+15,000% more surface area. But those cuts would&nbsp;&nbsp;
+
+00:07:57.120 --> 00:08:10.000
+be separated by 0.085 mm of sausage skin, which uh&nbsp;
+you basically have just a minced sausage. the the&nbsp;&nbsp;
+
+00:08:10.000 --> 00:08:16.240
+cylinder uh at that point would not be would&nbsp;
+not be unharmed. You know what's easier than&nbsp;&nbsp;
+
+00:08:16.240 --> 00:08:23.440
+a helioid both cutting it and calculating its&nbsp;
+area? A rectangle. What if we just cut the hot&nbsp;&nbsp;
+
+00:08:23.440 --> 00:08:29.440
+dog lengthwise? I [music] mean leaving at least&nbsp;
+one end intact because I think whatever we do,&nbsp;&nbsp;
+
+00:08:29.440 --> 00:08:34.880
+we need a contiguous like single piece hot dog.&nbsp;
+Otherwise, you may as well just dice it up. But if&nbsp;&nbsp;
+
+00:08:34.880 --> 00:08:40.400
+you were to cut in the middle and then all the way&nbsp;
+down like a rectangle, easy to compute the area&nbsp;&nbsp;
+
+00:08:40.400 --> 00:08:46.800
+and easy to cut. So let's see how that works. So&nbsp;
+I'm going to start by making a rectangular cut the&nbsp;&nbsp;
+
+00:08:46.800 --> 00:08:53.200
+entire length of the hot dog, which if we work out&nbsp;
+the area of this and double it for both sides for&nbsp;&nbsp;
+
+00:08:53.200 --> 00:09:02.720
+our standard hot dog, that's an extra 77.4 square&nbsp;
+cm exposed. So already inside there is an extra&nbsp;&nbsp;
+
+00:09:02.720 --> 00:09:09.360
+63.7% surface area. But why stop? We're going to&nbsp;
+rotate it a third of the way around. And I'm going&nbsp;&nbsp;
+
+00:09:09.360 --> 00:09:18.720
+to do another one all the way down here. That's&nbsp;
+adding another 77.4 square cm of area for now. A&nbsp;&nbsp;
+
+00:09:18.720 --> 00:09:27.760
+total of 127.3% extra area. And one more. Now two&nbsp;
+already more than the Babish spiral. But if we've&nbsp;&nbsp;
+
+00:09:27.760 --> 00:09:37.920
+got space over here for a third one down here,&nbsp;
+that's now 191% more area. And you're thinking,&nbsp;&nbsp;
+
+00:09:37.920 --> 00:09:42.080
+well, Matt, hang on. The area is on the inside. We&nbsp;
+got to cook that. Well, now I'm going to complete&nbsp;&nbsp;
+
+00:09:42.080 --> 00:09:48.960
+all the cuts to the end just on one end. So, we&nbsp;
+still have this one here to keep it a contiguous&nbsp;&nbsp;
+
+00:09:48.960 --> 00:09:56.560
+dog. But if I split all of those out, I give&nbsp;
+you the six-legged squid sausage. Now, I wanted&nbsp;&nbsp;
+
+00:09:56.560 --> 00:10:06.080
+to call this the hot pod after an oc octopus pod&nbsp;
+for feet, but apparently uh this is a sepha dog.&nbsp;&nbsp;
+
+00:10:06.080 --> 00:10:17.360
+There you are, the six-legged sephila dog for an&nbsp;
+extra 191% surface area. I can keep jiggling it if&nbsp;&nbsp;
+
+00:10:17.360 --> 00:10:29.600
+that helps. Um, I'm getting a lot of negative&nbsp;
+energy from everyone else here. Nom. Oh no.
+
+00:10:29.600 --> 00:10:38.960
+The Babish spiral 116% extra surface area.&nbsp;
+Rounding up the sephila dog. 191% extra&nbsp;&nbsp;
+
+00:10:38.960 --> 00:10:44.720
+surface area. Not only is there more area, it's&nbsp;
+more adorable. Look at it. Eat me. It's not as&nbsp;&nbsp;
+
+00:10:44.720 --> 00:10:51.360
+terrifying as people have claimed it is. And&nbsp;
+these horizontal cuts, would you believe it,&nbsp;&nbsp;
+
+00:10:51.360 --> 00:10:56.560
+are always better. So, so far we've taken the&nbsp;
+coil to just be roughly what Babish did in the&nbsp;&nbsp;
+
+00:10:56.560 --> 00:11:03.040
+video. And then for this, I've just done as many&nbsp;
+lengthwise cuts as we needed to get significantly&nbsp;&nbsp;
+
+00:11:03.040 --> 00:11:10.960
+more surface area. But what if we take like&nbsp;
+the gap between the cuts as a fixed value? So,&nbsp;&nbsp;
+
+00:11:10.960 --> 00:11:17.280
+you're prepared to cut a certain width here and&nbsp;
+you end up cutting a certain width here. How would&nbsp;&nbsp;
+
+00:11:17.280 --> 00:11:24.320
+it look if you compared all possible spirals to&nbsp;
+all possible sephila dogs? I calculated the ratio&nbsp;&nbsp;
+
+00:11:24.320 --> 00:11:31.600
+of the spiralized increase in area versus the&nbsp;
+sephila dog increase in area for a whole range of&nbsp;&nbsp;
+
+00:11:31.600 --> 00:11:36.720
+different cut separation values. And I'm going to&nbsp;
+put them on this plot. And because it's a ratio,&nbsp;&nbsp;
+
+00:11:36.720 --> 00:11:43.200
+if the line is above one, that means that spiral&nbsp;
+is better. If it's below one, it means sephloid&nbsp;&nbsp;
+
+00:11:43.200 --> 00:11:51.120
+dog is better. And the line looks like this.&nbsp;
+Now, as you can see, it's completely under one,&nbsp;&nbsp;
+
+00:11:51.120 --> 00:12:00.480
+which means that a sephloid dog cut for a given&nbsp;
+spacing of cuts is always better than a spiralized&nbsp;&nbsp;
+
+00:12:00.480 --> 00:12:07.120
+cut. Now, it starts off twice as good, but that's&nbsp;
+for impossibly small cuts. And as the cut spacing&nbsp;&nbsp;
+
+00:12:07.120 --> 00:12:13.040
+gets bigger and bigger, the ratio gets closer&nbsp;
+and closer to one, but it never crosses one.&nbsp;&nbsp;
+
+00:12:13.040 --> 00:12:18.640
+The sephila dog is always better. And the reason&nbsp;
+it looks like an up and down like saw function is&nbsp;&nbsp;
+
+00:12:18.640 --> 00:12:25.760
+because when you're cutting through the the the&nbsp;
+sephila dog, you can you got to round it because&nbsp;&nbsp;
+
+00:12:25.760 --> 00:12:30.400
+you work out the spacing and you do the maximum&nbsp;
+number you can fit at that spacing or greater. So&nbsp;&nbsp;
+
+00:12:30.400 --> 00:12:35.600
+you get the step function whenever you can just&nbsp;
+fit in one more cut. However, if you were to&nbsp;&nbsp;
+
+00:12:35.600 --> 00:12:43.440
+approximate both of these, you can see the value&nbsp;
+of two drops out incredibly nicely. The general&nbsp;&nbsp;
+
+00:12:43.440 --> 00:12:48.560
+equation for lots of rectangular cuts is just&nbsp;
+the area of a rectangle, the length of it, and&nbsp;&nbsp;
+
+00:12:48.560 --> 00:12:53.200
+twice the radius, that's the diameter. And then we&nbsp;
+have to multiply that by how many cuts there are,&nbsp;&nbsp;
+
+00:12:53.200 --> 00:12:57.360
+which is the circumference divided by the&nbsp;
+separation. And we round that down to the nearest&nbsp;&nbsp;
+
+00:12:57.360 --> 00:13:04.320
+whole number of cuts, which is not a very nice&nbsp;
+formula, but compare it to the helioite. Uh, what&nbsp;&nbsp;
+
+00:13:04.320 --> 00:13:09.360
+a mess. Although both of these can be simplified.&nbsp;
+So we could say for the heliocoid area we know in&nbsp;&nbsp;
+
+00:13:09.360 --> 00:13:15.120
+the limit you could just multiply discs. So swap&nbsp;
+it out for the area of a circle, multiply it by&nbsp;&nbsp;
+
+00:13:15.120 --> 00:13:18.800
+how many there are, which is the length divided&nbsp;
+by the spacing. Pretty straightforward. You know&nbsp;&nbsp;
+
+00:13:18.800 --> 00:13:25.520
+what? We can probably simplify the sephlog one&nbsp;
+as well. Instead of rounding down in the limit,&nbsp;&nbsp;
+
+00:13:25.520 --> 00:13:30.880
+we'll just allow fractional cuts. Even though it&nbsp;
+doesn't physically work, it's an approximation.&nbsp;&nbsp;
+
+00:13:30.880 --> 00:13:39.520
+Wait a minute. we rearrange these, they're the&nbsp;
+same. If you approximate both of these wildly&nbsp;&nbsp;
+
+00:13:39.520 --> 00:13:45.760
+different looking equations for area once they're&nbsp;
+both simplified down, it's the identical equation,&nbsp;&nbsp;
+
+00:13:45.760 --> 00:13:53.200
+but with that two and that proves in the limit,&nbsp;
+the sephila dog is precisely twice as good as the&nbsp;&nbsp;
+
+00:13:53.200 --> 00:14:00.080
+Babish spiral. Maths. Ah, delicious. Now, the&nbsp;
+Sepha dog has a lot of features. more surface&nbsp;&nbsp;
+
+00:14:00.080 --> 00:14:07.760
+area. Looks adorable. And check this out. Makes&nbsp;
+dogs appear. However, All right. All right. All&nbsp;&nbsp;
+
+00:14:07.760 --> 00:14:13.600
+right. On your bed. Yes, there is one downside to&nbsp;
+the Sepha dog. And it's though, even though the&nbsp;&nbsp;
+
+00:14:13.600 --> 00:14:18.000
+legs are delicious and crispy, it's not the same&nbsp;
+all the way along. By the time you get to this&nbsp;&nbsp;
+
+00:14:18.000 --> 00:14:24.400
+end, that's just a big chunk of regular hot dog.&nbsp;
+What a disappointment. If only there was a way you&nbsp;&nbsp;
+
+00:14:24.400 --> 00:14:29.760
+could cut up a hot dog to have all the advantage&nbsp;
+of the sephila dog with none of the disadvantage&nbsp;&nbsp;
+
+00:14:29.760 --> 00:14:36.480
+of the chunk. And there is. I've cracked it. This&nbsp;
+may be my greatest invention ever. I have come up&nbsp;&nbsp;
+
+00:14:36.480 --> 00:14:45.120
+with the fractal fertter. It's a fractal hot&nbsp;
+dog which solves the discontinuous crispiness&nbsp;&nbsp;
+
+00:14:45.120 --> 00:14:51.440
+problem. Moreover, the fractal furter has even&nbsp;
+more area because we're going to do four cuts.&nbsp;&nbsp;
+
+00:14:51.440 --> 00:14:55.440
+Now, to do that, we're going to use the fact&nbsp;
+that because of how hot dogs are packaged,&nbsp;&nbsp;
+
+00:14:55.440 --> 00:15:00.960
+they're basically cross-sectional squares.&nbsp;
+They're cuboids. Ignore that. That invalidates&nbsp;&nbsp;
+
+00:15:00.960 --> 00:15:05.680
+all our cylinder assumptions up until now. And&nbsp;
+I'm going to do them in two pairs of cuts. So,&nbsp;&nbsp;
+
+00:15:05.680 --> 00:15:10.960
+the very first cut, I'm going to use the&nbsp;
+seams, if you will, on the hot dog. If I&nbsp;&nbsp;
+
+00:15:10.960 --> 00:15:17.360
+go all the way through there and come out on the&nbsp;
+opposite seam, and then do the lengthwise cut,&nbsp;&nbsp;
+
+00:15:17.360 --> 00:15:25.520
+that should be right the whole way down. I can&nbsp;
+now, there we go, do its partner cut at 90 degrees&nbsp;&nbsp;
+
+00:15:25.520 --> 00:15:33.840
+to that one. So I come in through this seam out&nbsp;
+the opposite one. Yes. Cut all the way along. And&nbsp;&nbsp;
+
+00:15:33.840 --> 00:15:40.320
+what I end up with, you could call a four-legged&nbsp;
+sephila dog. There it is. But what I'm going to&nbsp;&nbsp;
+
+00:15:40.320 --> 00:15:45.360
+do is to complete it, I'm going to rotate it.&nbsp;
+So instead of going out this end, I'm going to&nbsp;&nbsp;
+
+00:15:45.360 --> 00:15:50.640
+come out this end. And I'm going to do the other&nbsp;
+pair of cuts exactly in between the ones I just&nbsp;&nbsp;
+
+00:15:50.640 --> 00:15:59.200
+did. So if I start here on the middle of the flat&nbsp;
+surface and go all the way down very carefully,&nbsp;&nbsp;
+
+00:15:59.200 --> 00:16:05.280
+I don't want to accidentally cut off a leg and&nbsp;
+out the far end there. And then rotate and do the&nbsp;&nbsp;
+
+00:16:05.280 --> 00:16:13.760
+other one at 90° to that one. So I go in here all&nbsp;
+the way down. Now, the trick is to make sure you&nbsp;&nbsp;
+
+00:16:13.760 --> 00:16:21.040
+cut out the opposite side at the same time. There&nbsp;
+we are. Let me just triple check this cut. That&nbsp;&nbsp;
+
+00:16:21.040 --> 00:16:36.960
+one's good as well. So, now I have a continuous&nbsp;
+ring of hot dog meat known as the fractal furter.
+
+00:16:36.960 --> 00:16:46.240
+Look at that. That That's art. I don't care what&nbsp;
+anyone says. Look at that. Come on. There it is.&nbsp;&nbsp;
+
+00:16:46.240 --> 00:16:52.240
+The fully cooked fractal furter. Also attracts&nbsp;
+dogs. And as you can see, if I'm very careful&nbsp;&nbsp;
+
+00:16:52.240 --> 00:16:59.200
+here, this is still one like continuous piece of&nbsp;
+hot dog, but equally crispy in all directions.&nbsp;&nbsp;
+
+00:16:59.200 --> 00:17:07.600
+And because we have four lengthwise cuts, that's&nbsp;
+a total of over 300 square cm of extra area. This&nbsp;&nbsp;
+
+00:17:07.600 --> 00:17:16.960
+is a 254.6% 6% increase on area. This blows the&nbsp;
+spiral out of the water. If you wanted to go all&nbsp;&nbsp;
+
+00:17:16.960 --> 00:17:26.000
+the way up to an extra 15,000%, well, then you're&nbsp;
+going to need 236 cuts. 118 to one end and 118 to&nbsp;&nbsp;
+
+00:17:26.000 --> 00:17:33.600
+the other end. That'd be spaced by 0.17 mm each,&nbsp;
+which is bordering on plausible. I don't think&nbsp;&nbsp;
+
+00:17:33.600 --> 00:17:39.360
+it's going to work. Anyway, I think this is as&nbsp;
+good as it gets. And honestly, I made this. I was&nbsp;&nbsp;
+
+00:17:39.360 --> 00:17:43.920
+just marking around. I thought this was going to&nbsp;
+be some ridiculous, you know, troll hot dog, but&nbsp;&nbsp;
+
+00:17:43.920 --> 00:17:50.720
+this is genuinely fun to make, actually enjoyable&nbsp;
+to cook and delicious. So, if anyone, please do&nbsp;&nbsp;
+
+00:17:50.720 --> 00:17:56.720
+try this. Send me photos of you having a fractal&nbsp;
+furter. And if anyone can come up with a better&nbsp;&nbsp;
+
+00:17:56.720 --> 00:18:06.160
+way to expose area in a hot dog, I would like&nbsp;
+to hear it. But until then, this reigns supreme.
+
+00:18:17.840 --> 00:18:21.040
+That is delicious on every scale. Oh, and thanks&nbsp;&nbsp;
+
+00:18:21.040 --> 00:18:27.520
+to Private Internet Access for sponsoring&nbsp;
+this incredibly serious educational video.
+
