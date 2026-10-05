@@ -391,6 +391,7 @@ def fetch_bestblogs(archive: dict) -> list[Raw]:
 # API: {"urls": [{"url", "added"}]}. Read-only here -- the reader prunes it --
 # so a run never conflicts with a push made while it was running.
 INBOX_SOURCE = "URL"
+INBOX_LEGACY_SOURCES = {INBOX_SOURCE, "Reader"}     # items added before the rename
 INBOX_MAX = 500
 
 
@@ -410,7 +411,7 @@ def fetch_inbox(archive: dict, path: Path, days: int) -> list[Raw]:
         urls = json.loads(path.read_text(encoding="utf-8")).get("urls") or []
     except (OSError, ValueError, AttributeError):
         return []
-    known = {r.get("url"): r for r in archive.values() if r.get("source") == INBOX_SOURCE}
+    known = {r.get("url"): r for r in archive.values() if r.get("source") in INBOX_LEGACY_SOURCES}
     cutoff = datetime.now(tz=UTC) - timedelta(days=days)
     out, seen = [], set()
     for e in urls[-INBOX_MAX:] if isinstance(urls, list) else []:
@@ -423,7 +424,8 @@ def fetch_inbox(archive: dict, path: Path, days: int) -> list[Raw]:
         seen.add(url)
         rec = known.get(canonical_url(url, INBOX_SOURCE, ""))
         title = (rec or {}).get("title") or page_title(url) or (p.hostname + p.path.rstrip("/"))
-        out.append(Raw("inbox", INBOX_SOURCE, title, url, when))
+        # A known record keeps its own source too: the id hashes it.
+        out.append(Raw("inbox", (rec or {}).get("source") or INBOX_SOURCE, title, url, when))
     print(f"Inbox: {len(out)} url(s), {sum(canonical_url(r.url, INBOX_SOURCE, '') not in known for r in out)} new")
     return out
 
