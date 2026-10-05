@@ -1,0 +1,11 @@
+requests==2.34.2
+charset-normalizer==3.5.2
+trafilatura==2.2.0
+python-dateutil==2.9.0.post0
+feedparser==6.0.14
+beautifulsoup4==4.15.0
+opencc-python-reimplemented==0.1.7
+curl-cffi==0.16.0
+yt-dlp[default]==2026.8.19
+bgutil-ytdlp-pot-provider==2.0.0
+faster-whisper==1.2.1
