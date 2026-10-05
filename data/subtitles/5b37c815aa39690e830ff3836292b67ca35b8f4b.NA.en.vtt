@@ -1,0 +1,754 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:00.240 --> 00:00:04.880
+There's a company quietly holding the world's&nbsp;
+software hostage, and no one is talking about it.&nbsp;
+
+00:00:04.880 --> 00:00:09.600
+Broadcom, the eighth largest company&nbsp;
+on earth, paid $69 billion for VMware.&nbsp;
+
+00:00:09.600 --> 00:00:14.960
+You’ve probably never heard of it, but globally,&nbsp;
+banks, grocery stores, telecom networks,&nbsp;&nbsp;
+
+00:00:14.960 --> 00:00:19.040
+government agencies, all rely on it.
+But after Broadcom bought it,&nbsp;&nbsp;
+
+00:00:19.040 --> 00:00:24.400
+despite promising no price increases,&nbsp;
+customers saw costs jump as much as 1000%.&nbsp;
+
+00:00:24.400 --> 00:00:28.480
+They’re now fighting lawsuits from&nbsp;
+the likes of AT&amp;T, T-Mobile, Tesco,&nbsp;&nbsp;
+
+00:00:28.480 --> 00:00:33.440
+while also fighting regulators, with one&nbsp;
+fining Broadcom a quarter million euros a day.&nbsp;
+
+00:00:33.440 --> 00:00:37.040
+Broadcom is even sending cease and&nbsp;
+desists to their own customers.&nbsp;
+
+00:00:37.040 --> 00:00:40.960
+The regulators who were supposed&nbsp;
+to stop this — the FTC, the UK,&nbsp;&nbsp;
+
+00:00:40.960 --> 00:00:44.720
+the European Commission — every&nbsp;
+single one of them let it through.&nbsp;
+
+00:00:44.720 --> 00:00:51.600
+Broadcom is holding the world’s software hostage,&nbsp;
+and you and I may end up paying the price…&nbsp;
+
+00:01:00.160 --> 00:01:04.640
+To find out how this happened, we need&nbsp;
+to go back before the acquisition.&nbsp;
+
+00:01:04.640 --> 00:01:10.080
+Because you might be thinking “How on&nbsp;
+earth did regulators let this one through?”&nbsp;
+
+00:01:10.080 --> 00:01:15.600
+A crucial question, that we’ll get to soon.
+But first, what the heck is VMware,&nbsp;&nbsp;
+
+00:01:15.600 --> 00:01:20.640
+and why does it matter?
+VMware just means “Virtual Machine-ware”.&nbsp;&nbsp;
+
+00:01:20.640 --> 00:01:25.680
+You might have heard that term, “virtual machine”.
+It basically means a fake computer running&nbsp;&nbsp;
+
+00:01:25.680 --> 00:01:27.600
+inside a real one.
+This is how people&nbsp;&nbsp;
+
+00:01:27.600 --> 00:01:31.680
+run Windows, even while on a Mac.
+Sounds niche, but there’s a good&nbsp;&nbsp;
+
+00:01:31.680 --> 00:01:36.080
+chance you interact with VMware every&nbsp;
+single day, just without knowing it.&nbsp;
+
+00:01:36.080 --> 00:01:41.840
+It was created in 1998, with the purpose of&nbsp;
+running virtual machines on Intel’s x86 hardware,&nbsp;&nbsp;
+
+00:01:41.840 --> 00:01:47.200
+and it solved a problem, which changed everything.
+Before it, you could realistically only run one&nbsp;&nbsp;
+
+00:01:47.200 --> 00:01:51.600
+“application” per physical server, because&nbsp;
+if you ran multiple… and one crashes,&nbsp;&nbsp;
+
+00:01:51.600 --> 00:01:56.960
+they all crash. It just wasn’t reliable.
+So you had lots of small individual workloads&nbsp;&nbsp;
+
+00:01:56.960 --> 00:02:03.360
+and servers, which only ran at about 10% capacity.
+Because they’re separate, if use on one spikes,&nbsp;&nbsp;
+
+00:02:03.360 --> 00:02:07.440
+it can’t draw from another which isn’t used.
+Virtual machines solved this,&nbsp;&nbsp;
+
+00:02:07.440 --> 00:02:11.200
+and this changed the world.
+You can have one big server running&nbsp;&nbsp;
+
+00:02:11.200 --> 00:02:15.680
+lots and lots of fake computers.
+And if one crashes, it doesn’t&nbsp;&nbsp;
+
+00:02:15.680 --> 00:02:19.440
+take the others down with it.
+VMware meant more efficiency,&nbsp;&nbsp;
+
+00:02:19.440 --> 00:02:25.600
+but also meant fewer servers, less cooling,&nbsp;
+energy consumption usually drops by 80%.&nbsp;
+
+00:02:25.600 --> 00:02:29.360
+This is quite simplified, and VMware&nbsp;
+offers a lot of different software&nbsp;&nbsp;
+
+00:02:29.360 --> 00:02:36.320
+products… but this affects, basically everything.
+Online banking, grocery stores, telecom services,&nbsp;&nbsp;
+
+00:02:36.320 --> 00:02:42.400
+major government infrastructure like tunnels&nbsp;
+and bridges, VMware is huge, and everywhere.&nbsp;
+
+00:02:42.400 --> 00:02:48.480
+VMware had become a near monopoly. It held&nbsp;
+about 70% of the virtualization market.&nbsp;
+
+00:02:48.480 --> 00:02:53.040
+But all this brings us back to Broadcom,&nbsp;
+the 8th largest company on earth,&nbsp;&nbsp;
+
+00:02:53.040 --> 00:02:59.280
+worth about 1.7 trillion dollars. Larger&nbsp;
+than Meta, Tesla, and Saudi Aramco.&nbsp;
+
+00:02:59.280 --> 00:03:04.560
+And the villain of our story: President Hock Tan.
+Tan has a bit of a history here.&nbsp;
+
+00:03:04.560 --> 00:03:10.480
+In 2018 he tried to buy Qualcomm, before he was&nbsp;
+blocked by the Trump Administration, thankfully.&nbsp;
+
+00:03:10.480 --> 00:03:16.720
+But soon enough, his eyes wandered to VMware,&nbsp;
+and Tan saw a huge area of untapped revenue.&nbsp;&nbsp;
+
+00:03:16.720 --> 00:03:22.640
+Unfortunately, it would make everyone else's&nbsp;
+lives much worse, and Broadcom way more money.&nbsp;
+
+00:03:22.640 --> 00:03:29.680
+But to the shock of many, the US, UK, and most&nbsp;
+importantly, the EU all approved the acquisition.&nbsp;
+
+00:03:29.680 --> 00:03:36.080
+In November 2023, Broadcom acquired VMware&nbsp;
+for $61 billion, or at $69 billion including&nbsp;&nbsp;
+
+00:03:36.080 --> 00:03:39.600
+VMware’s debt.
+What? How?&nbsp;
+
+00:03:39.600 --> 00:03:43.120
+How on earth did the Broadcom&nbsp;
+takeover get approved?&nbsp;
+
+00:03:43.120 --> 00:03:48.080
+And what did Tan have planned, that would end&nbsp;
+with lawsuits, mass migration away from VMware,&nbsp;&nbsp;
+
+00:03:48.080 --> 00:03:51.680
+and Broadcom sending cease and&nbsp;
+desists… to existing customers?&nbsp;
+
+00:03:51.680 --> 00:04:05.440
+Great question, because… I’m&nbsp;
+still a bit confused myself.&nbsp;
+
+00:04:05.440 --> 00:04:09.200
+Speaking of software, how many times have&nbsp;
+you tried to learn a new coding language,&nbsp;&nbsp;
+
+00:04:09.200 --> 00:04:13.840
+or coding in general, only to quit?
+Ironically, in the age of vibe coding,&nbsp;&nbsp;
+
+00:04:13.840 --> 00:04:18.560
+knowing code is more important than ever,&nbsp;
+and gives you a big advantage in any career.&nbsp;
+
+00:04:18.560 --> 00:04:22.720
+People across every industry are now&nbsp;
+building their own apps and products.&nbsp;
+
+00:04:22.720 --> 00:04:28.560
+And it’s never been easier to learn, with Coddy.
+Coddy offers gamified and bite-sized coding&nbsp;&nbsp;
+
+00:04:28.560 --> 00:04:32.720
+lessons, which quickly gets you writing&nbsp;
+and learning code, through daily lessons.&nbsp;
+
+00:04:32.720 --> 00:04:38.240
+Coddy tailors plans to you. Before you touch any&nbsp;
+code, it’ll ask why you want to learn a language,&nbsp;&nbsp;
+
+00:04:38.240 --> 00:04:41.360
+and what level you’re at.
+Then, you learn by doing.&nbsp;
+
+00:04:41.360 --> 00:04:47.440
+I was amazed how easy and fun the lessons are.
+Coddy lessons give you an explanation, a quiz,&nbsp;&nbsp;
+
+00:04:47.440 --> 00:04:51.120
+and practical exercise. So&nbsp;
+it’s not just reading theory,&nbsp;&nbsp;
+
+00:04:51.120 --> 00:04:56.160
+but it’s also not just looking at a page of code.
+Learn a language by completing a journey. Improve&nbsp;&nbsp;
+
+00:04:56.160 --> 00:05:01.040
+your skills with daily challenges. Or target your&nbsp;
+weak spots with Coddy’s personalized practices,&nbsp;&nbsp;
+
+00:05:01.040 --> 00:05:04.560
+which are tailored to your past&nbsp;
+mistakes and your goals. Pretty cool!&nbsp;
+
+00:05:04.560 --> 00:05:08.000
+Coddy is here to help those who are&nbsp;
+meaning to learn to code, but can’t&nbsp;&nbsp;
+
+00:05:08.000 --> 00:05:12.560
+quite find the time to dive deep into learning&nbsp;
+it all. It’s built for people with no time,&nbsp;&nbsp;
+
+00:05:12.560 --> 00:05:17.120
+and… honestly feels too good to be true.
+Coddy might be the one that finally sticks,&nbsp;&nbsp;
+
+00:05:17.120 --> 00:05:20.960
+and helps you level up your career.
+Learn code today in a way that sticks,&nbsp;&nbsp;
+
+00:05:20.960 --> 00:05:25.440
+by clicking the link in the description.&nbsp;
+Thank you to Coddy for sponsoring this video.
+
+00:05:25.440 --> 00:05:31.920
+The FTC, the Justice Department, the UK CMA, and&nbsp;
+the European Commission, all made a fatal mistake…&nbsp;
+
+00:05:31.920 --> 00:05:36.400
+They were all concerned with the risks&nbsp;
+to the hardware market… not software.&nbsp;
+
+00:05:36.400 --> 00:05:42.800
+The EU focused on fibre channel adapters,
+the UK focused on server hardware components,&nbsp;
+
+00:05:42.800 --> 00:05:48.400
+and the US raised a similar hardware issue, but&nbsp;
+ultimately chose not to block the acquisition.&nbsp;
+
+00:05:48.400 --> 00:05:52.720
+The risks here weren’t high enough to block&nbsp;
+the deal… but none of them thought about what&nbsp;&nbsp;
+
+00:05:52.720 --> 00:05:56.560
+would harm customers the most:
+VMware’s licence structure.&nbsp;
+
+00:05:56.560 --> 00:06:01.360
+In a blog in 2022 about VMware, Hock Tan wrote:
+[Hock Tan, Broadcom President]: “The Broadcom&nbsp;&nbsp;
+
+00:06:01.360 --> 00:06:06.080
+business case for this transaction is premised&nbsp;
+on focusing the business model, increasing R&amp;D,&nbsp;&nbsp;
+
+00:06:06.080 --> 00:06:10.960
+and executing in getting customers to use the&nbsp;
+full portfolio of innovative product offerings,&nbsp;&nbsp;
+
+00:06:10.960 --> 00:06:15.680
+not on increasing prices.”
+Sounds good right? But,&nbsp;&nbsp;
+
+00:06:15.680 --> 00:06:20.480
+this is actually way worse. And notice&nbsp;
+the “not on increasing prices“ part.&nbsp;
+
+00:06:20.480 --> 00:06:23.920
+He also said “I’ve continued to&nbsp;
+see questions in press reports&nbsp;&nbsp;
+
+00:06:23.920 --> 00:06:29.840
+about whether we intend to raise prices on&nbsp;
+VMware products. The answer is simple: No.”&nbsp;
+
+00:06:29.840 --> 00:06:34.480
+Because this seems to contradict what followed.
+After the acquisition, customer&nbsp;&nbsp;
+
+00:06:34.480 --> 00:06:38.560
+costs went up across the board.
+Managed service providers serving&nbsp;&nbsp;
+
+00:06:38.560 --> 00:06:44.480
+doctors’ offices and small retailers saw a 10x&nbsp;
+increase in cost, from around $50-70K per year,&nbsp;&nbsp;
+
+00:06:44.480 --> 00:06:48.800
+to a minimum of $650K+.
+A lot of businesses&nbsp;&nbsp;
+
+00:06:48.800 --> 00:06:55.360
+saw price jumps of 300 to 400%.
+European cloud providers saw cost hikes from&nbsp;&nbsp;
+
+00:06:55.360 --> 00:07:02.880
+800% to 1,500%! Eight to fifteen times higher!
+Tesco, the giant UK grocery chain, said some&nbsp;&nbsp;
+
+00:07:02.880 --> 00:07:10.960
+VMware costs jumped around 175 percent, while&nbsp;
+other VMware costs jumped 350%! Which it&nbsp;&nbsp;
+
+00:07:10.960 --> 00:07:17.680
+described as “manifestly unfair and excessive.”&nbsp;
+They even had an existing contract from 2021,&nbsp;&nbsp;
+
+00:07:17.680 --> 00:07:22.800
+which Broadcom basically ignored.
+But one of the biggest was AT&amp;T&nbsp;
+
+00:07:22.800 --> 00:07:27.920
+“After a 10 plus year strategic relationship with&nbsp;
+Broadcom … I am sad to report that we appear to be&nbsp;&nbsp;
+
+00:07:27.920 --> 00:07:35.040
+at an impasse on our VMware deal, This proposed&nbsp;
+annual increase of +1,050 percent in one year is&nbsp;&nbsp;
+
+00:07:35.040 --> 00:07:40.800
+extreme and certainly not how we expect strategic&nbsp;
+partners to engage in doing business with AT&amp;T.”&nbsp;
+
+00:07:40.800 --> 00:07:46.160
+What followed, was outrage, lawsuits,&nbsp;
+complaints to regulators, and much more.&nbsp;
+
+00:07:46.160 --> 00:07:50.320
+But… Hock Tan promised he&nbsp;
+wouldn’t increase prices…&nbsp;
+
+00:07:50.320 --> 00:07:54.480
+Well, Broadcom didn’t technically.&nbsp;
+They did something much worse.&nbsp;
+
+00:07:54.480 --> 00:08:00.720
+Broadcom made two colossal changes:
+They stopped selling perpetual VMware licences.&nbsp;
+
+00:08:00.720 --> 00:08:04.400
+Previously customers bought&nbsp;
+VMware once, and owned it forever.&nbsp;
+
+00:08:04.400 --> 00:08:09.680
+And those customers still generated money,&nbsp;
+because they paid for ongoing support from VMware.&nbsp;&nbsp;
+
+00:08:09.680 --> 00:08:15.760
+Updates, security patches, support, etc.
+But Broadcom, after the acquisition,&nbsp;&nbsp;
+
+00:08:15.760 --> 00:08:20.240
+stopped providing paid security patches&nbsp;
+and support… to existing perpetual&nbsp;&nbsp;
+
+00:08:20.240 --> 00:08:25.360
+owners. Not that they wouldn’t update the&nbsp;
+software, you couldn’t pay for it, at all.&nbsp;
+
+00:08:25.360 --> 00:08:30.400
+For important infrastructure like VMware,&nbsp;
+you can’t just not update it either.&nbsp;
+
+00:08:30.400 --> 00:08:35.760
+Security needs to be continuously updated and&nbsp;
+maintained, especially in cases like banks or&nbsp;&nbsp;
+
+00:08:35.760 --> 00:08:39.760
+the government, where gaps in security&nbsp;
+could have catastrophic consequences.&nbsp;
+
+00:08:39.760 --> 00:08:45.120
+After the acquisition, Broadcom notified AT&amp;T&nbsp;
+that support for its roughly 75,000 virtual&nbsp;&nbsp;
+
+00:08:45.120 --> 00:08:52.480
+machines running across 8,600 servers would end.
+So how did existing customers… still use VMware?&nbsp;
+
+00:08:52.480 --> 00:08:56.480
+That was the final part of the trap.
+Broadcom was pushing perpetual&nbsp;&nbsp;
+
+00:08:56.480 --> 00:09:00.720
+customers… to a new subscription.
+But not just any subscription.&nbsp;
+
+00:09:00.720 --> 00:09:06.080
+Broadcom reduced the VMware product catalogue&nbsp;
+from over 70 product families, to just 4,&nbsp;&nbsp;
+
+00:09:06.080 --> 00:09:11.200
+and gave customers just 30 days of notice.
+This meant hundreds of standard products&nbsp;&nbsp;
+
+00:09:11.200 --> 00:09:16.000
+people used, like individual SKUs,&nbsp;
+great for small businesses, were gone.&nbsp;
+
+00:09:16.000 --> 00:09:20.240
+You had to upgrade to the entire bundle,&nbsp;
+either the VMware Cloud Foundation,&nbsp;&nbsp;
+
+00:09:20.240 --> 00:09:26.880
+or the VMware vSphere Foundation. “All new&nbsp;
+support must be via VCF or VVF subscription.”&nbsp;
+
+00:09:26.880 --> 00:09:30.800
+That’s why all those companies, including&nbsp;
+gigantic conglomerates, technically&nbsp;&nbsp;
+
+00:09:30.800 --> 00:09:38.400
+had price hikes as high as 1000% or more.
+This, is diabolical, but we’re not even done.&nbsp;
+
+00:09:38.400 --> 00:09:43.040
+Broadcom sent cease and desists to their&nbsp;
+own perpetual customers, against downloading&nbsp;&nbsp;
+
+00:09:43.040 --> 00:09:45.440
+security patches.
+Yeah.&nbsp;
+
+00:09:45.440 --> 00:09:50.960
+But, you can’t just up and leave VMware.
+It’s not software you can just change or&nbsp;&nbsp;
+
+00:09:50.960 --> 00:09:55.840
+uninstall, for a lot of industries,&nbsp;
+virtualization is very foundational.&nbsp;&nbsp;
+
+00:09:55.840 --> 00:10:02.720
+It’s described as “bone-breaking engineering”.
+Migrating is slow and expensive… and risky.&nbsp;&nbsp;
+
+00:10:02.720 --> 00:10:07.200
+Exactly what Broadcom was counting on.
+Perfect for someone who wants to upcharge&nbsp;&nbsp;
+
+00:10:07.200 --> 00:10:13.360
+customers, as… they can’t really go&nbsp;
+anywhere else. At least not quickly.&nbsp;
+
+00:10:13.360 --> 00:10:19.600
+And what happened next, was all the ways it&nbsp;
+backfired, some Broadcom didn’t anticipate.&nbsp;
+
+00:10:19.600 --> 00:10:32.960
+But there might still be ways you and&nbsp;
+I pay the price for this acquisition.&nbsp;
+
+00:10:32.960 --> 00:10:36.480
+If you’ve watched this far, consider&nbsp;
+subscribing! It helps the channel and&nbsp;&nbsp;
+
+00:10:36.480 --> 00:10:40.960
+means you won’t miss future videos.
+Hock Tan bragged that Broadcom got&nbsp;&nbsp;
+
+00:10:40.960 --> 00:10:46.800
+more than 90% of VMware’s 10,000 largest&nbsp;
+customers re-signed to new contracts.&nbsp;
+
+00:10:46.800 --> 00:10:53.280
+But some of the actual largest, certainly&nbsp;
+haven’t, and are fighting Broadcom at every turn.&nbsp;
+
+00:10:53.280 --> 00:10:57.120
+First are the lawsuits.
+AT&amp;T sued Broadcom,&nbsp;&nbsp;
+
+00:10:57.120 --> 00:11:02.640
+as it owned perpetual licences, and had a contract&nbsp;
+that allowed it to extend support even further.&nbsp;
+
+00:11:02.640 --> 00:11:09.520
+Broadcom, allegedly, went back on that contract.
+This was especially important, because AT&amp;T&nbsp;&nbsp;
+
+00:11:09.520 --> 00:11:14.560
+had a 25 year contract for FirstNet. The&nbsp;
+federal wireless first-responder network.&nbsp;
+
+00:11:14.560 --> 00:11:20.000
+AT&amp;T in the lawsuit said “Broadcom’s&nbsp;
+attempt to bully AT&amp;T into paying a&nbsp;&nbsp;
+
+00:11:20.000 --> 00:11:24.880
+king’s ransom for subscriptions AT&amp;T does&nbsp;
+not want or need, or risk widespread network&nbsp;&nbsp;
+
+00:11:24.880 --> 00:11:29.360
+outages that could cripple the operations&nbsp;
+of millions of AT&amp;T customers worldwide”.&nbsp;
+
+00:11:29.360 --> 00:11:35.360
+And Broadcom’s response was… weird.
+“If AT&amp;T truly felt the support services&nbsp;&nbsp;
+
+00:11:35.360 --> 00:11:40.320
+were essential to avoid irreparable harm to its&nbsp;
+customers, it would have exercised and purchased&nbsp;&nbsp;
+
+00:11:40.320 --> 00:11:43.760
+the ‘three-year-renewal’ option”
+Odd.&nbsp;
+
+00:11:43.760 --> 00:11:48.640
+The two eventually settled out of court,&nbsp;
+but this is far from the only lawsuit.&nbsp;
+
+00:11:48.640 --> 00:11:52.480
+T-Mobile also sued Broadcom, to&nbsp;
+try to force Broadcom to keep&nbsp;&nbsp;
+
+00:11:52.480 --> 00:11:57.360
+providing support for perpetual licences.
+"In its complaint, T-Mobile said it has&nbsp;&nbsp;
+
+00:11:57.360 --> 00:12:04.800
+tens of thousands of virtual machines using VMware&nbsp;
+software across approximately 303,140 CPU cores.&nbsp;&nbsp;
+
+00:12:04.800 --> 00:12:10.080
+It also said that it was migrating off VMware but&nbsp;
+noted the time-consuming and technical challenges&nbsp;&nbsp;
+
+00:12:10.080 --> 00:12:16.880
+involved in migrating over 1,000 applications."
+Tesco is also suing Broadcom for over £100&nbsp;&nbsp;
+
+00:12:16.880 --> 00:12:23.040
+million, and accused them of “abusive conduct”.
+The grocery giant bought perpetual VMware licences&nbsp;&nbsp;
+
+00:12:23.040 --> 00:12:29.440
+in 2021, with support through 2026, plus&nbsp;
+the option to extend it another four years.&nbsp;
+
+00:12:29.440 --> 00:12:35.120
+But, Tesco says Broadcom refused to continue&nbsp;
+standalone support, which they already paid for,&nbsp;&nbsp;
+
+00:12:35.120 --> 00:12:41.680
+and demanded they move to subscription&nbsp;
+bundles, and pushed prices up ~175%.&nbsp;
+
+00:12:41.680 --> 00:12:45.280
+But it gets even worse.
+The Dutch Ministry of Infrastructure and&nbsp;&nbsp;
+
+00:12:45.280 --> 00:12:51.360
+Water Management, which has used VMware for over&nbsp;
+15 years, suddenly saw an 85 percent jump in cost,&nbsp;&nbsp;
+
+00:12:51.360 --> 00:12:56.560
+to use the same software. From around&nbsp;
+$2.4 million to nearly $4.6 million.&nbsp;
+
+00:12:56.560 --> 00:13:01.600
+It asked Broadcom for a support extension&nbsp;
+of two to three years while it migrated out,&nbsp;&nbsp;
+
+00:13:01.600 --> 00:13:05.520
+which Broadcom refused, unless&nbsp;
+it moved to a new platform.&nbsp;
+
+00:13:05.520 --> 00:13:09.120
+This is a vital ministry which runs&nbsp;
+the Netherlands’ tunnels, locks,&nbsp;&nbsp;
+
+00:13:09.120 --> 00:13:12.800
+and bridges, essentially held hostage by Broadcom.&nbsp;
+
+00:13:12.800 --> 00:13:17.040
+That was, until a Dutch Court found&nbsp;
+Broadcom had breached its duty of care,&nbsp;&nbsp;
+
+00:13:17.040 --> 00:13:23.600
+and ordered two years more support, at&nbsp;
+reasonable cost, or be fined €250,000… per day.&nbsp;
+
+00:13:23.600 --> 00:13:30.320
+Gotta say, that verdict feels pretty good to see.
+This has also caused an EU trade body, CISPE,&nbsp;&nbsp;
+
+00:13:30.320 --> 00:13:36.240
+to look much closer at Broadcom. CISPE sued,&nbsp;
+not Broadcom, but the European Commission,&nbsp;&nbsp;
+
+00:13:36.240 --> 00:13:42.080
+to void the original merger approval, arguing&nbsp;
+regulators didn't properly scrutinise the deal.&nbsp;
+
+00:13:42.080 --> 00:13:47.440
+Which, in fairness, is true. They didn’t.
+Broadcom tried to fight back, bidding to&nbsp;&nbsp;
+
+00:13:47.440 --> 00:13:51.520
+stop regulators requesting US&nbsp;
+legal documents tied to VMware.&nbsp;
+
+00:13:51.520 --> 00:13:54.960
+But the bid was denied, letting&nbsp;
+the investigation continue.&nbsp;
+
+00:13:54.960 --> 00:13:58.240
+There’s no doubt VMware is&nbsp;
+making much more profit now.&nbsp;
+
+00:13:58.240 --> 00:14:05.840
+VMware's operating margins went from 13–22%&nbsp;
+pre-acquisition to 77% under Broadcom.&nbsp;
+
+00:14:05.840 --> 00:14:09.520
+But long term, this may have&nbsp;
+backfired spectacularly.&nbsp;
+
+00:14:09.520 --> 00:14:16.320
+T-Mobile, Western Union, GEICO, Computershare,&nbsp;
+Danfoss, are all moving away from VMware.&nbsp;
+
+00:14:16.320 --> 00:14:21.520
+Regardless of the lawsuit outcome, Tesco has&nbsp;
+also started migrating 40,000 servers away&nbsp;&nbsp;
+
+00:14:21.520 --> 00:14:26.640
+from VMware. “The decision to migrate servers&nbsp;
+while simultaneously suing the vendor reflects&nbsp;&nbsp;
+
+00:14:26.640 --> 00:14:31.680
+how badly the relationship has broken down.”
+“The VMware exodus is creating a market for&nbsp;&nbsp;
+
+00:14:31.680 --> 00:14:37.360
+alternatives that did not exist two years ago.”
+And it’s certainly helping competitors.&nbsp;
+
+00:14:37.360 --> 00:14:43.840
+Competitor Nutanix’s CEO Rajiv Ramaswami described&nbsp;
+the pace of Broadcom defections as “steady and&nbsp;&nbsp;
+
+00:14:43.840 --> 00:14:48.000
+climbing”, and could continue for five years.
+“I think there's no doubt that the customer&nbsp;&nbsp;
+
+00:14:48.000 --> 00:14:50.960
+sentiment continues to be&nbsp;
+negative about Broadcom,”&nbsp;
+
+00:14:50.960 --> 00:14:58.400
+A survey of over 110 VMware customers in late&nbsp;
+2024 found 98% are using, planning, or considering&nbsp;&nbsp;
+
+00:14:58.400 --> 00:15:04.080
+alternatives to at least part of their VMware&nbsp;
+estate, and 92% expect further price hikes.&nbsp;
+
+00:15:04.080 --> 00:15:10.960
+CloudBolt estimated VMware’s virtualization market&nbsp;
+share could drop from 70% to 40%, in just 5 years.&nbsp;
+
+00:15:10.960 --> 00:15:17.360
+But, even so, for all the companies that just&nbsp;
+decide to pay up, the cost might pass on to us.&nbsp;
+
+00:15:17.360 --> 00:15:21.600
+Even if prices of everything don’t&nbsp;
+immediately jump, companies often don’t&nbsp;&nbsp;
+
+00:15:21.600 --> 00:15:28.400
+just “absorb” new costs without consequence.
+Cloud providers absorb some, then slowly pass&nbsp;&nbsp;
+
+00:15:28.400 --> 00:15:34.240
+on the rest to their own customers. Maybe not you&nbsp;
+or me, but their own business customers, who buy&nbsp;&nbsp;
+
+00:15:34.240 --> 00:15:39.840
+cloud hosting, who now have a higher IT cost.
+Eventually, the end B2C product might&nbsp;&nbsp;
+
+00:15:39.840 --> 00:15:44.880
+go up in price, or down in quality.
+Or if governments have to pay Broadcom more&nbsp;&nbsp;
+
+00:15:44.880 --> 00:15:51.120
+for virtualization, that's more tax dollars, more&nbsp;
+of your money, which could go to other services.&nbsp;
+
+00:15:51.120 --> 00:15:55.440
+As a report by ECCO, an industry group&nbsp;
+representing European cloud companies,&nbsp;&nbsp;
+
+00:15:55.440 --> 00:16:01.360
+stated “[VMware] price hikes have been absorbed&nbsp;
+internally (at the expense of innovation) and&nbsp;&nbsp;
+
+00:16:01.360 --> 00:16:06.240
+externally (at the expense of consumers).”
+Broadcom took something people owned and&nbsp;&nbsp;
+
+00:16:06.240 --> 00:16:10.480
+turned it into rent, but there’s another&nbsp;
+company that set the trend for all this:&nbsp;
+
+00:16:10.480 --> 00:16:11.280
+Adobe.&nbsp;
+
+00:16:11.280 --> 00:16:16.560
+Turning owned software into a subscription, and&nbsp;
+keeping customers trapped with excessive fees.&nbsp;
+
+00:16:16.560 --> 00:16:21.440
+Now, they might just be getting what they deserve.
+Watch this video next to learn more.
+
