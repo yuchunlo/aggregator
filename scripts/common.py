@@ -37,6 +37,47 @@ GONE_SUMMARY = "無法取得頁面內容（原始頁面已移除，且無存檔�
 PLACEHOLDER_PREFIX = "無法取得頁面內容"
 
 
+# Scratch fields: the feed copy of a pending item, written by update_news for
+# summarize_feed in the same job. They are kept in memory and in a sidecar file
+# outside the repo (SCRATCH_FILE, default in the temp dir) -- save_doc never
+# writes them, so archive.json cannot carry them into a commit.
+SCRATCH = ("feed_content", "feed_images")
+
+
+def scratch_path() -> Path:
+    return Path(os.environ.get("SCRATCH_FILE") or Path(tempfile.gettempdir()) / "aggregator_feed_scratch.json")
+
+
+def drop_scratch(item) -> bool:
+    return bool([item.pop(k) for k in SCRATCH if isinstance(item, dict) and k in item])
+
+
+def save_scratch(items) -> int:
+    """Sidecar {id: {feed_content, feed_images}} for pending items; replaces any older one."""
+    data = {it["id"]: sc for it in items
+            if it.get("id") and not it.get("summary") and (sc := {k: it[k] for k in SCRATCH if it.get(k)})}
+    write_atomic(scratch_path(), data)
+    return len(data)
+
+
+def load_scratch(items, consume=True) -> int:
+    """Merge the sidecar into pending items (in memory only); delete it when consumed."""
+    p = scratch_path()
+    try:
+        data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    except Exception:
+        data = {}
+    n = 0
+    for it in items:
+        sc = data.get(it.get("id")) if isinstance(data, dict) else None
+        if isinstance(sc, dict) and not it.get("summary"):
+            it.update({k: sc[k] for k in SCRATCH if sc.get(k)})
+            n += 1
+    if consume:
+        p.unlink(missing_ok=True)
+    return n
+
+
 ID_RE = re.compile(r"[0-9a-f]{40}")          # sha1 from update_news.make_id; names files
 LANG_RE = re.compile(r"[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*")
 
@@ -125,8 +166,11 @@ def load_doc(path) -> dict:
 
 
 def save_doc(path, doc: dict) -> None:
+    """Scratch fields stay in memory; the file never gets them (see SCRATCH)."""
     doc["total_items"] = len(doc["items"])
-    write_atomic(path, doc)
+    items = [{k: v for k, v in it.items() if k not in SCRATCH} if any(k in it for k in SCRATCH) else it
+             for it in doc["items"]]
+    write_atomic(path, {**doc, "items": items})
 
 
 # ---- HTTP -------------------------------------------------------------------
@@ -341,3 +385,4 @@ def get(url: str, timeout, session: requests.Session | None = None,
         except Exception:
             return None
     return None
+

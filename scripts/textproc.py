@@ -199,9 +199,23 @@ def rules() -> dict:
     return _rules
 
 
-def strip_boilerplate(text: str) -> str:
+# Markup in the text is the article's subject (a tutorial's <form> sample), not
+# extraction debris. Shared with summary_qc so both agree on what is code.
+_CODE_CTX = re.compile(r"HTML|CSS|JavaScript|TypeScript|JSX|React|Vue|Svelte|DOM|XML|SVG|前端|網頁設計|"
+                       r"標籤|元素|屬性|範例|程式碼|語法|原始碼|模板|tag|element|attribute|markup|snippet", re.I)
+_CODE_TOK = re.compile(r"\bfunction\b|\bconst\b|=>|\bimport\b|\bdef\b|\breturn\b|onClick|useState|"
+                       r"\{\s*\}|`[^`]{1,80}`|「\s*<[^」]{1,80}」")
+
+
+def looks_like_code(s: str) -> bool:
+    return CODE_NOTE in s or bool(_CODE_CTX.search(s)) or len(_CODE_TOK.findall(s)) >= 3
+
+
+def strip_boilerplate(text: str, markup: bool = True) -> str:
+    """markup=False keeps HTML-looking text (code samples) untouched."""
     r = rules()
-    text = sanitize_markup(text)
+    if markup:
+        text = sanitize_markup(text)
     for b in r["blocks"]:
         text = text.replace(b, "")
     if r["inline"]:
@@ -218,7 +232,7 @@ def restrip(summary: str) -> str:
     for m in (TABLE_NOTE, CODE_NOTE, FALLBACK_MARK):
         if body.endswith(m):
             body, marks = body[:-len(m)].rstrip(), [m] + marks
-    new = strip_boilerplate(body)
+    new = strip_boilerplate(body, markup=not looks_like_code(summary))
     if new == body:
         return summary
     return " ".join([new, *marks]) if new else BLANK_SUMMARY
@@ -388,7 +402,7 @@ def build(content: str, kind: str = "page", table=False, code=False, meta=False)
     Returns "" when only boilerplate remains, None when the text is
     undecodable (mojibake): that is a fetch problem, so the item stays pending.
     """
-    content = lang.fix_mojibake(content)
+    content = lang.collapse_loops(lang.fix_mojibake(content))   # Whisper/MT loops: keep one copy
     if lang.garbled(content):
         STATS["garbled"] += 1
         return None

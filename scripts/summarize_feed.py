@@ -8,13 +8,13 @@ re-validates thumbnails, converts 簡體, and translates non-Chinese summaries.
     summarize_feed.py                       # normal run (env: ITEMS_FILE, MAX_ITEMS...)
     summarize_feed.py --offline-only          # feed copies + local subtitles only, no fetches (after download_sub)
     summarize_feed.py --backfill-only [--dry-run] [--limit N] [--no-translate]
+    (summary QC runs first in every backfill; standalone: summary_qc.py [--fix])
     summarize_feed.py --mine-boilerplate N  # candidate drop_unit rules from corpus
 """
 
 from __future__ import annotations
 
 import argparse
-import html as html_mod
 import os
 import re
 import sys
@@ -27,32 +27,50 @@ from pathlib import Path
 import extract
 import lang
 import subtitle_priority
+import summary_qc
 import textproc
 import thumbs
-from common import (BLANK_SUMMARY, FALLBACK_MARK, GONE_SUMMARY, host_in, host_of,
+from common import (BLANK_SUMMARY, drop_scratch, load_scratch, FALLBACK_MARK, GONE_SUMMARY, host_in, host_of,
                     is_pending, is_youtube, load_doc, save_doc, valid_id)
 
 SUBTITLES_DIR = Path(os.environ.get("SUBTITLES_DIR", "data/subtitles"))
 SLEEP = 1.5                   # polite delay after each network item
 BATCH, MAX_FAIL_STREAK = 25, 4
 SKIP_HOSTS = ("news.google.com",)      # feed copy is redirect debris, page is useless
-PAUSE_DOMAINS = ("douban.com",)        # same skeleton page on every subdomain
+PAUSE_DOMAINS = ("douban.com",)        # same skeleton page on every subdomain: pause as one
 TECHMEME_FETCH = ("Source", "Report", "Documents:")
+# Douban marks (想看 / 看过 ...): the page is a login skeleton, so the feed copy
+# is all there is. Its 备注 is the user's own note; ratings and tags are not.
+DOUBAN_MARK_RE = re.compile(r"^(?:想[看读听讀聽]|[看读听讀聽][过過])")
+DOUBAN_DROP_RE = re.compile(r"^\s*(?:推荐|推薦|评分|評分|标签|標籤|tags?)\s*[:：]", re.I)
+DOUBAN_LABEL_RE = re.compile(r"^\s*(?:备注|備註|短评|短評)\s*[:：]\s*")
 # Summarised from the feed copy without fetching the page, when one exists.
+# Their feed images (feed_images) supply the thumbnail. YouTube is routed
+# before this and update_news stores no feed copy for it.
 FEED_FIRST_HOSTS = tuple("""
 abei.club aftermath.site ageofinvention.xyz artincontext.org attlin.com beartalking.com
-bituzi.com blocktempo.com blogspot.com buttondown.com caffes.me careher.net cashchou.com
+bituzi.com blocktempo.com buttondown.com caffes.me careher.net cashchou.com
 chaidarun.com cityofsound.com cocktail4party.com coolshell.cn curtismchale.ca davidoks.blog
 devtang.com esence.travel first-cafe.com firstround.com fomosoc.com fs.blog gilifedesigner.com
 honest-broker.com huli.tw hunterwalk.com joestudwell.com kopu.chat limboy.me
 lipperalpha.refinitiv.com lostmagazine.org louie.lu lutaonan.com matters.town maxjamesread.com
-medium.com meiguinfo.com mickzh.com noswag.tw notesbylex.com personaljournal.ca polgeonow.com
+mcclin.blogspot.com medium.com meiguinfo.com mickzh.com noswag.tw notesbylex.com personaljournal.ca polgeonow.com
 pseudoyu.com readtrung.com ruanyifeng.com samaltman.com shenlvmeng.github.com shiuncorner.com
 sirupsen.com sive.rs smallbooks.com.tw soidid.tw starrocket.io steveblank.com substack.com
 techcabal.com tiaodao.typlog.io travelwithbook.com trensse.com
 unchartedterritories.tomaspueyo.com uselessetymology.com vox.com waitbutwhy.com werner.wiki
 whogovernstw.org yuanyu.idv.tw zmonster.me bestblogs.dev
 """.split())
+
+# route -> (needs network, counts against --max-items)
+ROUTES = {
+    "douban":  (False, False),
+    "feed":    (False, False),   # feed copy only, never the page
+    "youtube": (False, False),
+    "title":   (True, False),    # techmeme headline, translated
+    "bridge":  (True, True),     # techmeme Sources/Report/Documents: read the page
+    "fetch":   (True, True),
+}
 
 
 def _ts(value) -> float:
@@ -77,76 +95,95 @@ def pick_subtitle(item_id: str) -> Path | None:
     return best[1] if best else None
 
 
+def route(it) -> str | None:
+    url = it["url"]
+    if host_in(url, SKIP_HOSTS):
+        return None
+    if is_youtube(url):
+        return "youtube"
+    if host_in(url, ("douban.com",)) and DOUBAN_MARK_RE.match((it.get("title") or "").strip()):
+        return "douban"
+    if host_in(url, FEED_FIRST_HOSTS) and ((it.get("feed_content") or "").strip() or it.get("feed_images")):
+        return "feed"
+    if "techmeme.com" in url:
+        return "bridge" if (it.get("title") or "").startswith(TECHMEME_FETCH) else "title"
+    return "fetch"
+
+
+def pause_key(url: str) -> str:
+    return next((d for d in PAUSE_DOMAINS if host_in(url, (d,))), host_of(url))
+
+
+def douban_note(feed: str) -> str:
+    """The user's own words in a douban mark's feed copy: ratings/tags dropped, labels stripped."""
+    lines = (DOUBAN_LABEL_RE.sub("", ln).strip() for ln in feed.splitlines() if not DOUBAN_DROP_RE.match(ln))
+    return "\n".join(ln for ln in lines if ln)
+
+
 class Run:
-    def __init__(self, path, doc, max_items: int, deadline: float | None):
+    def __init__(self, path, doc, max_items: int, deadline: float | None, offline_only=False):
         self.path, self.doc, self.max_items, self.deadline = path, doc, max_items, deadline
+        self.offline_only = offline_only
         self.n = Counter()
-        self.paused: dict[str, int] = {}          # host -> items skipped since
+        self.paused: dict[str, int] = {}          # pause key -> items skipped since
 
     # ---- bookkeeping ----
     def touch(self):
         save_doc(self.path, self.doc)          # every change reaches disk at once
 
     def done(self, it, summary, how):
+        summary, f = summary_qc.gate(it, summary, self.doc["items"])
+        if f:
+            how += f"; QC {f.category} ({f.detail}) -> " + ("repaired" if summary.strip() else "blank")
         it["summary"] = summary
-        it.pop("feed_content", None)
+        drop_scratch(it)
         self.n["ok"] += 1
         print(f"    ok ({how})")
         self.touch()
 
-    def thumb(self, it, html):
-        if not it.get("thumbnail") and html and (t := thumbs.extract(html, it["url"])):
+    def feed_thumb(self, it) -> bool:
+        """Thumbnail from the feed's own image urls; True when the item has one."""
+        if not it.get("thumbnail") and (t := thumbs.pick(it.get("feed_images"), it["url"], "feed")):
             it["thumbnail"] = t
             self.touch()
+        return bool(it.get("thumbnail"))
 
-    def title_fallback(self, it) -> bool:
-        tr = textproc.translate(it.get("title") or "")
-        if tr:
-            self.done(it, lang.to_twp(tr) + " " + FALLBACK_MARK, "translated title")
-        return bool(tr)
+    def claim_fetch(self, it) -> bool:
+        """One page fetch for `it`, if the cap, the pause list and the mode allow it."""
+        if self.offline_only or self.n["attempted"] >= self.max_items:
+            return False
+        key = pause_key(it["url"])
+        if key in self.paused:
+            self.paused[key] += 1
+            return False
+        self.n["attempted"] += 1
+        return True
 
-    # ---- routing ----
-    @staticmethod
-    def route(it) -> str | None:
-        url = it["url"]
-        if host_in(url, SKIP_HOSTS):
-            return None
-        if is_youtube(url):
-            return "youtube"
-        if host_in(url, FEED_FIRST_HOSTS) and (it.get("feed_content") or "").strip():
-            return "feed"
-        if host_in(url, PAUSE_DOMAINS) and (it.get("title") or "").strip().startswith(("想读", "想看", "想听")):
-            return "blank"
-        return "techmeme" if "techmeme.com" in url else "fetch"
-
-    def process(self, pending: list, offline_only=False):
-        routed = [(r, it) for it in pending if (r := self.route(it))]
-        offline = [x for x in routed if x[0] in ("feed", "youtube", "blank")]
-        online = [] if offline_only else [x for x in routed if x[0] not in ("feed", "youtube", "blank")]
-        print(f"pending={len(pending)}: offline={len(offline)} network={len(online)} "
+    # ---- main loop ----
+    def process(self, pending: list):
+        routed = [(r, it) for it in pending if (r := route(it))]
+        routed.sort(key=lambda x: ROUTES[x[0]][0])          # offline first; stable keeps date order
+        if self.offline_only:
+            routed = [x for x in routed if not ROUTES[x[0]][0]]
+        n_off = sum(not ROUTES[r][0] for r, _ in routed)
+        print(f"pending={len(pending)}: offline={n_off} network={len(routed) - n_off} "
               f"(fetch cap {self.max_items})")
-        for r, it in offline + online:
+        for r, it in routed:
             if self.deadline and time.monotonic() > self.deadline:
                 self.n["time_cut"] = 1
                 print("Time budget reached; the rest stay pending.")
                 break
-            metered = r == "fetch" or (r == "techmeme" and it.get("title", "").startswith(TECHMEME_FETCH))
-            if metered and self.n["attempted"] >= self.max_items:
+            if ROUTES[r][1] and not self.claim_fetch(it):
                 continue
-            key = next((d for d in PAUSE_DOMAINS if host_in(it["url"], (d,))), host_of(it["url"]))
-            if metered and key in self.paused:
-                self.paused[key] += 1
-                continue
-            if metered:
-                self.n["attempted"] += 1
+            before = self.n["attempted"]
             if r != "youtube":                # printed only once a subtitle exists
                 self.head(it, r)
             try:
-                getattr(self, "do_" + r)(it, key)
+                getattr(self, "do_" + r)(it)
             except Exception as e:           # one bad item must not end the run
                 self.n["failed"] += 1
                 print(f"    error ({type(e).__name__}: {e}), kept pending")
-            if r not in ("feed", "youtube", "blank"):
+            if ROUTES[r][0] or self.n["attempted"] > before:
                 time.sleep(SLEEP)
 
     @staticmethod
@@ -154,25 +191,33 @@ class Run:
         print(f"[{r}] ({it.get('published_at') or 'no date'}) {(it.get('title') or '')[:60]}\n"
               f"    {it['url']}")
 
-    # ---- handlers ----
-    def do_blank(self, it, _key):
-        self.done(it, BLANK_SUMMARY, "douban mark, blank")
+    # ---- offline handlers ----
+    def do_douban(self, it):
+        """想X and X过 alike: the note from the feed copy, else blank. Never fetched."""
+        note = douban_note(it.get("feed_content") or "")
+        s = textproc.build(note, "feed") if note else ""
+        if s:
+            self.done(it, s, f"douban mark, feed note {len(note)} chars")
+        else:                       # no feed copy / rating only / undecodable: nothing to say
+            self.done(it, BLANK_SUMMARY, "douban mark, no note in feed, blank")
 
-    def do_feed(self, it, _key):
-        html = it["feed_content"]
-        self.thumb(it, html_mod.unescape(html))          # even if the summary fails
-        text = html.strip()
-        s = textproc.build(text, "feed", meta=len(text) < extract.MIN_BODY)
+    def do_feed(self, it):
+        """Feed copy only, never the page: text -> summary, else blank.
+        The thumbnail comes from feed_images either way."""
+        self.feed_thumb(it)
+        text = (it.get("feed_content") or "").strip()
+        s = textproc.build(text, "feed", meta=len(text) < extract.MIN_BODY) if text else ""
         if s:
             self.done(it, s, f"feed, {len(text)} chars")
-        elif s is None:             # undecodable feed copy: drop it, the page gets fetched next run
-            it.pop("feed_content", None)
+        elif s is None:             # undecodable feed copy: stays pending for a fresh copy
+            drop_scratch(it)
             self.n["failed"] += 1
             self.touch()
-        else:                       # feed copy held only boilerplate / images: nothing to say
-            self.done(it, BLANK_SUMMARY, "only boilerplate in feed copy, blank")
+            print("    undecodable feed copy -> kept pending")
+        else:                       # only boilerplate / images: nothing to say
+            self.done(it, BLANK_SUMMARY, "no text in feed copy, blank")
 
-    def do_youtube(self, it, _key):
+    def do_youtube(self, it):
         if not it.get("thumbnail"):
             m = re.search(r"(?:[?&]v=|/shorts/|/live/|youtu\.be/)([\w-]{6,20})(?![\w-])", it["url"])
             if m:
@@ -191,22 +236,28 @@ class Run:
         else:
             self.n["failed"] += 1
 
-    def do_techmeme(self, it, key):
-        # Sources:/Report:/Documents: headlines rest on obtained reporting:
-        # read the page; others get the translated headline.
-        if not it["title"].startswith(TECHMEME_FETCH):
-            self.title_fallback(it)
-            return
-        self.do_fetch(it, key, kind="bridge", fallback=self.title_fallback)
+    # ---- network handlers ----
+    def title_fallback(self, it) -> bool:
+        tr = textproc.translate(it.get("title") or "")
+        if tr:
+            self.done(it, lang.to_twp(tr) + " " + FALLBACK_MARK, "translated title")
+        return bool(tr)
 
-    def do_fetch(self, it, key, kind="page", fallback=None):
+    def do_title(self, it):
+        self.title_fallback(it)
+
+    def do_bridge(self, it):
+        # Sources:/Report:/Documents: headlines rest on obtained reporting.
+        self.do_fetch(it, kind="bridge", fallback=self.title_fallback)
+
+    def do_fetch(self, it, kind="page", fallback=None):
         feed = it.get("feed_content") or ""
         found = {}
         f = extract.fetch(it["url"], feed, found)
-        if not it.get("thumbnail"):
-            if t := found.get("thumbnail") or thumbs.extract(html_mod.unescape(feed), it["url"]):
-                it["thumbnail"] = t
-                self.touch()
+        if not it.get("thumbnail") and found.get("thumbnail"):
+            it["thumbnail"] = found["thumbnail"]
+            self.touch()
+        self.feed_thumb(it)                  # page had none: the feed's images may
         s = textproc.build(f.text, kind, f.table, f.code, f.kind == "meta") if f.text else ""
         if s:
             return self.done(it, s, f"{f.kind}, {len(f.text)} chars")
@@ -214,13 +265,14 @@ class Run:
             return
         if f.text and s is not None and f.kind in ("body", "meta"):    # page read fine, but only boilerplate in it
             return self.done(it, BLANK_SUMMARY, f"{f.kind}: only boilerplate, blank")
+        key = pause_key(it["url"])
         if f.kind == "blocked":              # site-wide refusal: pause host, stay pending
             self.paused.setdefault(key, 0)
             self.n["blocked"] += 1
             print(f"    blocked -> kept pending, {key} paused for this run")
         elif f.kind == "gone":               # permanent answer for this url
             it["summary"] = GONE_SUMMARY
-            it.pop("feed_content", None)
+            drop_scratch(it)
             self.n["gone"] += 1
             self.touch()
             print("    gone (404/410, no archive) -> placeholder")
@@ -230,8 +282,9 @@ class Run:
 
 
 def backfill(items, *, translate=True, deadline=None, save=None, limit=0) -> Counter:
-    """Bring stored items up to the current rules: thumbnails, 簡體, language."""
+    """Bring stored items up to the current rules: QC fixes, thumbnails, 簡體, language."""
     n, targets = Counter(), []
+    summary_qc.report(summary_qc.apply(items, fix=True))   # mojibake, loops, chrome, mismatch, spam
     for it in items:
         if it.get("thumbnail"):
             ok, why = thumbs.still_valid(it)
@@ -240,11 +293,7 @@ def backfill(items, *, translate=True, deadline=None, save=None, limit=0) -> Cou
                 n["thumbnail"] += 1
                 n[f"thumb: {why}"] += 1
         s = it.get("summary")
-        if not s or not s.strip() or s == GONE_SUMMARY:
-            continue
-        if lang.garbled(s):                     # stored mojibake / translated garbage
-            del it["summary"]                   # pending again: re-fetched with the fixed decoder
-            n["garbled"] += 1
+        if not s or not s.strip() or s == GONE_SUMMARY:   # QC above may have blanked it
             continue
         if (t := textproc.restrip(s)) != s:              # rules added since it was written
             it["summary"] = s = t
@@ -258,7 +307,7 @@ def backfill(items, *, translate=True, deadline=None, save=None, limit=0) -> Cou
             targets.append(it)
     targets = targets[:limit] if limit else targets
     print(f"Backfill: thumbnails dropped={n['thumbnail']}, boilerplate={n['boilerplate']}, "
-          f"simplified={n['simplified']}, garbled reset={n['garbled']}, "
+          f"simplified={n['simplified']}, "
           f"non-Chinese={len(targets)}"
           + "".join(f"\n  {k}×{v}" for k, v in n.items() if k.startswith("thumb: ")))
     if not (targets and translate):
@@ -336,6 +385,8 @@ def main(argv=None) -> int:
         return 1
     doc = load_doc(a.items_file)
     items = doc["items"]
+    if not a.mine_boilerplate and not a.backfill_only:
+        load_scratch(items)                    # update_news's feed copies, this job only
     save = lambda: save_doc(a.items_file, doc)
 
     if a.mine_boilerplate:
@@ -343,6 +394,7 @@ def main(argv=None) -> int:
         return 0
     if a.backfill_only:
         if a.dry_run:
+            summary_qc.report(summary_qc.apply(items, fix=False))
             t = [it for it in items if lang.needs_translation(it.get("summary"))]
             print(f"would translate {len(t)}")
             for it in t[:5]:
@@ -355,9 +407,10 @@ def main(argv=None) -> int:
     start = time.monotonic()
     budget = a.time_budget_seconds
     pending = sorted(filter(is_pending, items), key=lambda it: _ts(it.get("published_at")), reverse=True)
-    run = Run(a.items_file, doc, a.max_items, start + budget * 0.5 if budget else None)
+    run = Run(a.items_file, doc, a.max_items, start + budget * 0.5 if budget else None,
+              offline_only=a.offline_only)
     try:
-        run.process(pending, offline_only=a.offline_only)
+        run.process(pending)
         print(f"Done. {dict(run.n)}; paused hosts: {dict(run.paused) or '-'}")
         if textproc.STATS:
             print("Stats: " + ", ".join(f"{k}×{v}" for k, v in sorted(textproc.STATS.items())))
@@ -368,10 +421,7 @@ def main(argv=None) -> int:
             except Exception as e:
                 print(f"ERROR: backfill aborted ({type(e).__name__}: {e})")
     finally:
-        # feed_content is scratch: update_news writes it, only this reads it.
-        for it in items:
-            it.pop("feed_content", None)
-        save()
+        save()                                 # save_doc never writes scratch fields
     return 0
 
 

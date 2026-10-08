@@ -30,7 +30,7 @@ DENY = frozenset(u.lower() for u in (
     "https://gmhjohnny.wordpress.com/wp-content/uploads/2020/09/j102.png",
 ))
 DENY_RE = re.compile(r"^https?://kottke\.org/.*/images/\d{4}/logo-colors/", re.I)
-SKIP_HOSTS = ("finance.technews.tw", "douban.com")   # never take a thumbnail from these (incl. subdomains)
+SKIP_HOSTS = ("finance.technews.tw", "douban.com", "granitefirm.com")   # never take a thumbnail from these (incl. subdomains)
 # Hosts that serve only article uploads with meaningless filenames (Blogger).
 TRUSTED_HOSTS = ("blogger.googleusercontent.com", "bp.blogspot.com")
 TRUSTED_PATH_RE = re.compile(r"^https?://lh\d+\.googleusercontent\.com/blogger_img_proxy/", re.I)
@@ -147,25 +147,41 @@ BODY_IMG_RE = re.compile(r"""<img\b[^>]*?\bsrc\s*=\s*["']([^"']+)["']""", re.I)
 IMG_DIM_RE = re.compile(r"""\b(?:width|height)\s*=\s*["']?(\d+)""", re.I)
 
 
-def extract(html: str, page_url: str) -> str | None:
-    """First usable image: og:image / twitter:image, then body <img>s."""
-    if not html or skipped_host(page_url):
-        return None
-    cands = [(m.group(1) or m.group(2), "meta") for m in META_IMAGE_RE.finditer(html[:60000])]
-    for m in BODY_IMG_RE.finditer(html):
+def candidates(html: str, page_url: str, limit: int = 24) -> list[str]:
+    """Image urls worth judging, in order: og:image / twitter:image, then body
+    <img>s that are not declared icon-sized. Absolute, unescaped, de-duplicated."""
+    raws = [m.group(1) or m.group(2) for m in META_IMAGE_RE.finditer((html or "")[:60000])]
+    for m in BODY_IMG_RE.finditer(html or ""):
         dims = [int(d) for d in IMG_DIM_RE.findall(html[m.start():m.end() + 120])]
-        if dims and max(dims) < 200:
-            continue                               # icon or tracking pixel
-        cands.append((m.group(1), "body"))
-        if len(cands) > 24:
+        if not (dims and max(dims) < 200):         # icon or tracking pixel
+            raws.append(m.group(1))
+        if len(raws) > limit:
             break
-    for raw, where in cands:
+    out = []
+    for raw in raws:
         url = GOOGLE_SIZE_RE.sub("", urljoin(page_url, html_mod.unescape((raw or "").strip())))
+        if url and url not in out:
+            out.append(url)
+    return out
+
+
+def pick(urls, page_url: str, where: str = "page") -> str | None:
+    """First usable url among `urls` (already in preference order)."""
+    if skipped_host(page_url):
+        return None
+    for url in urls or ():
         ok, reason = usable(url)
         if ok:
             print(f"    thumbnail ({where}): {url}  [{reason}]")
             return url
     return None
+
+
+def extract(html: str, page_url: str) -> str | None:
+    """First usable image of a page: og:image / twitter:image, then body <img>s."""
+    if not html or skipped_host(page_url):
+        return None
+    return pick(candidates(html, page_url), page_url)
 
 
 def still_valid(item: dict) -> tuple[bool, str]:

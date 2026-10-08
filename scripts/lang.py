@@ -175,6 +175,75 @@ def fix_mojibake(text: str) -> str:
     return text
 
 
+# A loop: one unit (1-12 chars, containing a word char) repeated >=10 times over
+# >=40 chars, or >=15 times however short ("小小小…"); or a cycle of 2-3 short
+# clauses repeated >=5 times ("在那裡，它是，在那裡，它是…"). Machine translation
+# and Whisper both fall into these.
+LOOP_MIN, LOOP_MIN_SHORT, LOOP_MIN_CYCLE = 10, 15, 5
+_CLAUSE_DELIM = re.compile(r"([，,、；;。.！!？?\s]+)")
+
+
+def _unit_loops(text: str):
+    for mo in _REPEAT.finditer(text):
+        unit = mo.group(1)
+        reps = len(mo.group()) // len(unit)
+        if re.search(r"[^\W\d_]", unit) and (len(mo.group()) >= 40 or reps >= LOOP_MIN_SHORT):
+            yield mo.start(), mo.start() + reps * len(unit), unit, reps
+
+
+def _cycle_loops(text: str):
+    """Runs of a 2-3 clause cycle, as (start, end, cycle_text, reps)."""
+    parts = _CLAUSE_DELIM.split(text)          # clause, delim, clause, delim, ...
+    clauses = parts[0::2]
+    starts, pos = [], 0
+    for i, p in enumerate(parts):
+        if i % 2 == 0:
+            starts.append(pos)
+        pos += len(p)
+    i = 0
+    while i < len(clauses):
+        hit = None
+        for p in (2, 3):
+            cyc = clauses[i:i + p]
+            if len(cyc) < p or len(set(cyc)) < p or not all(0 < len(c) <= 12 for c in cyc):
+                continue
+            k = 1
+            while clauses[i + k * p:i + (k + 1) * p] == cyc:
+                k += 1
+            if k >= LOOP_MIN_CYCLE:
+                hit = (p, k)
+                break
+        if hit:
+            p, k = hit
+            end_clause = i + p * k                  # first clause after the run
+            end = starts[end_clause] if end_clause < len(starts) else len(text)
+            one = starts[i + p] if i + p < len(starts) else end
+            yield starts[i], end, text[starts[i]:one], k
+            i = end_clause
+        else:
+            i += 1
+
+
+def find_loops(text: str) -> list[tuple]:
+    """[(start, end, unit, reps)] of degenerate repetition, in text order."""
+    if not text:
+        return []
+    out = sorted([*_unit_loops(text), *_cycle_loops(text)])
+    keep, last = [], -1
+    for lp in out:                                  # overlapping finds: keep the first
+        if lp[0] >= last:
+            keep.append(lp)
+            last = lp[1]
+    return keep
+
+
+def collapse_loops(text: str) -> str:
+    """Each loop reduced to a single occurrence of its unit; the rest untouched."""
+    for start, end, unit, _ in reversed(find_loops(text)):
+        text = text[:start] + unit + text[end:]
+    return text
+
+
 def garbled(text: str) -> bool:
     """Unrepaired mojibake, replacement characters, or a degenerate loop
     (machine translation of garbage repeats one phrase dozens of times)."""
@@ -188,8 +257,7 @@ def garbled(text: str) -> bool:
                    for b in [[m[c] for c in mo.group()]] for x, y in zip(b, b[1:]))
     if max(pairs(m, run) for m, run in _MOJI.values()) * 2 / chars > 0.05:
         return True
-    return any(len(mo.group()) >= 40 and re.search(r"\w", mo.group(1))
-               for mo in _REPEAT.finditer(text))
+    return next(_unit_loops(text), None) is not None
 
 
 # ---- translation ------------------------------------------------------------
@@ -309,6 +377,11 @@ def _accept(out: str) -> tuple:
     out = (out or "").strip()
     if not out:
         return None, "empty result"
+    if find_loops(out):                     # keep what the provider got right
+        fixed = collapse_loops(out)
+        if len(fixed) < 0.6 * len(out):     # mostly loop: nothing worth keeping
+            return None, "garbled result"
+        out = fixed
     if garbled(out):
         return None, "garbled result"
     if needs_translation(out):

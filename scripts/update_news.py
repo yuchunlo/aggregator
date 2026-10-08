@@ -27,6 +27,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dtparser
 
 import common
+import thumbs
 from common import UA, host_in, host_of, load_doc, make_session, save_doc
 
 UTC = timezone.utc
@@ -76,6 +77,7 @@ class Raw:
     published_at: datetime | None
     feed_url: str = ""
     content: str = ""
+    images: tuple = ()          # image urls from the feed entry (html <img>, media:*, enclosures)
 
 
 # ---- identity -----------------------------------------------------------------
@@ -172,6 +174,32 @@ def entry_content(entry, link: str) -> str:
     return html_to_text(max(cands, key=len))[:FEED_CONTENT_MAX] if cands else ""
 
 
+FEED_IMAGES_MAX = 12
+
+
+def entry_images(entry, link: str) -> tuple:
+    """Image urls a feed entry carries, best first: <img>s in its html (the
+    article's own images), then media:content / media:thumbnail / image
+    enclosures (often small renditions). Plain-text feed_content loses these,
+    so they are kept beside it for the thumbnail."""
+    if host_in(link, FEED_CONTENT_SKIP):
+        return ()
+    html = [str(b.get("value") or "") for b in entry.get("content") or [] if isinstance(b, dict)]
+    html += [str(entry[k]) for k in ("summary", "description") if entry.get(k)]
+    urls = [u for h in sorted(html, key=len, reverse=True) for u in thumbs.candidates(h, link)]
+    for key in ("media_content", "media_thumbnail"):
+        urls += [str(m.get("url") or "") for m in entry.get(key) or [] if isinstance(m, dict)
+                 if str(m.get("medium") or m.get("type") or "image").startswith("image")]
+    urls += [str(l.get("href") or "") for l in entry.get("links") or [] if isinstance(l, dict)
+             and l.get("rel") == "enclosure" and str(l.get("type") or "").startswith("image/")]
+    out = []
+    for u in urls:
+        u = u.strip()
+        if u.lower().startswith(("http://", "https://")) and len(u) <= 2048 and u not in out:
+            out.append(u)
+    return tuple(out[:FEED_IMAGES_MAX])
+
+
 def compact(text: str, limit: int = 96) -> str:
     s = re.sub(r"\s+", " ", text or "").strip()
     return s if len(s) <= limit else s[:limit - 1].rstrip() + "…"
@@ -216,7 +244,7 @@ def parse_rss(content: bytes, feed: dict) -> list[Raw]:
         when = parse_date(e.get("published")) or parse_date(e.get("updated")) or parse_date(e.get("pubDate"))
         if title and link and when:
             out.append(Raw(feed["category"], source, title, link, when, feed["url"],
-                           entry_content(e, link)))
+                           entry_content(e, link), entry_images(e, link)))
     return out
 
 
@@ -502,8 +530,11 @@ def ingest(archive: dict, raws: list[Raw], now: datetime) -> None:
             rec["published_at"] = iso(raw.published_at)       # feeds fix their dates
         rec.update(category=raw.category, source=raw.source,
                    title=title, url=url, last_seen_at=iso(now))
-        if raw.content and not rec.get("summary") and not rec.get("feed_content"):
-            rec["feed_content"] = raw.content
+        if not rec.get("summary"):
+            if raw.content and not rec.get("feed_content"):
+                rec["feed_content"] = raw.content
+            if raw.images and not rec.get("feed_images"):
+                rec["feed_images"] = list(raw.images)
 
 
 def main(argv=None) -> int:
@@ -548,10 +579,11 @@ def main(argv=None) -> int:
         print(f"Retention: dropped {dropped} item(s) not seen for {a.archive_days}+ days")
     for r in kept:
         if r.get("summary"):
-            r.pop("feed_content", None)
+            common.drop_scratch(r)
     kept.sort(key=lambda r: parse_date(r.get("last_seen_at")) or datetime.min.replace(tzinfo=UTC),
               reverse=True)
     doc = {"generated_at": iso(now), "items": kept}
+    print(f"Feed copies for {common.save_scratch(kept)} pending item(s) -> {common.scratch_path()}")
     save_doc(path, doc)
     print(f"Wrote {path} ({len(kept)} items, fetched {len(raws)} raw)")
     return 0

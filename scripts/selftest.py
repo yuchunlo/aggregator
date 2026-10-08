@@ -16,6 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 os.environ.setdefault("TRANSLATE", "off")
+os.environ["SCRATCH_FILE"] = os.path.join(tempfile.mkdtemp(), "scratch.json")   # never the real sidecar
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import common, lang, update_news as un, subtitle_priority as sp, thumbs, textproc, extract, download_sub as ds  # noqa: E402
@@ -257,6 +258,61 @@ def check_encoding():
     eq(["summary" in it for it in items], [False, True], "backfill re-queues stored mojibake")
 
 
+def check_summary_qc():
+    """Stored-summary QC: each category gets its fix, and the known false
+    positives (HTML in a tutorial, news about gambling, real Russian) pass."""
+    import summary_qc as qc
+    zh = "研究人員在報告中指出，這項技術可以大幅降低資料中心的耗電量，並預計明年開始量產。"
+    act = lambda s, title="t", url="https://x.example/a": (
+        (f := qc.inspect({"summary": s, "title": title, "url": url})) and (f.category, f.action))
+    eq(act(zh * 3), None, "clean summary")
+    eq(act("嘿嘿嘿，" + zh), None, "three 嘿 is speech, not a loop")
+    eq(act(zh + "小" * 20 + zh), ("loop", "repair"), "char loop collapsed")
+    eq(act(zh + "在那裡，它是，" * 8 + zh), ("loop", "repair"), "clause cycle collapsed")
+    eq(act("前言。" + "考查，" * 30), ("loop", "refetch"), "loop-only summary rebuilt")
+    f = qc.inspect({"summary": zh + "小" * 20 + zh, "title": "t", "url": "u"})
+    eq("小小" in f.fixed, False, "collapse leaves no run")
+    bad = "".join(bytes([b]).decode("cp1252", "ignore") or chr(b) for b in (zh * 2).encode())
+    eq(act(bad), ("garbled", "repair"), "latin-1 mojibake repaired in place")
+    eq(act("前言" + "\ufffd" * 10 + zh), ("garbled", "refetch"), "replacement chars")
+    cyr = (zh[:10] + "ђѓѕјљњћџ") * 3
+    eq(act(cyr), ("garbled", "refetch"), "cp1251 mojibake")
+    eq(act("Президент заявил, что правительство рассмотрит новый закон о бюджете в следующем месяце."),
+       None, "real Russian is not mojibake")
+    eq(act("Sign up Sign in Open in app Write"), ("scrape", "refetch"), "Medium chrome")
+    eq(act("Subscribe Sign in Claim my free post"), ("scrape", "refetch"), "Substack paywall")
+    eq(act("Please enable JavaScript to view this page."), ("scrape", "refetch"), "JS wall")
+    tut = "這篇教學示範如何用 HTML 建立表單：<form><input type=\"text\"><button>送出</button></form>，再用 CSS 調整 <div class=\"row\"> 的排版。" + zh
+    eq(act(tut), None, "HTML sample in a tutorial is content")
+    eq(act(zh + "<div class=\"post\"><span>a</span><img src=x><p>b</p><br>" + zh * 2),
+       ("scrape", "repair"), "tag debris stripped")
+    eq(act("澳門博彩收入上月成長，娛樂城業者看好下半年。" + zh), None, "gambling news is not spam")
+    eq(act("KEBAYA4D slot gacor daftar sekarang deposit minimal Rp 10rb"), ("spam", "blank"), "promo spam")
+    eq(act("頂尖成長工作室，SEO, AEO 全包，" + zh), ("spam", "blank"), "growth-studio ad")
+    yt = "https://www.youtube.com/watch?v=abcdefghijk"
+    it = {"summary": "Sign up Sign in", "title": "t", "url": yt}
+    qc.apply([it]); eq(it["summary"], common.BLANK_SUMMARY, "youtube: refetch is pointless")
+    items = [{"title": "蘋果發表新款手機", "url": "https://a.example/1", "summary": "蘋果今天發表新款手機，" + zh * 2},
+             {"title": "颱風明天登陸", "url": "https://b.example/zz/2", "summary": "蘋果今天發表新款手機，" + zh * 2},
+             {"title": "蘋果發表新款手機（更新）", "url": "https://a.example/1-update", "summary": "蘋果今天發表新款手機，" + zh * 2}]
+    qc.apply(items[:2], fix=True)
+    eq(["summary" in it for it in items[:2]], [True, False],
+       "shared summary: keeper stays, mismatch refetched")
+    eq(qc.check_shared([items[0], items[2]]), {}, "retitled copy of the same article")
+    eq(qc.gate({"title": "t", "url": "https://x.example/a"}, "Sign up Sign in", [])[0],
+       common.BLANK_SUMMARY, "fresh summary failing QC is never stored: no retry state needed")
+    eq(qc.gate({"title": "t", "url": "u"}, zh + "小" * 20 + zh, [])[0], zh + "小" + zh, "gate repairs")
+    eq(qc.gate({"title": "颱風", "url": "https://c.example/9"}, items[0]["summary"], [items[0]])[0],
+       common.BLANK_SUMMARY, "gate: new item copying another title's summary")
+    eq(qc.gate({"title": "t", "url": "u"}, zh * 2, items)[0], zh * 2, "gate passes clean text")
+    s = "教學：用 HTML 的 <input type=\"text\"> 建立欄位，" + zh
+    eq(textproc.restrip(s), s, "restrip keeps HTML samples in code articles")
+    eq("<img" in textproc.restrip(zh + "<img src=x>" + zh), False, "restrip still cleans debris")
+    eq(lang._accept(zh + "小" * 20 + zh)[0], zh + "小" + zh, "translation loop collapsed, rest kept")
+    out = textproc.build(zh + "在那裡，在那裡，" * 12 + "後來大家都回家了。", "subtitle")
+    eq((out is not None, (out or "").count("在那裡") <= 1), (True, True), "build collapses ASR loops, not drops")
+
+
 def check_inbox():
     """data/inbox.json from the reader: only safe recent urls; a known url
     keeps its title (the id hashes it) and is not fetched again."""
@@ -285,6 +341,111 @@ def check_inbox():
         eq(un.fetch_inbox(archive, d / "inbox.json", 60), [], "inbox: malformed file ignored")
     finally:
         un.common.get = real
+
+
+def check_routes_douban_blogspot():
+    """2026-10: douban 看过/读过/听过 went to the page (a login skeleton), got
+    'blocked' and stayed pending forever; every mark (想X too) now uses the
+    feed note or goes blank. blogspot.com left FEED_FIRST_HOSTS: its feed copy
+    is plain text, so image-only posts (mcclin) lost their thumbnail; it is back
+    as feed-first now that update_news keeps the entry's image urls (feed_images)."""
+    import summarize_feed as sf
+    db = "https://movie.douban.com/subject/1/"
+    eq([sf.route({"url": db, "title": t}) for t in ("想看 X", "想读 X", "看过 X", "读过 X", "听过 X", "看過 X")],
+       ["douban"] * 6, "every douban mark takes the douban route")
+    eq(sf.route({"url": "https://www.douban.com/note/1/", "title": "想法"}), "fetch", "other douban pages still fetched")
+    eq(sf.route({"url": "https://mcclin.blogspot.com/x.html", "title": "t", "feed_images": ["https://a/b.png"]}),
+       "feed", "feed images alone are enough for the feed route")
+    eq(sf.route({"url": "https://www.techmeme.com/1", "title": "Source: X"}), "bridge", "techmeme Source -> bridge")
+    eq(sf.route({"url": "https://www.techmeme.com/1", "title": "X"}), "title", "techmeme other -> title")
+    eq(sf.douban_note("推荐: 力荐\n标签: 科幻\n备注: 很好看"), "很好看", "douban note: rating/tags dropped")
+    d = Path(tempfile.mkdtemp())
+    f = d / "a.json"
+    tag = "Only those that risk going too far, can possibly know how far he can go.\n2026年10月8日"
+    feed_img = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvY/w485-h640/shot.png"
+    img = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvX/w1200-h630-p-k-no-nu/chart.png"
+    f.write_text(json.dumps({"items": [
+        {"id": "a" * 40, "url": "https://mcclin.blogspot.com/2026/10/x.html", "title": "t", "feed_content": tag},
+        {"id": "b" * 40, "url": db, "title": "看过 X", "feed_content": "推荐: 力荐\n备注: 很好看的电影，结局令人意外。"},
+        {"id": "c" * 40, "url": db, "title": "想看 Y", "feed_content": "备注: 朋友说这部电影的配乐非常出色。"},
+        {"id": "d" * 40, "url": db, "title": "看过 Z", "feed_content": "推荐: 还行"},
+        {"id": "e" * 40, "url": db, "title": "想读 W"},
+        {"id": "f" * 40, "url": "https://fs.blog/x", "title": "t", "feed_content": tag},
+        {"id": "9" * 40, "url": "https://mcclin.blogspot.com/2026/10/y.html", "title": "u", "feed_content": tag,
+         "feed_images": [feed_img]}]}))
+    page = f'<html><head><meta property="og:image" content="{img}"></head><body><p>{tag}</p></body></html>'
+    fetched = []
+    real_get, real_sleep = extract.http_get, sf.SLEEP
+    extract.http_get, sf.SLEEP = (lambda url, t, imp=False: (fetched.append(url), (page, "ok"))[1]), 0
+    try:
+        sf.main(["--items-file", str(f), "--no-backfill", "--no-translate"])
+    finally:
+        extract.http_get, sf.SLEEP = real_get, real_sleep
+    out = json.loads(f.read_text())["items"]
+    eq((out[0].get("thumbnail"), out[0].get("summary")), (None, common.BLANK_SUMMARY),
+       "feed-first, only boilerplate, no feed image: blank, page not read")
+    eq((out[6].get("thumbnail"), out[6].get("summary"), "feed_images" in out[6]),
+       (feed_img, common.BLANK_SUMMARY, False), "feed image used, blank, scratch dropped")
+    eq(out[1].get("summary"), "很好看的電影，結局令人意外。", "看过: feed note")
+    eq(out[2].get("summary"), "朋友說這部電影的配樂非常出色。", "想看: feed note, same flow")
+    eq((out[3].get("summary"), out[4].get("summary")), (common.BLANK_SUMMARY,) * 2,
+       "douban: rating only / no feed copy -> blank")
+    eq(fetched, [], "feed-first items never fetch the page")
+    eq([k for it in out for k in common.SCRATCH if k in it], [], "no scratch left after a run")
+    eq(thumbs.extract(f'<meta property="og:image" content="{img}">', "https://www.granitefirm.com/blog/x"),
+       None, "granitefirm.com never yields a thumbnail")
+
+
+def check_feed_images():
+    """update_news keeps an entry's image urls beside its plain-text copy."""
+    rss = b"""<?xml version="1.0"?><rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>b</title>
+<item><title>t</title><link>https://mcclin.blogspot.com/2026/10/x.html</link><pubDate>Thu, 08 Oct 2026 01:08:00 +0000</pubDate>
+<description>&lt;div&gt;&lt;a href="https://blogger.googleusercontent.com/img/b/X/s1600/a.png"&gt;&lt;img height="640" src="https://blogger.googleusercontent.com/img/b/X/w485-h640/a.png" width="485" /&gt;&lt;/a&gt;&lt;img src="/icon.gif" width="16"&gt;&lt;/div&gt;</description>
+<media:thumbnail url="https://blogger.googleusercontent.com/img/b/X/s72-c/a.png" height="72" width="72"/></item></channel></rss>"""
+    raws = un.parse_rss(rss, {"category": "c", "title": "b", "url": "https://x/feed"})
+    eq(list(raws[0].images), ["https://blogger.googleusercontent.com/img/b/X/w485-h640/a.png",
+                              "https://blogger.googleusercontent.com/img/b/X/s72-c/a.png"],
+       "feed images: body <img> first, icons skipped, media:thumbnail last")
+    eq(raws[0].content, "", "image-only entry has no text")
+    archive = {}
+    un.ingest(archive, raws, datetime.now(timezone.utc))
+    eq(next(iter(archive.values())).get("feed_images"), list(raws[0].images), "ingest stores feed_images")
+
+
+def check_scratch_never_left():
+    """feed_content / feed_images never reach archive.json: save_doc drops them,
+    update_news hands them over in a sidecar outside the repo."""
+    import summarize_feed as sf
+    d = Path(tempfile.mkdtemp())
+    f = d / "a.json"
+    yt = {"id": "a" * 40, "url": "https://www.youtube.com/watch?v=abcdefghijk", "title": "v"}
+    eq(sf.route(dict(yt, feed_content="x", feed_images=["https://a/b.png"])), "youtube",
+       "youtube items never take the feed route")
+    items = [{"id": "b" * 40, "url": "https://fs.blog/x", "title": "t",
+              "feed_content": "這是一段足夠長的部落格文章內容，討論市場與利率的關係。" * 3,
+              "feed_images": ["https://example.com/img/rate-chart.png"]},
+             {"id": "c" * 40, "url": "https://example.org/x", "title": "p", "feed_content": "keep"},
+             {"id": "d" * 40, "url": "https://example.org/y", "title": "q", "summary": "done", "feed_content": "z"}]
+    common.save_doc(f, {"items": items})
+    left = lambda: [k for it in json.loads(f.read_text())["items"] for k in common.SCRATCH if k in it]
+    eq(left(), [], "save_doc never writes scratch")
+    eq("feed_content" in items[0], True, "save_doc leaves the in-memory copy alone")
+    eq(common.save_scratch(items), 2, "sidecar: pending items only")
+    with contextlib.suppress(RuntimeError):
+        real = sf.Run.process
+        sf.Run.process = lambda self, p: (_ for _ in ()).throw(RuntimeError("crash"))
+        try:
+            sf.main(["--items-file", str(f), "--no-backfill"])
+        finally:
+            sf.Run.process = real
+    eq(left(), [], "no scratch on disk after a crash")
+    eq(common.scratch_path().exists(), False, "sidecar consumed")
+    common.save_scratch(items)
+    sf.main(["--items-file", str(f), "--no-backfill", "--max-items", "0"])
+    out = json.loads(f.read_text())["items"]
+    eq((bool(out[0].get("summary")), out[0].get("thumbnail")),
+       (True, "https://example.com/img/rate-chart.png"), "sidecar feeds the feed route")
+    eq(left(), [], "no scratch on disk after a run")
 
 
 def check_offline_only():
