@@ -15,9 +15,7 @@ env:
   ARCHIVE_FILE: data/archive.json
   SUBTITLE_DIR: data/subtitles
   COOKIES_PATH: /dev/shm/cookies.txt
-  # ASR budget is audio-seconds: 20 videos is trivial at 10 min each and
-  # impossible at 3 h each. 4 h of audio at base-model speed fits the job.
-  MAX_ASR_TOTAL_SECONDS: 14400
+  MAX_ASR_TOTAL_SECONDS: 28800
   WHISPER_MODEL: base
   HF_HOME: /home/runner/.cache/huggingface
 
@@ -71,7 +69,7 @@ jobs:
       - name: Download subtitles
         run: |
           python scripts/download_sub.py --archive "$ARCHIVE_FILE" --output-dir "$SUBTITLE_DIR" \
-            --cookies-path "$COOKIES_PATH" --max-items 400 --max-transcribe 20 \
+            --cookies-path "$COOKIES_PATH" --max-items 400 --max-transcribe 40 \
             --max-asr-total "$MAX_ASR_TOTAL_SECONDS" --whisper-model "$WHISPER_MODEL"
 
       - name: Remove cookies
