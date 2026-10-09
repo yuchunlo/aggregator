@@ -356,8 +356,9 @@ def check_routes_douban_blogspot():
     eq(sf.route({"url": "https://www.douban.com/note/1/", "title": "想法"}), "fetch", "other douban pages still fetched")
     eq(sf.route({"url": "https://mcclin.blogspot.com/x.html", "title": "t", "feed_images": ["https://a/b.png"]}),
        "feed", "feed images alone are enough for the feed route")
-    eq(sf.route({"url": "https://www.techmeme.com/1", "title": "Source: X"}), "bridge", "techmeme Source -> bridge")
-    eq(sf.route({"url": "https://www.techmeme.com/1", "title": "X"}), "title", "techmeme other -> title")
+    eq([sf.route({"url": "https://www.techmeme.com/1", "title": t, "feed_content": "x"}) for t in ("Source: X", "X")],
+       ["feed", "feed"], "techmeme: plain feed-first")
+    eq(sf.route({"url": "https://www.techmeme.com/1", "title": "X"}), "fetch", "techmeme without feed copy: fetch")
     eq(sf.douban_note("推荐: 力荐\n标签: 科幻\n备注: 很好看"), "很好看", "douban note: rating/tags dropped")
     d = Path(tempfile.mkdtemp())
     f = d / "a.json"

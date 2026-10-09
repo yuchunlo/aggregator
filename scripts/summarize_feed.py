@@ -38,7 +38,6 @@ SLEEP = 1.5                   # polite delay after each network item
 BATCH, MAX_FAIL_STREAK = 25, 4
 SKIP_HOSTS = ("news.google.com",)      # feed copy is redirect debris, page is useless
 PAUSE_DOMAINS = ("douban.com",)        # same skeleton page on every subdomain: pause as one
-TECHMEME_FETCH = ("Source", "Report", "Documents:")
 # Douban marks (想看 / 看过 ...): the page is a login skeleton, so the feed copy
 # is all there is. Its 备注 is the user's own note; ratings and tags are not.
 DOUBAN_MARK_RE = re.compile(r"^(?:想[看读听讀聽]|[看读听讀聽][过過])")
@@ -57,7 +56,7 @@ lipperalpha.refinitiv.com lostmagazine.org louie.lu lutaonan.com matters.town ma
 mcclin.blogspot.com medium.com meiguinfo.com mickzh.com noswag.tw notesbylex.com personaljournal.ca polgeonow.com
 pseudoyu.com readtrung.com ruanyifeng.com samaltman.com shenlvmeng.github.com shiuncorner.com
 sirupsen.com sive.rs smallbooks.com.tw soidid.tw starrocket.io steveblank.com substack.com
-techcabal.com tiaodao.typlog.io travelwithbook.com trensse.com
+techcabal.com techmeme.com tiaodao.typlog.io travelwithbook.com trensse.com
 unchartedterritories.tomaspueyo.com uselessetymology.com vox.com waitbutwhy.com werner.wiki
 whogovernstw.org yuanyu.idv.tw zmonster.me bestblogs.dev
 """.split())
@@ -67,8 +66,6 @@ ROUTES = {
     "douban":  (False, False),
     "feed":    (False, False),   # feed copy only, never the page
     "youtube": (False, False),
-    "title":   (True, False),    # techmeme headline, translated
-    "bridge":  (True, True),     # techmeme Sources/Report/Documents: read the page
     "fetch":   (True, True),
 }
 
@@ -105,8 +102,6 @@ def route(it) -> str | None:
         return "douban"
     if host_in(url, FEED_FIRST_HOSTS) and ((it.get("feed_content") or "").strip() or it.get("feed_images")):
         return "feed"
-    if "techmeme.com" in url:
-        return "bridge" if (it.get("title") or "").startswith(TECHMEME_FETCH) else "title"
     return "fetch"
 
 
@@ -237,20 +232,7 @@ class Run:
             self.n["failed"] += 1
 
     # ---- network handlers ----
-    def title_fallback(self, it) -> bool:
-        tr = textproc.translate(it.get("title") or "")
-        if tr:
-            self.done(it, lang.to_twp(tr) + " " + FALLBACK_MARK, "translated title")
-        return bool(tr)
-
-    def do_title(self, it):
-        self.title_fallback(it)
-
-    def do_bridge(self, it):
-        # Sources:/Report:/Documents: headlines rest on obtained reporting.
-        self.do_fetch(it, kind="bridge", fallback=self.title_fallback)
-
-    def do_fetch(self, it, kind="page", fallback=None):
+    def do_fetch(self, it):
         feed = it.get("feed_content") or ""
         found = {}
         f = extract.fetch(it["url"], feed, found)
@@ -258,11 +240,9 @@ class Run:
             it["thumbnail"] = found["thumbnail"]
             self.touch()
         self.feed_thumb(it)                  # page had none: the feed's images may
-        s = textproc.build(f.text, kind, f.table, f.code, f.kind == "meta") if f.text else ""
+        s = textproc.build(f.text, "page", f.table, f.code, f.kind == "meta") if f.text else ""
         if s:
             return self.done(it, s, f"{f.kind}, {len(f.text)} chars")
-        if fallback and fallback(it):
-            return
         if f.text and s is not None and f.kind in ("body", "meta"):    # page read fine, but only boilerplate in it
             return self.done(it, BLANK_SUMMARY, f"{f.kind}: only boilerplate, blank")
         key = pause_key(it["url"])
