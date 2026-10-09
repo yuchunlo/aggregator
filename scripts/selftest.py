@@ -547,6 +547,8 @@ def check_merge_and_id():
        "id is case-insensitive")
     eq(un.canonical_url("https://vocus.cc/@who/abc123?utm_source=x"), "https://vocus.cc/article/abc123",
        "vocus canonical + tracking stripped")
+    eq(un.canonical_url("https://vocus.cc/@/6aba2fc9fd897800019e270a"),
+       "https://vocus.cc/article/6aba2fc9fd897800019e270a", "vocus: empty author slot")
     now = un.parse_date("2026-09-29")
     arch = {}
     raw = un.Raw("tech", "S", "T", "https://a.com/p", un.parse_date("2026-09-01"), content="body")

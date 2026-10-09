@@ -61,7 +61,7 @@ FEED_SKIP = {"https://rachelbythebay.com/w/atom.xml", "https://flak.tedunangst.c
 # The explicit table wins over the feed's own origin, which can be a proxy.
 ORIGIN_FIXUPS = {"notesbylex.com": "https://notesbylex.com"}
 DEV_ORIGIN = re.compile(r"^(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|[^.]+\.local)(?::\d+)?$", re.I)
-VOCUS_AUTHOR = re.compile(r"^(https?://(?:www\.)?vocus\.cc)/@[^/]+/([0-9A-Za-z]+)(.*)$")
+VOCUS_AUTHOR = re.compile(r"^(https?://(?:www\.)?vocus\.cc)/@[^/]*/([0-9A-Za-z]+)(.*)$")
 TG_POST = re.compile(r"[A-Za-z0-9_]{1,64}/\d{1,12}")
 JIKE_ID = re.compile(r"[0-9A-Za-z_-]{1,64}")
 BESTBLOGS = "https://www.bestblogs.dev"
