@@ -66,6 +66,12 @@ TG_POST = re.compile(r"[A-Za-z0-9_]{1,64}/\d{1,12}")
 JIKE_ID = re.compile(r"[0-9A-Za-z_-]{1,64}")
 BESTBLOGS = "https://www.bestblogs.dev"
 BESTBLOGS_ISSUE = re.compile(r"^https?://(?:www\.)?bestblogs\.dev(?:/[a-z]{2})?/newsletter/issue(\d{1,4})/?$", re.I)
+# The Paper (澎湃) channel pages: Next.js, no RSS. Scraped like BestBlogs.
+THEPAPER = "https://www.thepaper.cn"
+THEPAPER_CHANNELS = {"channel_168153": ("opmlrss", "澎湃·上海书评")}   # path -> (category, source)
+THEPAPER_ARTICLE = re.compile(r"^(?:https?://(?:www|m)\.thepaper\.cn)?/newsDetail_forward_(\d{5,12})(?:[/?#]|$)", re.I)
+NEXT_DATA_RE = re.compile(r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>', re.S | re.I)
+CN_REL_TIME = re.compile(r"(\d{1,3})\s*(分钟|小时|天)前")
 
 
 @dataclass
@@ -414,6 +420,132 @@ def fetch_bestblogs(archive: dict) -> list[Raw]:
     return out
 
 
+def _next_data(html: str):
+    m = NEXT_DATA_RE.search(html or "")
+    try:
+        return json.loads(m[1]) if m else None
+    except ValueError:
+        return None
+
+
+def _walk(node):
+    """Every dict inside a JSON tree."""
+    stack = [node]
+    while stack:
+        n = stack.pop()
+        if isinstance(n, dict):
+            yield n
+            stack.extend(n.values())
+        elif isinstance(n, list):
+            stack.extend(reversed(n))
+
+
+def _thepaper_date(d: dict, now: datetime) -> datetime | None:
+    for k in ("pubTimeLong", "publishTime", "pubTime", "pubTimeNew"):
+        v = d.get(k)
+        if v in (None, ""):
+            continue
+        if isinstance(v, str) and (m := CN_REL_TIME.search(v)):
+            unit = {"分钟": "minutes", "小时": "hours", "天": "days"}[m[2]]
+            return now - timedelta(**{unit: int(m[1])})
+        if isinstance(v, str) and not re.search(r"\d{4}", v) and not v.isdigit():
+            continue
+        if when := parse_date(v):
+            # bare "2026-10-12 08:30" is Beijing time
+            if isinstance(v, str) and not re.search(r"(?:z|[+-]\d{2}:?\d{2})$", v.strip(), re.I):
+                when -= timedelta(hours=8)
+            return when
+    return None
+
+
+def thepaper_listing(html: str, now: datetime) -> list[tuple[str, str, datetime | None]]:
+    """(article id, title, date) from a channel page: the __NEXT_DATA__ JSON,
+    else the server-rendered links (whose text repeats the title)."""
+    out: dict[str, tuple[str, datetime | None]] = {}
+    for d in _walk(_next_data(html)):
+        cid, name = d.get("contId"), d.get("name") or d.get("title")
+        link = str(d.get("link") or d.get("url") or "")
+        if not (cid and isinstance(name, str) and name.strip()):
+            continue
+        if link and not THEPAPER_ARTICLE.match(link):     # collections, ads, videos elsewhere
+            continue
+        cid = str(cid)
+        if cid.isdigit() and cid not in out:
+            out[cid] = (name.strip(), _thepaper_date(d, now))
+    if not out:
+        soup = BeautifulSoup(html or "", "html.parser")
+        for a in soup.find_all("a", href=True):
+            if not (m := THEPAPER_ARTICLE.match(a["href"])) or "commTag" in a["href"]:
+                continue
+            text = re.sub(r"\s+", " ", a.get_text(" ", strip=True))
+            half = len(text) // 2                  # "标题 标题" (img alt + caption)
+            if half and text[:half].strip() == text[half:].strip():
+                text = text[:half].strip()
+            if text and len(text) > len(out.get(m[1], ("",))[0]):
+                out[m[1]] = (text, None)
+    return [(cid, t, w) for cid, (t, w) in out.items()]
+
+
+def thepaper_article(cid: str, now: datetime):
+    """(body html, date, images) of one article page, or None."""
+    url = f"{THEPAPER}/newsDetail_forward_{cid}"
+    r = common.get(url, (CONNECT_TIMEOUT, 30), session(), lang=LANG)
+    if r is None or r.status != 200:
+        return None
+    data, body, when = _next_data(r.text), "", None
+    for d in _walk(data):
+        if str(d.get("contId", "")) == cid or "content" in d:
+            c = d.get("content")
+            if isinstance(c, str) and "<" in c and len(c) > len(body):
+                body = c
+            when = when or (_thepaper_date(d, now) if str(d.get("contId", "")) == cid else None)
+    soup = BeautifulSoup(r.text, "html.parser")
+    if not body:
+        node = (soup.select_one("[class*=cententWrap]") or soup.select_one("[class*=contentWrap]")
+                or soup.select_one("article") or soup.select_one("main"))
+        body = str(node) if node else ""
+    if when is None:
+        meta = soup.select_one('meta[property="article:published_time"]')
+        when = parse_date(meta.get("content")) if meta else None
+    if when is None and (m := re.search(r"(20\d{2}-\d{2}-\d{2} \d{2}:\d{2})", soup.get_text(" "))):
+        when = parse_date(m[1] + " +08:00")
+    text = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
+    images = tuple(thumbs.candidates(body, url)) + tuple(thumbs.candidates(r.text[:60000], url)[:2])
+    return (body if len(text) >= 300 else ""), when, images
+
+
+def fetch_thepaper(archive: dict) -> list[Raw]:
+    """澎湃 channel pages (no RSS). Like fetch_bestblogs, the article body is
+    fetched once, when the item is new, and kept as the feed copy, so
+    summarize_feed never fetches the page itself. Items still listed are
+    re-emitted (refreshing last_seen_at) without refetching."""
+    now = datetime.now(tz=UTC)
+    known = {m[1]: r for r in archive.values()
+             if (m := THEPAPER_ARTICLE.match(str(r.get("url", ""))))}
+    out = []
+    for path, (category, source) in THEPAPER_CHANNELS.items():
+        r = common.get(f"{THEPAPER}/{path}", (CONNECT_TIMEOUT, 30), session(), lang=LANG)
+        if r is None or r.status != 200:
+            print(f"WARNING: thepaper {path}: {'HTTP %d' % r.status if r else 'fetch failed'}")
+            continue
+        listing = thepaper_listing(r.text, now)
+        fresh = [cid for cid, _, _ in listing
+                 if not (k := known.get(cid)) or not (k.get("summary") or k.get("feed_content"))]
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            pages = dict(zip(fresh, ex.map(lambda c: thepaper_article(c, now), fresh)))
+        for cid, title, when in listing:
+            body, images = "", ()
+            if got := pages.get(cid):
+                body, images = got[0], got[2]
+                when = got[1] or when
+            if cid in known and when is None:
+                when = parse_date(known[cid].get("published_at"))
+            out.append(Raw(category, source, title, f"{THEPAPER}/newsDetail_forward_{cid}",
+                           when, content=body, images=images))
+        print(f"thepaper {path}: {len(listing)} listed, {len(fresh)} fetched")
+    return out
+
+
 # ---- inbox ---------------------------------------------------------------------
 # data/inbox.json is written by the reader (feed-github.js) through the GitHub
 # API: {"urls": [{"url", "added"}]}. Read-only here -- the reader prunes it --
@@ -566,6 +698,7 @@ def main(argv=None) -> int:
     else:
         print(f"WARNING: no OPML ({where}); RSS sources skipped.")
     raws += fetch_bestblogs(archive)
+    raws += fetch_thepaper(archive)
     raws += fetch_inbox(archive, Path(a.output_dir) / "inbox.json", a.archive_days)
 
     ingest(archive, raws, now)

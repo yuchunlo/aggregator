@@ -570,6 +570,7 @@ def check_merge_and_id():
         # main() also scrapes BestBlogs: on a runner with network that adds live
         # issues to the archive. The test is about retention only, so stay offline.
         real_bb, un.fetch_bestblogs = un.fetch_bestblogs, lambda archive: []
+        real_tp, un.fetch_thepaper = un.fetch_thepaper, lambda archive: []
         try:
             with contextlib.redirect_stdout(io.StringIO()):
                 un.main(["--output-dir", d])
@@ -580,6 +581,7 @@ def check_merge_and_id():
             eq(kept(), [], "retention days configurable")
         finally:
             un.fetch_bestblogs = real_bb
+            un.fetch_thepaper = real_tp
 
 
 if __name__ == "__main__":

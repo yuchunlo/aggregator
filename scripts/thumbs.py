@@ -28,9 +28,12 @@ DENY = frozenset(u.lower() for u in (
     "https://maxjamesread.com/wp-content/uploads/2021/04/S__46555156-scaled.jpg",
     "https://gmhjohnny.wordpress.com/wp-content/uploads/2020/09/cropped-j102.png",
     "https://gmhjohnny.wordpress.com/wp-content/uploads/2020/09/j102.png",
+    "https://ritholtz.com/wp-content/uploads/2024/12/Barrons.jpg",
+    "https://www.thepaper.cn/_next/static/media/logo_light.4da59bed.png",
 ))
 DENY_RE = re.compile(r"^https?://kottke\.org/.*/images/\d{4}/logo-colors/", re.I)
-SKIP_HOSTS = ("finance.technews.tw", "douban.com", "granitefirm.com")   # never take a thumbnail from these (incl. subdomains)
+SKIP_HOSTS = ("finance.technews.tw", "douban.com", "granitefirm.com",
+              "blocktempo.com", "oreilly.com", "mckinsey.com")   # never take a thumbnail from these (incl. subdomains)
 # Hosts that serve only article uploads with meaningless filenames (Blogger).
 TRUSTED_HOSTS = ("blogger.googleusercontent.com", "bp.blogspot.com")
 TRUSTED_PATH_RE = re.compile(r"^https?://lh\d+\.googleusercontent\.com/blogger_img_proxy/", re.I)
