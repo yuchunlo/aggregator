@@ -596,6 +596,24 @@ def check_thumb_clean():
     eq(c("https://a.cn/x.jpg?w=5"), "https://a.cn/x.jpg?w=5", "unrelated query untouched")
 
 
+def check_firstory_host():
+    c = un.canonical_url
+    eq(c("https://open.firstory.me/story/clwysgs8128dq01uk5tt621ha"),
+       "https://open.firstory.fm/story/clwysgs8128dq01uk5tt621ha", "firstory .me -> .fm")
+    eq(c("https://OPEN.FIRSTORY.ME/story/abc?x=1"), c("https://open.firstory.fm/story/abc?x=1"), "firstory host case")
+    eq(c("https://open.firstory.fm/story/abc"), "https://open.firstory.fm/story/abc", "firstory .fm unchanged")
+    eq(c("https://feed.firstory.me/rss/user/abc"), "https://feed.firstory.me/rss/user/abc", "other firstory hosts untouched")
+    with tempfile.TemporaryDirectory() as d:
+        old = "https://open.firstory.me/story/abc"
+        rec = {"id": un.make_id("opmlrss", "S", "T", old), "category": "opmlrss", "source": "S", "title": "T",
+               "url": old, "published_at": "2026-10-01T00:00:00Z", "last_seen_at": "2026-10-01T00:00:00Z"}
+        common.save_doc(Path(d) / "archive.json", {"items": [rec]})
+        _, arch = un.load_archive(Path(d) / "archive.json")
+        new_id = un.make_id("opmlrss", "S", "T", "https://open.firstory.fm/story/abc")
+        eq([(r["id"], r["url"]) for r in arch.values()], [(new_id, "https://open.firstory.fm/story/abc")],
+           "stored .me item migrated and re-keyed on load")
+
+
 def check_podcast():
     import podcast
     import summarize_feed as sf

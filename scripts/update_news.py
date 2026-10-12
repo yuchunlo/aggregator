@@ -61,6 +61,8 @@ FEED_SKIP = {"https://rachelbythebay.com/w/atom.xml", "https://flak.tedunangst.c
 # The explicit table wins over the feed's own origin, which can be a proxy.
 ORIGIN_FIXUPS = {"notesbylex.com": "https://notesbylex.com"}
 DEV_ORIGIN = re.compile(r"^(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|[^.]+\.local)(?::\d+)?$", re.I)
+# Same Firstory episode under two hosts; one spelling, so one id.
+HOST_ALIASES = {"open.firstory.me": "open.firstory.fm"}
 VOCUS_AUTHOR = re.compile(r"^(https?://(?:www\.)?vocus\.cc)/@[^/]*/([0-9A-Za-z]+)(.*)$")
 TG_POST = re.compile(r"[A-Za-z0-9_]{1,64}/\d{1,12}")
 JIKE_ID = re.compile(r"[0-9A-Za-z_-]{1,64}")
@@ -126,6 +128,9 @@ def normalize_url(raw: str) -> str:
 def canonical_url(raw: str, source: str = "", feed_url: str = "") -> str:
     url = normalize_url(raw)
     p = urlparse(url)
+    if (alias := HOST_ALIASES.get(p.netloc.lower())):
+        p = p._replace(netloc=alias)
+        url = urlunparse(p)
     if p.netloc and DEV_ORIGIN.match(p.netloc):
         f = urlparse(feed_url or "")
         origin = ORIGIN_FIXUPS.get(source.strip().casefold()) or (
