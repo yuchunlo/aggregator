@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Fetch subtitles for pending YouTube items; fall back to local ASR.
+Podcast episodes (小宇宙, Firstory) go straight to ASR on their mp3/m4a.
 
 Files are {item_id}.{orig_lang}.{sub_lang}.vtt (yt-dlp's naming), which is all
 summarize_feed looks at. ASR = yt-dlp audio + faster-whisper (CPU int8), with
@@ -19,6 +20,7 @@ import tempfile
 from collections import Counter
 from pathlib import Path
 
+import podcast
 from common import BLANK_SUMMARY, is_youtube, load_doc, safe_lang, save_doc, valid_id
 from subtitle_priority import choose_track, track_rank
 
@@ -29,6 +31,8 @@ BASE_ARGS = ["--user-agent", UA, "--no-progress", "--socket-timeout", "30"]
 SUB_ARGS = ["--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
 AUDIO_ARGS = ["--extractor-args", "youtube:player_client=tv,web_safari,default",
               "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]
+# Direct audio files: yt-dlp's generic extractor, no cookies (they are YouTube's).
+PODCAST_ARGS = ["--no-playlist"]
 EXHAUSTED_UNDER = 10 * 60    # remaining ASR budget too small for any real video
 
 
@@ -106,7 +110,8 @@ class Unavailable(RuntimeError):
 _models = {}
 
 
-def transcribe(url, cookies, out_dir: Path, item_id, orig, a, duration) -> Path:
+def transcribe(url, cookies, out_dir: Path, item_id, orig, a, duration, cmd=None) -> tuple[Path, float]:
+    """(vtt path, audio seconds). `cmd` replaces the YouTube download command."""
     try:
         from faster_whisper import WhisperModel
     except ImportError:
@@ -114,7 +119,8 @@ def transcribe(url, cookies, out_dir: Path, item_id, orig, a, duration) -> Path:
     with tempfile.TemporaryDirectory(prefix=f"asr-{item_id}-") as d:
         # ~1s of download per 4s of audio, floor 5 min, cap 45 min
         timeout = min(max(a.audio_timeout, duration * 0.25), 45 * 60) if duration else a.audio_timeout
-        rc, out, err = run(ytdlp(cookies, url, *AUDIO_ARGS, "-o", f"{d}/audio.%(ext)s"), timeout)
+        dl = (cmd or (lambda o: ytdlp(cookies, url, *AUDIO_ARGS, "-o", o)))(f"{d}/audio.%(ext)s")
+        rc, out, err = run(dl, timeout)
         files = sorted(p for p in Path(d).glob("audio.*") if p.suffix != ".part")
         if rc is None:
             raise RuntimeError(f"audio download timed out after {timeout:.0f}s")
@@ -135,7 +141,7 @@ def transcribe(url, cookies, out_dir: Path, item_id, orig, a, duration) -> Path:
         raise RuntimeError("no speech segments")
     path = out_dir / f"{item_id}.{safe_lang(orig, detected)}.{detected}.vtt"
     path.write_text(vtt, encoding="utf-8")
-    return path
+    return path, float(info.duration or duration or 0)
 
 
 class Budget:
@@ -173,8 +179,9 @@ class Budget:
             f"/{self.a.max_asr_total / 60:.0f}min" if self.a.max_asr_total else "")
 
 
-def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n) -> bool:
-    """Returns whether the item changed (marked blank)."""
+def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n, cmd=None) -> bool:
+    """Returns whether the item changed. A permanent failure marks a video
+    blank; a podcast stays pending and is retried every run (no limit)."""
     refused = budget.refuse(duration, live)
     permanent = False
     if refused:
@@ -182,7 +189,8 @@ def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n
         print(f"[ASR-SKIP] {item_id}: {why}" + ("" if permanent else " (kept pending)"))
     else:
         try:
-            path = transcribe(url, cookies, out_dir, item_id, orig, a, duration)
+            path, secs = transcribe(url, cookies, out_dir, item_id, orig, a, duration, cmd)
+            duration = secs or duration
             budget.count += 1
             budget.spent += max(duration, 0.0)
             n["succeeded"] += 1
@@ -194,12 +202,37 @@ def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n
             print(f"[ASR-FAILED] {item_id}: {e}")
             permanent = True
         discard(out_dir, item_id)
+    if permanent and cmd is not None:         # podcast: retried next run, never blank
+        n["deferred"] += 1
+        return False
     if permanent:
         item["summary"] = BLANK_SUMMARY
         n["no_subs"] += 1
         return True
     n["deferred"] += 1
     return False
+
+
+def podcast_asr(item, a, budget, out_dir, cookies, n) -> bool:
+    """Resolve the episode page to its mp3/m4a, then the shared ASR path."""
+    url, item_id = item["url"], item["id"]
+    try:
+        ep = podcast.resolve(url)
+    except Exception as e:
+        ep = None
+        print(f"[PODCAST] {item_id}: resolve error {type(e).__name__}: {e}")
+    if ep is None:
+        n["failed"] += 1
+        print(f"[PODCAST] {item_id}: no audio found on {url} (kept pending, retried next run)")
+        return False
+    dirty = False
+    if ep.duration and item.get("length") != int(ep.duration):
+        item["length"] = int(ep.duration)          # stored for the frontend
+        dirty = True
+    print(f"[PODCAST] {item_id}: {ep.audio_url} ({ep.duration / 60:.0f}min)")
+    cmd = lambda o: ["yt-dlp", *BASE_ARGS, *PODCAST_ARGS, "-o", o, "--", ep.audio_url]
+    return asr(item, url, item_id, ep.lang, ep.duration, False, a, budget,
+               out_dir, cookies, n, cmd) or dirty
 
 
 def remove_orphans(out_dir: Path, ids: set) -> int:
@@ -238,10 +271,17 @@ def main(argv=None) -> int:
     budget, n, dirty = Budget(a), Counter(), False
 
     todo = [it for it in doc["items"] if valid_id(it.get("id")) and it.get("summary") is None
-            and is_youtube(it.get("url", "")) and it["id"] not in have]
+            and (is_youtube(it.get("url", "")) or podcast.is_episode(it.get("url", "")))
+            and it["id"] not in have]
     for item in todo[:a.max_items]:
         url, item_id = item["url"], item["id"]
         n["processed"] += 1
+        if podcast.is_episode(url):
+            dirty |= podcast_asr(item, a, budget, out_dir, cookies, n)
+            if budget.stop():
+                print(f"[BUDGET] {budget.left() / 60:.0f} min of ASR left; rest stay pending")
+                break
+            continue
         rc, out, err = run(ytdlp(cookies, url, *SUB_ARGS, "--skip-download", "--dump-json"),
                            a.probe_timeout)
         if cookies_rejected(err):

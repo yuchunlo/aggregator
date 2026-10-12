@@ -557,6 +557,10 @@ def check_merge_and_id():
     rec = next(iter(arch.values()))
     eq(list(rec), ["id", "category", "source", "title", "url", "published_at", "last_seen_at",
                    "feed_content"], "new record fields (no site_name / first_seen_at)")
+    with tempfile.TemporaryDirectory() as d:
+        common.save_doc(Path(d) / "a.json", {"items": [dict(rec, feed_images=["https://a/b.png"])]})
+        saved = json.loads((Path(d) / "a.json").read_text(encoding="utf-8"))["items"][0]
+    eq(set(saved) <= common.ITEM_FIELDS, True, f"saved item fields within ITEM_FIELDS: {sorted(saved)}")
     import dataclasses
     un.ingest(arch, [dataclasses.replace(raw, published_at=un.parse_date("2026-09-02"))], now)
     eq(rec["published_at"], "2026-09-02T00:00:00Z", "feed date overwrites any category")
@@ -582,6 +586,55 @@ def check_merge_and_id():
         finally:
             un.fetch_bestblogs = real_bb
             un.fetch_thepaper = real_tp
+
+
+def check_thumb_clean():
+    c = thumbs.clean
+    eq(c("https://a.cn/x/chart.png?x-oss-process=image/resize,w_1024"), "https://a.cn/x/chart.png", "oss resize dropped")
+    eq(c("https://a.cn/x.jpg?v=2&x-oss-process=image/resize,w_1024/format,webp#f"), "https://a.cn/x.jpg?v=2#f", "other params kept")
+    eq(c("https://a.cn/x.jpg?imageMogr2/thumbnail/600x"), "https://a.cn/x.jpg", "qiniu dropped")
+    eq(c("https://a.cn/x.jpg?w=5"), "https://a.cn/x.jpg?w=5", "unrelated query untouched")
+
+
+def check_podcast():
+    import podcast
+    import summarize_feed as sf
+    eq([podcast.is_episode(u) for u in (
+        "https://www.xiaoyuzhoufm.com/episode/6ab2546493d5eb3bdc794b18",
+        "https://open.firstory.fm/story/clwysgs8128dq01uk5tt621ha",
+        "https://open.firstory.me/story/clwysgs8128dq01uk5tt621ha",
+        "https://www.xiaoyuzhoufm.com/podcast/61358d971c5d56efe5bcb5d2",
+        "https://open.firstory.fm/user/decosmos")], [True, True, True, False, False], "podcast episode urls")
+    eq((podcast.hms("2588"), podcast.hms("43:08"), podcast.hms("00:43:08"), podcast.hms("x")),
+       (2588.0, 2588.0, 2588.0, 0.0), "itunes durations")
+    page = '<meta property="og:audio" content="https://media.xyzcdn.net/a/b.m4a">'
+    eq(podcast._audio_in_page(page), "https://media.xyzcdn.net/a/b.m4a", "og:audio")
+    eq(podcast._audio_in_page('{"u":"https:\\/\\/cdn.x\\/r\\/a.mp3"}'), "https://cdn.x/r/a.mp3", "escaped json audio url")
+    real = podcast._xiaoyuzhou
+    try:
+        for audio, want in (("http://127.0.0.1/a.m4a", False), ("http://169.254.169.254/a.mp3", False),
+                            ("file:///etc/passwd.mp3", False)):
+            podcast._xiaoyuzhou = lambda u, e, s, audio=audio: podcast.Episode(audio)
+            eq(podcast.resolve("https://www.xiaoyuzhoufm.com/episode/6ab2546493d5eb3bdc794b18") is not None,
+               want, f"audio url guarded: {audio}")
+    finally:
+        podcast._xiaoyuzhou = real
+    ep = {"id": "e" * 40, "url": "https://www.xiaoyuzhoufm.com/episode/6ab2546493d5eb3bdc794b18"}
+    eq(sf.route(ep), None, "podcast waits for ASR")
+    # download_sub leaves a failed podcast pending, item untouched, every run
+    class A:
+        no_transcribe, max_transcribe, max_asr_duration, max_asr_total = True, 0, 0, 0
+    it = {"id": "f" * 40, "url": ep["url"], "title": "t"}
+    real_resolve = podcast.resolve
+    try:
+        podcast.resolve = lambda u: None
+        n = __import__("collections").Counter()
+        changed = [ds.podcast_asr(it, A, ds.Budget(A), Path("."), Path("."), n) for _ in range(5)]
+        eq((changed, sorted(it)), ([False] * 5, ["id", "title", "url"]), "failed podcast: no marks, retried")
+    finally:
+        podcast.resolve = real_resolve
+    eq(sf.route(dict(ep, published_at="2020-01-01T00:00:00Z")), None, "old podcast still waits: no time limit")
+    eq(sf.route(dict(ep, feed_content="show notes " * 50)), None, "podcast never falls back to show notes")
 
 
 if __name__ == "__main__":

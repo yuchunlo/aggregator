@@ -26,6 +26,7 @@ from pathlib import Path
 
 import extract
 import lang
+import podcast
 import subtitle_priority
 import summary_qc
 import textproc
@@ -66,6 +67,7 @@ ROUTES = {
     "douban":  (False, False),
     "feed":    (False, False),   # feed copy only, never the page
     "youtube": (False, False),
+    "podcast": (False, False),   # local ASR transcript only
     "fetch":   (True, True),
 }
 
@@ -98,6 +100,10 @@ def route(it) -> str | None:
         return None
     if is_youtube(url):
         return "youtube"
+    if podcast.is_episode(url):
+        # Transcript only: summarising the show notes would end the item
+        # before ASR runs. No fallback; download_sub retries every run.
+        return "podcast" if pick_subtitle(it.get("id", "")) else None
     if host_in(url, ("douban.com",)) and DOUBAN_MARK_RE.match((it.get("title") or "").strip()):
         return "douban"
     if host_in(url, FEED_FIRST_HOSTS) and ((it.get("feed_content") or "").strip() or it.get("feed_images")):
@@ -231,6 +237,17 @@ class Run:
         else:
             self.n["failed"] += 1
 
+    def do_podcast(self, it):
+        path = pick_subtitle(it.get("id", ""))
+        text = textproc.vtt_to_text(path)
+        if len(text) < textproc.MIN_CAPTION_CHARS:
+            return self.done(it, BLANK_SUMMARY, f"{path.name}: no speech, blank")
+        s = textproc.build(text, "subtitle")
+        if s:
+            self.done(it, s, f"{path.name}, {len(text)} chars")
+        else:
+            self.n["failed"] += 1
+
     # ---- network handlers ----
     def do_fetch(self, it):
         feed = it.get("feed_content") or ""
@@ -266,6 +283,9 @@ def backfill(items, *, translate=True, deadline=None, save=None, limit=0) -> Cou
     n, targets = Counter(), []
     summary_qc.report(summary_qc.apply(items, fix=True))   # mojibake, loops, chrome, mismatch, spam
     for it in items:
+        if it.get("thumbnail") and (c := thumbs.clean(it["thumbnail"])) != it["thumbnail"]:
+            it["thumbnail"] = c
+            n["thumb: processing params stripped"] += 1
         if it.get("thumbnail"):
             ok, why = thumbs.still_valid(it)
             if not ok:

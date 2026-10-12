@@ -92,6 +92,21 @@ common default style theme layout title text head header footer heading caption 
 list nav menu sub""")
 
 
+# Cloud image-processing params (resize/crop renditions): Aliyun OSS, Huawei OBS,
+# Baidu BOS, Qiniu. Dropped so the stored url is the original image.
+PROCESS_PARAM_RE = re.compile(r"^(?:x-oss-process|x-image-process|x-bce-process|imageMogr2|imageView2)(?:[=/]|$)", re.I)
+
+
+def clean(url: str) -> str:
+    """`url` without image-processing query params; other params kept."""
+    if not url or "?" not in url:
+        return url
+    base, _, rest = url.partition("?")
+    query, hash_, frag = rest.partition("#")
+    kept = [p for p in query.split("&") if p and not PROCESS_PARAM_RE.match(p)]
+    return base + ("?" + "&".join(kept) if kept else "") + hash_ + frag
+
+
 def skipped_host(page_url: str) -> bool:
     return host_in(page_url, SKIP_HOSTS)
 
@@ -173,6 +188,7 @@ def pick(urls, page_url: str, where: str = "page") -> str | None:
     if skipped_host(page_url):
         return None
     for url in urls or ():
+        url = clean(url)
         ok, reason = usable(url)
         if ok:
             print(f"    thumbnail ({where}): {url}  [{reason}]")

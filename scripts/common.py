@@ -44,6 +44,11 @@ PLACEHOLDER_PREFIX = "無法取得頁面內容"
 SCRATCH = ("feed_content", "feed_images")
 
 
+# Items carry only these fields (the frontend owns `status`); no step may add
+# others. feed_content / feed_images are in-memory scratch (see SCRATCH).
+ITEM_FIELDS = frozenset(("id", "category", "source", "title", "url", "published_at",
+                         "last_seen_at", "thumbnail", "summary", "status", "length"))
+
 def scratch_path() -> Path:
     return Path(os.environ.get("SCRATCH_FILE") or Path(tempfile.gettempdir()) / "aggregator_feed_scratch.json")
 
