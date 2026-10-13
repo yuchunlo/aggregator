@@ -12,11 +12,11 @@ from typing import NamedTuple
 import trafilatura
 from bs4 import BeautifulSoup
 
-import thumbs
 from urllib.parse import quote
 
 import common
 import lang
+import thumbs
 from common import UA, host_in, make_session
 
 TIMEOUT, TIMEOUT_SLOW = 30, 60
@@ -265,6 +265,8 @@ def via_wayback(url: str) -> str | None:
     if not USE_WAYBACK:
         return None
     r = common.get("https://archive.org/wayback/available?url=" + quote(url, safe=""), TIMEOUT, session)
+    if r is None or r.status != 200:
+        return None
     try:
         snap = (json.loads(r.content).get("archived_snapshots") or {}).get("closest") or {}
     except Exception:

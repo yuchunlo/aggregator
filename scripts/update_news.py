@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import copy
 import gzip
 import hashlib
 import json
@@ -18,19 +17,16 @@ import threading
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import feedparser
 from bs4 import BeautifulSoup
-from dateutil import parser as dtparser
-
 import common
 import thumbs
-from common import UA, host_in, host_of, load_doc, make_session, save_doc
+from common import UA, UTC, host_in, host_of, iso, load_doc, make_session, next_data, parse_date, save_doc, walk
 
-UTC = timezone.utc
 CONNECT_TIMEOUT, READ_TIMEOUT = 5, 12     # a dead host fails the handshake fast
 WORKERS = 32
 LANG = "zh-CN,zh;q=0.9,en;q=0.8"
@@ -68,11 +64,11 @@ TG_POST = re.compile(r"[A-Za-z0-9_]{1,64}/\d{1,12}")
 JIKE_ID = re.compile(r"[0-9A-Za-z_-]{1,64}")
 BESTBLOGS = "https://www.bestblogs.dev"
 BESTBLOGS_ISSUE = re.compile(r"^https?://(?:www\.)?bestblogs\.dev(?:/[a-z]{2})?/newsletter/issue(\d{1,4})/?$", re.I)
+BESTBLOGS_MAX, BESTBLOGS_MISSES, BESTBLOGS_BACKLOG = 2000, 3, 30
 # The Paper (澎湃) channel pages: Next.js, no RSS. Scraped like BestBlogs.
 THEPAPER = "https://www.thepaper.cn"
 THEPAPER_CHANNELS = {"channel_168153": ("opmlrss", "澎湃·上海书评")}   # path -> (category, source)
 THEPAPER_ARTICLE = re.compile(r"^(?:https?://(?:www|m)\.thepaper\.cn)?/newsDetail_forward_(\d{5,12})(?:[/?#]|$)", re.I)
-NEXT_DATA_RE = re.compile(r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>', re.S | re.I)
 CN_REL_TIME = re.compile(r"(\d{1,3})\s*(分钟|小时|天)前")
 
 
@@ -89,26 +85,6 @@ class Raw:
 
 
 # ---- identity -----------------------------------------------------------------
-
-def iso(dt):
-    return dt.astimezone(UTC).isoformat().replace("+00:00", "Z") if dt else None
-
-
-def parse_date(value) -> datetime | None:
-    if value in (None, ""):
-        return None
-    if isinstance(value, datetime):
-        return value.astimezone(UTC)
-    s = str(value).strip().removeprefix("$D")
-    try:
-        if re.fullmatch(r"\d{9,}(?:\.\d+)?", s) or isinstance(value, (int, float)):
-            n = float(s)
-            return datetime.fromtimestamp(n / 1000 if n > 1e10 else n, tz=UTC)
-        dt = dtparser.parse(s, tzinfos={"UT": 0, "UTC": 0, "GMT": 0})
-        return (dt if dt.tzinfo else dt.replace(tzinfo=UTC)).astimezone(UTC)
-    except Exception:
-        return None
-
 
 def normalize_url(raw: str) -> str:
     """Tracking params stripped. Feeds item ids: changing it forks the archive."""
@@ -259,14 +235,91 @@ def parse_rss(content: bytes, feed: dict) -> list[Raw]:
     return out
 
 
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com"}
+YOUTUBE_FEED = "https://www.youtube.com/feeds/videos.xml"
+YT_CHANNEL_ID = re.compile(r"^UC[\w-]{22}$")
+YT_PLAYLIST_ID = re.compile(r"^[\w-]{10,64}$")
+
+
+def youtube_feed_url(page_url: str) -> str | None:
+    """The RSS url for a YouTube channel (/channel/UC...) or playlist (?list=...) page, which needs no
+    network because the id is in the url. None for anything else (including @handle pages)."""
+    u = urlparse(page_url)
+    if u.scheme not in ("http", "https") or u.netloc.lower() not in YOUTUBE_HOSTS:
+        return None
+    parts = [p for p in u.path.split("/") if p]
+    if len(parts) >= 2 and parts[0] == "channel" and YT_CHANNEL_ID.match(parts[1]):
+        return f"{YOUTUBE_FEED}?channel_id={parts[1]}"
+    if parts[:1] == ["playlist"] or parts == []:
+        pl = dict(parse_qsl(u.query)).get("list", "")
+        if YT_PLAYLIST_ID.match(pl):
+            return f"{YOUTUBE_FEED}?playlist_id={pl}"
+    return None
+
+
+def is_youtube_channel_page(url: str) -> bool:
+    """/@handle, /c/name or /user/name: the page has to be fetched to learn the channel id."""
+    u = urlparse(url)
+    if u.scheme not in ("http", "https") or u.netloc.lower() not in YOUTUBE_HOSTS:
+        return False
+    parts = [p for p in u.path.split("/") if p]
+    return bool(parts) and (parts[0].startswith("@") and len(parts[0]) > 1 or parts[0] in ("c", "user") and len(parts) >= 2)
+
+
+def extract_youtube_channel_id(html: str) -> str | None:
+    """The page's own channel id: its RSS <link>, then the canonical <link>, then channel metadata. The
+    page is untrusted input, so only a strictly shaped id is ever returned."""
+    for pattern in (r'<link[^>]+type="application/rss\+xml"[^>]+channel_id=(UC[\w-]{22})',
+                    r'<link[^>]+rel="canonical"[^>]+youtube\.com/channel/(UC[\w-]{22})',
+                    r'"externalId":"(UC[\w-]{22})"'):
+        if m := re.search(pattern, html):
+            return m.group(1)
+    return None
+
+
+def resolve_youtube_feed(page_url: str) -> str | None:
+    r = common.get(page_url, (CONNECT_TIMEOUT, READ_TIMEOUT), session(), lang="en")
+    if r is None or r.status >= 400:
+        return None
+    cid = extract_youtube_channel_id(r.text)
+    return f"{YOUTUBE_FEED}?channel_id={cid}" if cid else None
+
+
+TG_HOSTS = {"t.me", "telegram.me"}
+TG_CHANNEL = re.compile(r"[A-Za-z][A-Za-z0-9_]{3,31}")
+TG_NOT_CHANNELS = {"joinchat", "addstickers", "addemoji", "share", "proxy", "socks", "login", "iv", "setlanguage", "bg", "c"}
+
+
+def telegram_page_url(url: str) -> str | None:
+    """The public preview page (https://t.me/s/NAME) for a Telegram channel url: t.me/NAME, t.me/s/NAME or a
+    post link t.me/NAME/123. None for anything else (invite links, private t.me/c/... links, other hosts).
+    NAME is matched strictly because it becomes part of the page url that gets fetched."""
+    u = urlparse(url)
+    if u.scheme not in ("http", "https") or u.netloc.lower() not in TG_HOSTS:
+        return None
+    parts = [p for p in u.path.split("/") if p]
+    if parts[:1] == ["s"]:
+        parts = parts[1:]
+    if not parts or parts[0].lower() in TG_NOT_CHANNELS or not TG_CHANNEL.fullmatch(parts[0]):
+        return None
+    if len(parts) > 2 or (len(parts) == 2 and not parts[1].isdigit()):
+        return None
+    return f"https://t.me/s/{parts[0]}"
+
+
 def bridge(xml_url: str, html_url: str) -> tuple[str, str] | None:
     """(parser, page url) for rsshub Telegram/Jike routes: scrape the public page."""
     parts = [p for p in urlparse(xml_url).path.strip("/").split("/") if p]
     if urlparse(xml_url).netloc == "rsshub.app":
+        # the route's last segment becomes part of a fetched url: same whitelist as everywhere
         if parts[:2] == ["telegram", "channel"] and len(parts) >= 3:
-            return "telegram", f"https://t.me/s/{parts[2]}"
+            page = telegram_page_url(f"https://t.me/{parts[2]}")
+            return ("telegram", page) if page else None
         if parts[:1] == ["jike"] and len(parts) >= 3 and parts[1] in ("topic", "user"):
-            return "jike", f"https://m.okjike.com/{parts[1]}s/{parts[2]}"
+            return ("jike", f"https://m.okjike.com/{parts[1]}s/{parts[2]}") if JIKE_ID.fullmatch(parts[2]) else None
+    for candidate in (xml_url, html_url):
+        if page := telegram_page_url(candidate):
+            return "telegram", page
     for prefix, kind in (("https://t.me/s/", "telegram"), ("https://m.okjike.com/topics/", "jike"),
                          ("https://m.okjike.com/users/", "jike")):
         if html_url.startswith(prefix):
@@ -307,7 +360,8 @@ def read_opml(raw: bytes, limit: int) -> list[dict]:
         elif xml in FEED_SKIP or xml.startswith(FEED_SKIP_PREFIX):
             continue
         else:
-            f["parser"], f["url"] = "rss", FEED_REPLACE.get(xml, xml)
+            f["parser"], f["url"] = "rss", youtube_feed_url(xml) or FEED_REPLACE.get(xml, xml)
+            f["youtube_page"] = is_youtube_channel_page(xml)   # resolved when fetched (fetch_feeds)
         feeds.append(f)
     return feeds[:limit] if limit > 0 else feeds
 
@@ -333,6 +387,9 @@ def fetch_feeds(feeds: list[dict]) -> list[Raw]:
 
     def one(url, group):
         via = "requests"
+        if group[0].get("youtube_page"):
+            if not (url := resolve_youtube_feed(url)):
+                return [], "could not find the YouTube channel id on this page", via
         r = common.get(url, (CONNECT_TIMEOUT, READ_TIMEOUT), session())
         if r and r.status in BLOCK_STATUS and (alt := common.get(
                 url, CONNECT_TIMEOUT + READ_TIMEOUT, impersonate=True, lang=LANG)):
@@ -363,12 +420,8 @@ def fetch_feeds(feeds: list[dict]) -> list[Raw]:
     return out
 
 
-def bestblogs_issue(n: int, prev: datetime | None):
-    """(title, body html, date) of one issue page, or None if it doesn't exist.
-
-    Date: the first YYYY-MM-DD on the page (the listing shows "Newsletter
-    2024-06-12"); else article:published_time, a bare MM-DD, dated with the
-    previous issue's year (rolling over when the month goes backwards)."""
+def bestblogs_issue(n: int, now: datetime) -> tuple[str, str, datetime | None] | None:
+    """(title, body text, date) of issue n, or None when the page isn't there."""
     r = common.get(f"{BESTBLOGS}/newsletter/issue{n}", (CONNECT_TIMEOUT, 30), session())
     if r is None or r.status != 200:
         return None
@@ -376,73 +429,55 @@ def bestblogs_issue(n: int, prev: datetime | None):
     meta = lambda prop: (soup.select_one(f'meta[property="{prop}"]') or {}).get("content") or ""
     title = meta("og:title") or (soup.title.get_text(" ", strip=True) if soup.title else "")
     title = re.sub(r"\s*\|\s*BestBlogs\.dev\s*$", "", title.strip())
-    root = copy.copy(soup.select_one("main") or soup.select_one("article") or soup.body or soup)
-    for t in root.find_all(("script", "style", "noscript", "nav", "header", "footer")):
+    root = soup.select_one("main") or soup.select_one("article") or soup.body or soup
+    for t in root.find_all(("nav", "header", "footer", "noscript")):
         t.decompose()
-    text = root.get_text(" ", strip=True)
+    text = html_to_text(str(root))
     date = None
     if m := re.search(r"(20\d{2})-(\d{2})-(\d{2})(?!\d)", text):
         date = parse_date(m[0])
-    elif prev and (m := re.search(r"(\d{1,2})-(\d{1,2})", meta("article:published_time"))):
-        month, day = int(m[1]), int(m[2])
-        # roll into the next year only on a real wrap (Dec -> Jan): the site's
-        # own listing has out-of-order dates within a year (issue 101 < 100)
-        year = prev.year + (prev.month - month > 6)
-        try:
-            date = datetime(year, month, day, tzinfo=UTC)
+    elif m := re.search(r"(\d{1,2})-(\d{1,2})", meta("article:published_time")):
+        try:                     # a bare MM-DD: this year, or last year if that is in the future
+            date = datetime(now.year, int(m[1]), int(m[2]), tzinfo=UTC)
+            date = date.replace(year=now.year - 1) if date > now + timedelta(days=1) else date
         except ValueError:
             pass
-    return title, (str(root) if len(text) >= 500 else ""), date
+    return title, (text[:FEED_CONTENT_MAX] if len(text) >= 500 else ""), date
 
 
-def fetch_bestblogs(archive: dict) -> list[Raw]:
-    """Issues at /newsletter/issueN (the index is a JS shell). Known issues are
-    re-emitted from storage so they stay inside retention -- refetched only
-    while their date is unknown. New ones are fetched until 3 consecutive
-    misses; the issue html becomes the feed copy, so summarize_feed never
-    fetches the page again. Runs whether or not an OPML file is given."""
-    item = lambda n, title, when, body="": Raw(
-        "tech", "BestBlogs", title, f"{BESTBLOGS}/newsletter/issue{n}", when,
-        content=body)
-    known = {int(m[1]): r for r in archive.values()
-             if (m := BESTBLOGS_ISSUE.match(str(r.get("url", "")))) and r.get("title")}
-    out, prev, dated, new = [], None, 0, 0
-    for n, r in sorted(known.items()):
-        when = parse_date(r.get("published_at"))
-        if when is None and (got := bestblogs_issue(n, prev)) and got[2]:
-            when, dated = got[2], dated + 1
-        prev = when or prev
-        out.append(item(n, r["title"], when))
-    n, misses = max(known, default=0) + 1, 0
-    while n <= 500 and misses < 3:
-        got = bestblogs_issue(n, prev)
-        misses = 0 if got else misses + 1
-        if got and got[0]:
-            out.append(item(n, got[0], got[2], got[1]))
-            prev, new = got[2] or prev, new + 1
-        n += 1
-    print(f"BestBlogs: {len(known)} known ({dated} newly dated), {new} new")
+def fetch_bestblogs(archive: dict, now: datetime, days: int) -> list[Raw]:
+    """New issues only. With issues in the archive: scan up from the highest
+    one. Without: find the latest issue (doubling, then bisecting), then walk
+    down while issues are inside retention."""
+    got: dict[int, tuple | None] = {}
+    probe = lambda n: got[n] if n in got else got.setdefault(n, bestblogs_issue(n, now))
+    known = [int(m[1]) for r in archive.values() if (m := BESTBLOGS_ISSUE.match(str(r.get("url", ""))))]
+    found = []
+    if known:
+        n, misses = max(known) + 1, 0
+        while n <= BESTBLOGS_MAX and misses < BESTBLOGS_MISSES:
+            misses = 0 if probe(n) else misses + 1
+            found += [n] if got[n] else []
+            n += 1
+    else:
+        hi = 1
+        while hi <= BESTBLOGS_MAX and probe(hi):
+            hi *= 2
+        lo = hi // 2                     # lo exists (or is 0), hi does not
+        while hi - lo > 1:
+            mid = (lo + hi) // 2
+            lo, hi = (mid, hi) if probe(mid) else (lo, mid)
+        cutoff = now - timedelta(days=days)
+        for n in range(lo, max(0, lo - BESTBLOGS_BACKLOG), -1):
+            if not probe(n):
+                continue
+            if got[n][2] and got[n][2] < cutoff:
+                break
+            found.append(n)
+    out = [Raw("tech", "BestBlogs", got[n][0], f"{BESTBLOGS}/newsletter/issue{n}", got[n][2], content=got[n][1])
+           for n in sorted(found) if got[n][0]]
+    print(f"BestBlogs: {len(known)} known, {len(out)} new ({len(got)} page(s) fetched)")
     return out
-
-
-def _next_data(html: str):
-    m = NEXT_DATA_RE.search(html or "")
-    try:
-        return json.loads(m[1]) if m else None
-    except ValueError:
-        return None
-
-
-def _walk(node):
-    """Every dict inside a JSON tree."""
-    stack = [node]
-    while stack:
-        n = stack.pop()
-        if isinstance(n, dict):
-            yield n
-            stack.extend(n.values())
-        elif isinstance(n, list):
-            stack.extend(reversed(n))
 
 
 def _thepaper_date(d: dict, now: datetime) -> datetime | None:
@@ -467,7 +502,7 @@ def thepaper_listing(html: str, now: datetime) -> list[tuple[str, str, datetime 
     """(article id, title, date) from a channel page: the __NEXT_DATA__ JSON,
     else the server-rendered links (whose text repeats the title)."""
     out: dict[str, tuple[str, datetime | None]] = {}
-    for d in _walk(_next_data(html)):
+    for d in walk(next_data(html)):
         cid, name = d.get("contId"), d.get("name") or d.get("title")
         link = str(d.get("link") or d.get("url") or "")
         if not (cid and isinstance(name, str) and name.strip()):
@@ -497,13 +532,17 @@ def thepaper_article(cid: str, now: datetime):
     r = common.get(url, (CONNECT_TIMEOUT, 30), session(), lang=LANG)
     if r is None or r.status != 200:
         return None
-    data, body, when = _next_data(r.text), "", None
-    for d in _walk(data):
-        if str(d.get("contId", "")) == cid or "content" in d:
-            c = d.get("content")
-            if isinstance(c, str) and "<" in c and len(c) > len(body):
+    data, body, other, when = next_data(r.text), "", "", None
+    for d in walk(data):
+        own = str(d.get("contId", "")) == cid
+        c = d.get("content")
+        if isinstance(c, str) and "<" in c:      # this article's own body first; any other only as fallback
+            if own and len(c) > len(body):
                 body = c
-            when = when or (_thepaper_date(d, now) if str(d.get("contId", "")) == cid else None)
+            elif not own and len(c) > len(other):
+                other = c
+        when = when or (_thepaper_date(d, now) if own else None)
+    body = body or other
     soup = BeautifulSoup(r.text, "html.parser")
     if not body:
         node = (soup.select_one("[class*=cententWrap]") or soup.select_one("[class*=contentWrap]")
@@ -514,9 +553,9 @@ def thepaper_article(cid: str, now: datetime):
         when = parse_date(meta.get("content")) if meta else None
     if when is None and (m := re.search(r"(20\d{2}-\d{2}-\d{2} \d{2}:\d{2})", soup.get_text(" "))):
         when = parse_date(m[1] + " +08:00")
-    text = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
+    text = html_to_text(body)                     # plain text, like every other feed copy
     images = tuple(thumbs.candidates(body, url)) + tuple(thumbs.candidates(r.text[:60000], url)[:2])
-    return (body if len(text) >= 300 else ""), when, images
+    return (text[:FEED_CONTENT_MAX] if len(text) >= 300 else ""), when, images
 
 
 def fetch_thepaper(archive: dict) -> list[Raw]:
@@ -645,9 +684,19 @@ def load_archive(path: Path) -> tuple[dict, dict]:
         if all(key):
             first[key] = r
         keep.append(r)
-    if moved or len(keep) < len(doc["items"]):
-        print(f"Re-canonicalised {moved} url(s), merged {len(doc['items']) - len(keep)} duplicate(s).")
-    return doc, {r["id"]: r for r in keep if r.get("id")}
+    archive: dict = {}
+    for r in keep:                             # re-keying can land on an id already present
+        if not r.get("id"):
+            continue
+        if r["id"] in archive:
+            absorb(archive[r["id"]], r)
+        else:
+            archive[r["id"]] = r
+    if merged := len(doc["items"]) - len(archive):
+        print(f"Re-canonicalised {moved} url(s), merged {merged} duplicate(s).")
+    elif moved:
+        print(f"Re-canonicalised {moved} url(s).")
+    return doc, archive
 
 
 def ingest(archive: dict, raws: list[Raw], now: datetime) -> None:
@@ -702,7 +751,7 @@ def main(argv=None) -> int:
         sys.exit(f"ERROR: no OPML ({where}); make the secret with tools/opml_secret.html")
     else:
         print(f"WARNING: no OPML ({where}); RSS sources skipped.")
-    raws += fetch_bestblogs(archive)
+    raws += fetch_bestblogs(archive, now, a.archive_days)
     raws += fetch_thepaper(archive)
     raws += fetch_inbox(archive, Path(a.output_dir) / "inbox.json", a.archive_days)
 

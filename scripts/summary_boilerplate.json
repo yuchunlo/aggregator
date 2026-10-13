@@ -18,7 +18,7 @@
   "刪贅詞的話，min_keep_after_cut 的字數判斷會落在不同長度的文字上。",
   "",
   "scope 對應材料來源：page=抓取的網頁正文, meta=og/meta description,",
-  "feed=RSS feed_content, subtitle=YouTube 字幕, bridge=telegram/jike。",
+  "feed=RSS feed_content, subtitle=YouTube 字幕（含 podcast 逐字稿）。",
   "all=不分來源。remove_block / remove_inline / cut_to_end 一律不分來源",
   "（維持原本行為）。",
   "",
@@ -261,18 +261,6 @@
    "level": "sentence",
    "scope": "subtitle",
    "pattern": "本(?:影片|集|節目)由.{0,20}(?:贊助|贊助播出)"
-  },
-  {
-   "action": "drop_unit",
-   "level": "sentence",
-   "scope": "bridge",
-   "pattern": "^(?:轉發自|Forwarded from|轉自)"
-  },
-  {
-   "action": "drop_unit",
-   "level": "sentence",
-   "scope": "bridge",
-   "pattern": "^(?:頻道|群組|投稿)[:：]\\s*@?\\S+$"
   },
   {
    "action": "drop_unit",

@@ -19,7 +19,7 @@ os.environ.setdefault("TRANSLATE", "off")
 os.environ["SCRATCH_FILE"] = os.path.join(tempfile.mkdtemp(), "scratch.json")   # never the real sidecar
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import common, lang, update_news as un, subtitle_priority as sp, thumbs, textproc, extract, download_sub as ds  # noqa: E402
+import common, lang, update_news as un, thumbs, textproc, extract, download_sub as ds  # noqa: E402
 
 FAILS: list[str] = []
 
@@ -41,6 +41,7 @@ def check_jsonio():
 
 
 def check_subtitle_priority():
+    sp = ds
     c = sp.choose_track
     eq(c({"zh-Hant": {}}, {"en": {}}, "en"), (True, "zh-Hant"), "manual zh beats auto orig")
     eq(c({"en": {}, "fr": {}}, {}, "en"), (True, "en"), "manual orig beats manual other")
@@ -473,6 +474,45 @@ def check_offline_only():
        "offline-only: subtitle summarized, page not fetched, feed copy dropped")
 
 
+def check_cookies_status():
+    """An expired cookies file must leave a trace the reader can show; a healthy
+    run must not commit every day; an idle run must not claim cookies are fine."""
+    with tempfile.TemporaryDirectory() as d:
+        status = Path(d) / "status.json"
+        eq(common.record_status(status, "cookies", "ok", "t1"), True, "status: first write")
+        eq(common.record_status(status, "cookies", "ok", "t2"), False, "status: unchanged ok is not rewritten")
+        eq(json.loads(status.read_text())["cookies"]["checked_at"], "t1", "status: ok keeps its first time")
+        eq(common.record_status(status, "cookies", "expired", "t3"), True, "status: ok -> expired")
+        eq(common.record_status(status, "cookies", "expired", "t4"), True, "status: expired is refreshed every run")
+        eq(json.loads(status.read_text())["cookies"], {"state": "expired", "checked_at": "t4"}, "status: expired content")
+        status.write_text("{broken", encoding="utf-8")
+        eq(common.record_status(status, "cookies", "ok", "t5"), True, "status: damaged file starts over")
+
+        archive = Path(d) / "archive.json"
+        yid = "c" * 40
+        archive.write_text(json.dumps({"items": [{"id": yid, "url": "https://www.youtube.com/watch?v=abcdefghijk",
+                                                   "title": "v", "source": "y", "category": "x"}]}))
+        real_run = ds.run
+        argv = ["--archive", str(archive), "--output-dir", str(Path(d) / "subs"), "--cookies-path", str(Path(d) / "c.txt")]
+        try:
+            status.unlink()
+            ds.run = lambda cmd, timeout: (1, "", "ERROR: cookies are no longer valid")
+            with contextlib.redirect_stdout(io.StringIO()):
+                ds.main(argv)
+            eq(json.loads(status.read_text())["cookies"]["state"], "expired", "download_sub: rejected cookies are recorded")
+            ds.run = lambda cmd, timeout: (1, "", "ERROR: some other failure")
+            with contextlib.redirect_stdout(io.StringIO()):
+                ds.main(argv)
+            eq(json.loads(status.read_text())["cookies"]["state"], "ok", "download_sub: a run that was not rejected clears it")
+            status.unlink()
+            archive.write_text(json.dumps({"items": []}))
+            with contextlib.redirect_stdout(io.StringIO()):
+                ds.main(argv)
+            eq(status.exists(), False, "download_sub: nothing probed means no claim about cookies")
+        finally:
+            ds.run = real_run
+
+
 def check_security():
     for u in ("http://169.254.169.254/latest/meta-data", "http://127.0.0.1:4416/", "http://localhost/",
               "http://10.1.2.3/", "http://[::1]/", "http://[::ffff:127.0.0.1]/", "http://0.0.0.0/",
@@ -510,6 +550,98 @@ def check_security():
        None, "non-http thumbnail refused")
     eq(un.html_to_text("<p>a<code>x</code>b</p><pre>c</pre><code>1\n2</code><script>d</script>e"), "axb\ne",
        "feed html to text")
+
+
+def check_telegram_channels():
+    page = "https://t.me/s/madchuwin"
+    for url in ("https://t.me/s/madchuwin", "https://t.me/madchuwin", "http://t.me/madchuwin/", "https://t.me/madchuwin/1234",
+                "https://t.me/s/madchuwin/", "https://telegram.me/madchuwin", "https://T.ME/madchuwin"):
+        eq(un.telegram_page_url(url), page, f"channel url normalised: {url}")
+    for url in ("https://t.me/joinchat/AAAA", "https://t.me/+abcdEFGH", "https://t.me/c/123456/789", "https://t.me/addstickers/pack",
+                "https://t.me/s/", "https://t.me/", "https://t.me/ab", "https://t.me/1channel", "https://t.me/name/notanumber",
+                "https://t.me/name/1/2", "https://evil.example/madchuwin", "https://t.me.evil.example/madchuwin",
+                "https://t.me/joinchat", "https://t.me/share/123", "https://t.me/addstickers", "https://t.me/proxy",
+                "ftp://t.me/madchuwin"):
+        eq(un.telegram_page_url(url), None, f"not a public channel: {url}")
+    eq(un.telegram_page_url("https://t.me/name?x=%2e%2e#frag"), "https://t.me/s/name", "query and fragment are dropped, never passed through")
+    eq(un.bridge("https://t.me/madchuwin", ""), ("telegram", page), "xmlUrl t.me/NAME bridges to the preview page")
+    eq(un.bridge("https://t.me/s/madchuwin", ""), ("telegram", page), "xmlUrl t.me/s/NAME bridges to the preview page")
+    eq(un.bridge("https://example.com/rss", "https://t.me/madchuwin"), ("telegram", page), "htmlUrl t.me/NAME still bridges (old form)")
+    eq(un.bridge("https://rsshub.app/telegram/channel/madchuwin", ""), ("telegram", page), "rsshub telegram route still bridges")
+    eq(un.bridge("https://example.com/rss", "https://example.com/"), None, "ordinary feeds are not bridged")
+    opml = (b'<opml><body><outline title="T" xmlUrl="https://t.me/madchuwin" category="news"/>'
+            b'<outline title="J" xmlUrl="https://t.me/joinchat/AAAA"/></body></opml>')
+    feeds = un.read_opml(opml, 0)
+    eq((feeds[0]["parser"], feeds[0]["url"]), ("telegram", page), "OPML telegram entry uses the telegram parser")
+    eq(feeds[1]["parser"], "rss", "an invite link is not treated as a channel")
+    html = """<div class="tgme_widget_messages_list">
+      <div class="tgme_widget_message_wrap"><div class="tgme_widget_message text_not_supported_wrap js-widget_message" data-post="madchuwin/101">
+        <div class="tgme_widget_message_text js-message_text" dir="auto">第一則 <b>重點</b><br/>第二行</div>
+        <div class="tgme_widget_message_info"><a class="tgme_widget_message_date" href="https://t.me/madchuwin/101"><time datetime="2026-10-05T08:00:00+00:00" class="time">08:00</time></a></div></div></div>
+      <div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="../evil/1">
+        <div class="tgme_widget_message_text">不該收的</div><time datetime="2026-10-05T09:00:00+00:00"></time></div></div>
+      <div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="madchuwin/102">
+        <div class="tgme_widget_message_photo_wrap"></div><time datetime="2026-10-05T10:00:00+00:00"></time></div></div>
+    </div>"""
+    raw = un.parse_telegram(html, {"category": "news", "title": "T"})
+    eq([x.url for x in raw], ["https://t.me/madchuwin/101"], "only well-formed posts that have text and a date are kept")
+    eq(len(raw), 1, "post with attribute-built path or no text is dropped")
+    seen = []
+    def fake_get(url, timeout, session=None, impersonate=False, lang="en"):
+        seen.append(url)
+        return common.Resp(200, html.encode(), {"content-type": "text/html"}, url)
+    real_get, real_session = common.get, un.session
+    common.get, un.session = fake_get, lambda: None
+    try:
+        fetched = un.fetch_feeds([feeds[0]])
+    finally:
+        common.get, un.session = real_get, real_session
+    eq(seen, [page], "the preview page is the only thing fetched")
+    eq(len(fetched), 1, "items come out of the fetched preview page")
+
+
+def check_youtube_channel_urls():
+    uc = "UC" + "a" * 22
+    feed = "https://www.youtube.com/feeds/videos.xml"
+    eq(un.youtube_feed_url(f"https://www.youtube.com/channel/{uc}"), f"{feed}?channel_id={uc}", "channel url to feed")
+    eq(un.youtube_feed_url(f"https://youtube.com/channel/{uc}/videos"), f"{feed}?channel_id={uc}", "channel subpage to feed")
+    eq(un.youtube_feed_url("https://www.youtube.com/playlist?list=PLabcdefghijk"), f"{feed}?playlist_id=PLabcdefghijk", "playlist to feed")
+    eq(un.youtube_feed_url("https://www.youtube.com/@name"), None, "handle needs the network")
+    eq(un.youtube_feed_url("https://evil.example/channel/" + uc), None, "other hosts are not YouTube")
+    eq(un.youtube_feed_url("https://www.youtube.com/channel/UCshort"), None, "malformed channel id refused")
+    eq([un.is_youtube_channel_page(u) for u in ("https://www.youtube.com/@name", "https://www.youtube.com/c/name",
+        "https://www.youtube.com/user/name", "https://www.youtube.com/@", "https://evil.example/@name",
+        "https://www.youtube.com/watch?v=x")], [True, True, True, False, False, False], "which pages need resolving")
+    eq(un.extract_youtube_channel_id(f'<link rel="alternate" type="application/rss+xml" title="RSS" href="{feed}?channel_id={uc}">'),
+       uc, "channel id from the RSS link")
+    eq(un.extract_youtube_channel_id(f'<link rel="canonical" href="https://www.youtube.com/channel/{uc}">'), uc, "channel id from canonical")
+    eq(un.extract_youtube_channel_id(f'{{"externalId":"{uc}"}}'), uc, "channel id from metadata")
+    eq(un.extract_youtube_channel_id('<link type="application/rss+xml" href="x?channel_id=UC"><script>alert(1)</script>'), None,
+       "page content that is not a well-formed id is never returned")
+    eq(un.extract_youtube_channel_id('{"externalId":"UCshort"}'), None, "metadata id must be exactly 24 characters")
+    eq(un.extract_youtube_channel_id('{"externalId":"UC' + "a" * 40 + '"}'), None, "over-long id refused")
+    opml = (f'<opml><body><outline title="A" xmlUrl="https://www.youtube.com/channel/{uc}"/>'
+            f'<outline title="B" xmlUrl="https://www.youtube.com/@handle"/>'
+            f'<outline title="C" xmlUrl="https://c.example/rss"/></body></opml>').encode()
+    feeds = {f["title"]: f for f in un.read_opml(opml, 0)}
+    eq((feeds["A"]["url"], feeds["A"]["youtube_page"]), (f"{feed}?channel_id={uc}", False), "OPML channel url converted without fetching")
+    eq((feeds["B"]["url"], feeds["B"]["youtube_page"]), ("https://www.youtube.com/@handle", True), "OPML handle url marked for resolving")
+    eq(feeds["C"]["youtube_page"], False, "ordinary feeds are not resolved")
+    # fetch_feeds: the handle page is fetched, then the resolved feed is parsed
+    page = f'<link rel="alternate" type="application/rss+xml" href="{feed}?channel_id={uc}">'.encode()
+    rss = b'<rss version="2.0"><channel><title>T</title><item><title>Video</title><link>https://www.youtube.com/watch?v=abc</link><pubDate>Mon, 05 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
+    seen = []
+    def fake_get(url, timeout, session=None, impersonate=False, lang="en"):
+        seen.append(url)
+        return common.Resp(200, page if "@handle" in url else rss, {"content-type": "text/html" if "@handle" in url else "application/xml"}, url)
+    real_get, real_session = common.get, un.session
+    common.get, un.session = fake_get, lambda: None
+    try:
+        raw = un.fetch_feeds([feeds["B"]])
+    finally:
+        common.get, un.session = real_get, real_session
+    eq(seen, ["https://www.youtube.com/@handle", f"{feed}?channel_id={uc}"], "handle page fetched, then its resolved feed")
+    eq(len(raw), 1, "items parsed from the resolved feed")
 
 
 def check_opml_secret():
@@ -573,7 +705,7 @@ def check_merge_and_id():
             {"id": "c" * 40, "title": "legacy", "url": "https://x.example/3", "published_at": ago(10)}]})
         # main() also scrapes BestBlogs: on a runner with network that adds live
         # issues to the archive. The test is about retention only, so stay offline.
-        real_bb, un.fetch_bestblogs = un.fetch_bestblogs, lambda archive: []
+        real_bb, un.fetch_bestblogs = un.fetch_bestblogs, lambda *a: []
         real_tp, un.fetch_thepaper = un.fetch_thepaper, lambda archive: []
         try:
             with contextlib.redirect_stdout(io.StringIO()):
@@ -632,7 +764,7 @@ def check_podcast():
     try:
         for audio, want in (("http://127.0.0.1/a.m4a", False), ("http://169.254.169.254/a.mp3", False),
                             ("file:///etc/passwd.mp3", False)):
-            podcast._xiaoyuzhou = lambda u, e, s, audio=audio: podcast.Episode(audio)
+            podcast._xiaoyuzhou = lambda u, e, audio=audio: podcast.Episode(audio)
             eq(podcast.resolve("https://www.xiaoyuzhoufm.com/episode/6ab2546493d5eb3bdc794b18") is not None,
                want, f"audio url guarded: {audio}")
     finally:
@@ -647,12 +779,233 @@ def check_podcast():
     try:
         podcast.resolve = lambda u: None
         n = __import__("collections").Counter()
-        changed = [ds.podcast_asr(it, A, ds.Budget(A), Path("."), Path("."), n) for _ in range(5)]
+        changed = [ds.podcast_asr(it, A, ds.Budget(A), Path("."), n) for _ in range(5)]
         eq((changed, sorted(it)), ([False] * 5, ["id", "title", "url"]), "failed podcast: no marks, retried")
     finally:
         podcast.resolve = real_resolve
     eq(sf.route(dict(ep, published_at="2020-01-01T00:00:00Z")), None, "old podcast still waits: no time limit")
     eq(sf.route(dict(ep, feed_content="show notes " * 50)), None, "podcast never falls back to show notes")
+
+
+def check_bestblogs():
+    import summarize_feed as sf
+    now = datetime(2026, 10, 13, tzinfo=timezone.utc)
+    body = "".join(f"<p>第{i}篇：人工智慧模型在推理基準上取得進步，研究團隊公布了評測方法與資料集。</p>" for i in range(20))
+    page = lambda n, d: (f'<html><head><title>第{n}期 | BestBlogs.dev</title></head><body><nav>NAV</nav>'
+                         f'<main><h1>Newsletter {d}</h1>{body}<script>x()</script></main></body></html>')
+    dates = {n: (now - timedelta(days=7 * (40 - n))).strftime("%Y-%m-%d") for n in range(1, 41)}
+    seen = []
+
+    def fake_get(url, timeout, session=None, impersonate=False, lang=None):
+        seen.append(url)
+        n = int(url.rsplit("issue", 1)[1])
+        return common.Resp(200, page(n, dates[n]).encode(), {"content-type": "text/html"}, url) if n in dates \
+            else common.Resp(404, b"", {}, url)
+    real = un.common.get, un.session
+    un.common.get, un.session = fake_get, lambda: None
+    try:
+        raws = un.fetch_bestblogs({}, now, 60)
+        eq([int(r.url.rsplit("issue", 1)[1]) for r in raws], list(range(32, 41)),
+           "bestblogs: empty archive takes the latest issues inside retention only")
+        eq(len(seen) < 25, True, "bestblogs: latest issue found by bisection, not by walking from 1")
+        r = raws[-1]
+        eq((r.title, r.category, r.source, un.iso(r.published_at)), ("第40期", "tech", "BestBlogs", dates[40] + "T00:00:00Z"),
+           "bestblogs: title, labels, date from the page")
+        eq(("<" in r.content, "NAV" in r.content, "x()" in r.content, "第0篇" in r.content), (False, False, False, True),
+           "bestblogs: feed copy is plain text without chrome")
+        arch = {}
+        un.ingest(arch, raws, now)
+        seen.clear()
+        eq(un.fetch_bestblogs(arch, now, 60), [], "bestblogs: known issues are not emitted again")
+        eq(len(seen), un.BESTBLOGS_MISSES, "bestblogs: with issues known, only the next ones are probed")
+        dates[41] = now.strftime("%Y-%m-%d")
+        eq([r.url for r in un.fetch_bestblogs(arch, now, 60)], [f"{un.BESTBLOGS}/newsletter/issue41"],
+           "bestblogs: new issue found")
+    finally:
+        un.common.get, un.session = real
+    s = textproc.build(raws[-1].content, "feed")
+    eq(bool(s) and "<" not in s, True, "bestblogs: summary has no markup")
+    eq(un.canonical_url("https://bestblogs.dev/en/newsletter/issue007/"), f"{un.BESTBLOGS}/newsletter/issue7",
+       "bestblogs url canonical")
+    eq(sf.route({"url": f"{un.BESTBLOGS}/newsletter/issue7", "feed_content": "x"}), "feed",
+       "bestblogs summarized from its copy")
+
+
+def check_thepaper_body():
+    """澎湃 article pages: the article's own body, as plain text, never another article's."""
+    now = datetime(2026, 10, 13, tzinfo=timezone.utc)
+    own = "<p>" + "上海書評這一期討論城市記憶與出版史，作者回顧了三十年來的書店變遷。" * 12 + "</p>"
+    other = "<p>" + "推薦閱讀：另一篇完全不同的文章內容，篇幅更長。" * 40 + "</p>"
+    data = {"props": {"pageProps": {"detailData": {"contId": 123456, "content": own, "pubTimeLong": 1760300000000},
+                                    "recommend": [{"contId": 999999, "content": other}]}}}
+    page = f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(data)}</script></html>'
+    real = un.common.get, un.session
+    un.common.get = lambda url, *a, **k: common.Resp(200, page.encode(), {"content-type": "text/html"}, url)
+    un.session = lambda: None
+    try:
+        body, when, _ = un.thepaper_article("123456", now)
+    finally:
+        un.common.get, un.session = real
+    eq(("城市記憶" in body, "推薦閱讀" in body, "<p>" in body), (True, False, False), "thepaper: own contId body, plain text")
+    eq(when is not None, True, "thepaper: date from the article data")
+
+
+def check_status_ignores_podcasts():
+    """A run that only handled podcasts says nothing about the YouTube cookies."""
+    import podcast
+    with tempfile.TemporaryDirectory() as d:
+        archive, status = Path(d) / "archive.json", Path(d) / "status.json"
+        archive.write_text(json.dumps({"items": [{"id": "e" * 40, "title": "t", "source": "s", "category": "c",
+                                                  "url": "https://www.xiaoyuzhoufm.com/episode/6ab2546493d5eb3bdc794b18"}]}))
+        real = podcast.resolve
+        podcast.resolve = lambda u: None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                ds.main(["--archive", str(archive), "--output-dir", str(Path(d) / "subs"),
+                         "--cookies-path", str(Path(d) / "c"), "--status-file", str(status)])
+        finally:
+            podcast.resolve = real
+        eq(status.exists(), False, "subs: podcast-only run leaves the cookies flag alone")
+
+
+def check_accept_language():
+    """lang reaches the request on the plain path too; without it the session's own header stands."""
+    sent = []
+
+    class Spy:
+        def get(self, url, **kw):
+            sent.append(kw.get("headers"))
+            raise OSError("stop")             # only the headers matter here
+    common.get("https://example.com/", 5, Spy(), lang="zh-TW")
+    common.get("https://example.com/", 5, Spy())
+    eq(sent, [{"Accept-Language": "zh-TW"}, None], "Accept-Language: given lang sent, else session default")
+
+
+def check_summary_lines():
+    """Line breaks in the source survive into the summary (not for captions,
+    whose lines are cue units); translation and QC repair keep them too."""
+    a = "研究團隊在新的論文中指出，大型語言模型的推理能力在特定基準上有明顯提升。成本仍然很高，部署也不容易。"
+    b = "工程師表示，部署這些模型需要大量的運算資源與電力，資料中心正在擴建。"
+    c = "業界預計明年會有更便宜的推理晶片上市，價格可能下降一半以上。"
+    s = textproc.build("\n".join([a, b, c]) * 1, "page")
+    eq(s.count("\n") >= 1 and all(ln.strip() == ln and ln for ln in s.split("\n")), True,
+       "summary: source line breaks kept, lines trimmed, no blank lines")
+    eq(textproc.extractive("\n".join([a, b, c]), True, 10_000, "page", lines=True), "\n".join([a, b, c]),
+       "summary: break exactly where the source had one, sentences of a line stay together")
+    eq("\n" in textproc.build("\n".join([a, b, c]), "subtitle"), False, "summary: caption lines are not kept")
+    eq(textproc.tidy("中文 ， 句子 。 \n\n  English   text  \n"), "中文，句子。\nEnglish text", "tidy keeps lines")
+
+    calls = []
+
+    def fake_many(texts, session, stop_after=0):
+        calls.append(list(texts))
+        return [(None, "empty input") if not t else (None, "result still not Chinese") if t == "OK"
+                else ("譯:" + t, "") for t in texts]
+    real = lang.translate_many
+    lang.translate_many = fake_many
+    try:
+        got = lang.translate_keep_lines(["one\ntwo", "single", "bad\nOK", ""], None)
+    finally:
+        lang.translate_many = real
+    eq(got[:3], [("譯:one\n譯:two", ""), ("譯:single", ""), ("譯:bad OK", "")],
+       "translate_keep_lines: per-line, single, whole-text retry")
+    eq(got[3][0], None, "translate_keep_lines: empty stays empty")
+    eq(calls, [["one", "two", "single", "bad", "OK"], ["bad OK", ""]], "translate_keep_lines: one batch, one retry")
+
+    import summary_qc as qc
+    body = ("<p>研究人員在報告中指出，這項技術可以大幅降低資料中心的耗電量。</p>\n"
+            "<p>預計明年開始量產，價格也會比現有方案便宜三成以上，業界相當期待。</p>") * 2
+    f = qc.inspect({"summary": body, "title": "t"})
+    eq(bool(f) and f.action == "repair" and "\n" in f.fixed and "<" not in f.fixed, True,
+       "qc repair: tags stripped, line breaks kept")
+
+
+def check_asr_permanence():
+    """Only the item's own nature ends it: no speech, or a video over the cap.
+    Download failures and timeouts keep it pending (a podcast over the cap too)."""
+    import types, importlib.util
+    a = types.SimpleNamespace(no_transcribe=False, max_transcribe=0, max_asr_duration=0, max_asr_total=0,
+                              audio_timeout=1, whisper_model="x", whisper_compute_type="int8")
+    real_t, real_spec = ds.transcribe, importlib.util.find_spec
+    importlib.util.find_spec = lambda name: object()
+    try:
+        for exc, podcast_, want in ((RuntimeError("download timed out"), False, None),
+                                    (ImportError("no whisper"), False, None),
+                                    (ds.NoSpeech("x"), False, common.BLANK_SUMMARY),
+                                    (ds.NoSpeech("x"), True, common.BLANK_SUMMARY),
+                                    (ds.TooLong("x"), False, common.BLANK_SUMMARY),
+                                    (ds.TooLong("x"), True, None)):
+            def boom(*_a, exc=exc):
+                raise exc
+            ds.transcribe = boom
+            it, n = {"id": "a" * 40}, __import__("collections").Counter()
+            with tempfile.TemporaryDirectory() as d:
+                ds.asr(it, None, 60, False, a, ds.Budget(a), Path(d), n, None, is_podcast=podcast_)
+            eq(it.get("summary"), want, f"asr: {type(exc).__name__} podcast={podcast_}")
+    finally:
+        ds.transcribe, importlib.util.find_spec = real_t, real_spec
+
+
+def check_download_guard():
+    """Podcast audio goes through common.download: unsafe urls never reach the
+    network and leave no file behind; size and the 200 status are enforced."""
+    with tempfile.TemporaryDirectory() as d:
+        dest = Path(d) / "a.mp3"
+        for u in ("http://127.0.0.1/a.mp3", "http://169.254.169.254/a.mp3", "file:///etc/passwd", "https://u:p@1.1.1.1/a"):
+            eq((common.download(u, dest, 5, 1000), dest.exists()), (False, False), f"download refused: {u}")
+
+        class R:
+            def __init__(self, status, chunks, headers=None):
+                self.status_code, self.chunks, self.headers = status, chunks, headers or {}
+            def iter_content(self, _):
+                yield from self.chunks
+            def close(self):
+                pass
+
+        @contextlib.contextmanager
+        def fake_open(url, *_a):
+            yield replies.pop(0)
+        real = common._open
+        common._open = fake_open
+        try:
+            replies = [R(302, [], {"Location": "http://10.0.0.1/x.mp3"})]
+            eq(common.download("https://1.1.1.1/a.mp3", dest, 5, 1000), False, "download: redirect to private refused")
+            replies = [R(200, [b"x" * 600, b"x" * 600])]
+            eq((common.download("https://1.1.1.1/a.mp3", dest, 5, 1000), dest.exists()), (False, False),
+               "download: size cap, partial file removed")
+            replies = [R(404, [b"nope"])]
+            eq(common.download("https://1.1.1.1/a.mp3", dest, 5, 1000), False, "download: non-200 refused")
+            replies = [R(200, [b"ab", b"cd"])]
+            eq((common.download("https://1.1.1.1/a.mp3", dest, 5, 1000), dest.read_bytes()), (True, b"abcd"),
+               "download: body written")
+        finally:
+            common._open = real
+
+
+def check_archive_rekey_collision():
+    """A stored url that re-canonicalises onto an id already in the archive is
+    merged into it, not silently overwritten."""
+    with tempfile.TemporaryDirectory() as d:
+        new_url = "https://open.firstory.fm/story/abc"
+        base = {"category": "c", "source": "S", "title": "T", "published_at": None}
+        a = dict(base, id=un.make_id("c", "S", "T", new_url), url=new_url, summary="摘要" * 40,
+                 last_seen_at="2026-10-02T00:00:00Z")
+        b = dict(base, id=un.make_id("c", "S", "T", "https://open.firstory.me/story/abc"),
+                 url="https://open.firstory.me/story/abc", thumbnail="https://x.example/chart.png",
+                 last_seen_at="2026-10-03T00:00:00Z")
+        common.save_doc(Path(d) / "archive.json", {"items": [a, b]})
+        _, arch = un.load_archive(Path(d) / "archive.json")
+        r = arch.get(a["id"], {})
+        eq((len(arch), r.get("summary") == a["summary"], r.get("thumbnail"), r.get("last_seen_at")),
+           (1, True, b["thumbnail"], b["last_seen_at"]), "re-keyed duplicate merged, fields kept")
+
+
+def check_bridge_whitelist():
+    eq(un.bridge("https://rsshub.app/telegram/channel/madchuwin", ""), ("telegram", "https://t.me/s/madchuwin"),
+       "rsshub telegram route")
+    eq(un.bridge("https://rsshub.app/telegram/channel/..%2Fx", ""), None, "rsshub telegram name validated")
+    eq(un.bridge("https://rsshub.app/jike/user/AB-12", ""), ("jike", "https://m.okjike.com/users/AB-12"), "rsshub jike route")
+    eq(un.bridge("https://rsshub.app/jike/topic/a%2F..", ""), None, "rsshub jike id validated")
 
 
 if __name__ == "__main__":

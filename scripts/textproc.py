@@ -160,7 +160,7 @@ def vtt_to_text(path) -> str:
 # ============================================================== boilerplate
 BOILER_FILE = Path(os.environ.get("BOILERPLATE_FILE",
                                   Path(__file__).with_name("summary_boilerplate.json")))
-KINDS = ("page", "meta", "feed", "subtitle", "bridge")
+KINDS = ("page", "meta", "feed", "subtitle")
 _rules: dict | None = None
 
 
@@ -283,13 +283,16 @@ W_FLUFF, W_LEAD = 0.25, 0.5
 MMR_LAMBDA, MMR_DUP = 0.7, 0.65
 
 
-def split_sentences(text: str, cjk: bool) -> list[str]:
+def split_lines(text: str, cjk: bool) -> list[tuple[int, str]]:
+    """[(source line number, sentence)]: the line number lets a summary keep
+    the source's line breaks between the sentences it picks."""
     out = []
-    for line in re.sub(r"\n{2,}", "\n", _BULLET.sub("\n", text)).split("\n"):
+    lines = re.sub(r"\n{2,}", "\n", _BULLET.sub("\n", text)).split("\n")
+    for no, line in enumerate(lines):
         for s in (_ZH_SPLIT if cjk else _EN_SPLIT).split(line.strip()):
             s = s.strip()
             if s and (len(s) >= 8 if cjk else len(s.split()) >= 5):
-                out.append(s)
+                out.append((no, s))
     return out
 
 
@@ -330,18 +333,22 @@ def trim_to_sentences(text: str, limit: int) -> str:
     return "".join(kept).strip() if kept else pieces[0].strip()
 
 
-def extractive(text: str, cjk: bool, budget: int, kind: str) -> str:
-    sents = split_sentences(text, cjk)
-    if not sents:
+def extractive(text: str, cjk: bool, budget: int, kind: str, lines: bool = False) -> str:
+    """lines: picked sentences that came from different source lines are
+    joined with a line break, as in the source."""
+    pairs = split_lines(text, cjk)
+    if not pairs:
         return trim_to_sentences(text, budget)
-    keep = [s for s in sents if not is_boilerplate(s, kind)]
-    if keep and len(keep) < len(sents):
-        STATS[f"boiler:{kind}:sentence"] += len(sents) - len(keep)
-        sents = keep
+    keep = [(no, s) for no, s in pairs if not is_boilerplate(s, kind)]
+    if keep and len(keep) < len(pairs):
+        STATS[f"boiler:{kind}:sentence"] += len(pairs) - len(keep)
+        pairs = keep
     uniq = {}                                   # verbatim repeats: first wins
-    for s in sents:
-        uniq.setdefault(re.sub(r"\W+", "", s.lower()), s)
-    sents = [s for k, s in uniq.items() if k]
+    for no, s in pairs:
+        uniq.setdefault(re.sub(r"\W+", "", s.lower()), (no, s))
+    pairs = [p for k, p in uniq.items() if k]
+    line_of = [no for no, _ in pairs]
+    sents = [s for _, s in pairs]
 
     toks = [tokens(s, cjk) for s in sents]
     df = Counter(t for ts in toks for t in ts)
@@ -379,16 +386,35 @@ def extractive(text: str, cjk: bool, budget: int, kind: str) -> str:
                 c[4] = max(c[4], len(c[3] & best[3]) / len(union))
     if not chosen:
         return sents[0]
-    return ("" if cjk else " ").join(c[2] for c in sorted(chosen, key=lambda c: c[1]))
+    out, prev = "", None
+    for c in sorted(chosen, key=lambda c: c[1]):
+        if prev is not None:
+            out += "\n" if lines and line_of[c[1]] != line_of[prev] else ("" if cjk else " ")
+        out, prev = out + c[2], c[1]
+    return out
 
 
 # ============================================================== assembly
 _CJK_PUNCT = "\u4e00-\u9fff，。！？；：、（）「」"
 
 
+def tidy(text: str, keep_lines: bool = True) -> str:
+    """Collapse spaces (none around CJK punctuation); line breaks survive as
+    single newlines unless keep_lines is off."""
+    rows = text.split("\n") if keep_lines else [text]
+    out = []
+    for row in rows:
+        if lang.detect(row) != "other":
+            row = re.sub(rf"(?<=[{_CJK_PUNCT}])\s+|\s+(?=[{_CJK_PUNCT}])", "", row)
+        if row := re.sub(r"\s+", " ", row).strip():
+            out.append(row)
+    return "\n".join(out)
+
+
+
 def translate(text: str) -> str | None:
-    """zh-TW translation, recording why it failed."""
-    out, reason = lang.translate_one(text, session)
+    """zh-TW translation, line breaks kept, recording why it failed."""
+    out, reason = lang.translate_keep_lines([text], session)[0]
     if not out:
         STATS[f"translate-fail:{lang.short_reason(reason) or 'unknown'}"] += 1
     return out
@@ -397,7 +423,7 @@ def translate(text: str) -> str | None:
 def build(content: str, kind: str = "page", table=False, code=False, meta=False) -> str | None:
     """Extractive summary of `content`, in 繁中, plus trailing marks.
 
-    kind: page | feed | subtitle | bridge (selects boilerplate scope);
+    kind: page | feed | subtitle (selects boilerplate scope);
     meta: only a blurb was available (marked ↛).
     Returns "" when only boilerplate remains, None when the text is
     undecodable (mojibake): that is a fetch problem, so the item stays pending.
@@ -424,19 +450,15 @@ def build(content: str, kind: str = "page", table=False, code=False, meta=False)
 
     src = lang.detect(content)
     budget = max(1, min(SUMMARY_MAX, int(len(content) * SUMMARY_RATIO)) - len(suffix))
+    lines = kind != "subtitle"             # caption lines are cue/merge units, not the speaker's paragraphs
     if src.startswith("zh"):
-        summary = extractive(content, True, budget, kind)
+        summary = extractive(content, True, budget, kind, lines)
     else:
-        raw = extractive(content, src == "ja", int(budget * FOREIGN_BUDGET), kind)
+        raw = extractive(content, src == "ja", int(budget * FOREIGN_BUDGET), kind, lines)
         summary = translate(raw) if TRANSLATE else None
         if not summary:                   # stored as-is; backfill retries later
             STATS[f"untranslated:{src}"] += 1
             summary = raw
-    summary = lang.to_twp(summary)
-    if lang.detect(summary) in ("other",):
-        summary = re.sub(r"\s+", " ", summary).strip()
-    else:
-        summary = re.sub(rf"(?<=[{_CJK_PUNCT}])\s+|\s+(?=[{_CJK_PUNCT}])", "", summary)
-        summary = re.sub(r"\s+", " ", summary).strip()
+    summary = tidy(lang.to_twp(summary), keep_lines=lines)
     summary = trim_to_sentences(summary, budget)
     return summary + suffix if summary else ""

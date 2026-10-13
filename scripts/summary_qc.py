@@ -142,7 +142,6 @@ _HTML = re.compile(r"</?(?:div|span|script|style|iframe|table|tr|td|img|meta|lin
                    r"|&nbsp;|&amp;|&lt;|&gt;|&#\d+;", re.I)
 _HTML_STRONG = re.compile(r"width=device-width|name=[\"']?viewport|OptanonWrapper|crossorigin=|"
                           r"<meta\b|<script\b[^>]*\bsrc=|<link\b[^>]*\brel=|class=\"[\w\- :/\[\]]{20,}\"", re.I)
-looks_like_code = textproc.looks_like_code
 
 
 def check_scrape(s: str) -> Finding | None:
@@ -153,7 +152,7 @@ def check_scrape(s: str) -> Finding | None:
                        snippet(s, m.start()), "refetch")
     tags = _HTML.findall(s)
     strong = _HTML_STRONG.search(s)
-    if not (strong or len(tags) >= 5 or (tags and len(s) < 300)) or looks_like_code(s):
+    if not (strong or len(tags) >= 5 or (tags and len(s) < 300)) or textproc.looks_like_code(s):
         return None
     m = strong or _HTML.search(s)
     body = s.rstrip()
@@ -161,7 +160,7 @@ def check_scrape(s: str) -> Finding | None:
     body = body[:-1].rstrip() if mark else body
     clean = re.sub(r"<[^>]{0,300}>", " ", body)
     clean = re.sub(r"&(?:nbsp|amp|lt|gt|#\d+);", " ", clean)
-    clean = re.sub(r"\s+", " ", clean).strip()
+    clean = "\n".join(ln for ln in (re.sub(r"[ \t\r\f\v]+", " ", x).strip() for x in clean.split("\n")) if ln)
     detail = "leftover HTML"
     if len(clean) >= 80 and len(clean) >= 0.6 * len(body) and not _HTML_STRONG.search(clean):
         return Finding("scrape", detail + ", tags stripped", snippet(s, m.start()), "repair",
@@ -185,7 +184,6 @@ def check_spam(s: str, title: str) -> Finding | None:
     text = s + " " + title
     promo = {m.group(0).lower() for m in _PROMO.finditer(text)}
     if len(promo) >= 2 or (promo and _PROMO_TOPIC.search(text)):
-        topic = {m.group(0).lower() for m in _PROMO_TOPIC.finditer(text)}
         return Finding("spam", "promotion: " + ", ".join(sorted(promo))[:60], snippet(s), "blank")
     return None
 
@@ -339,6 +337,8 @@ def report(rows: list, out=print) -> None:
             out(f"  {a:<7}  {title}  ({f.detail})")
         if gh:
             titles = "; ".join((it.get("title") or "")[:40] for it, _, _ in rs[:5])
+            # titles are remote text: escape them so they cannot end or start a workflow command
+            titles = titles.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace("::", ": :")
             print(f"::warning title=summary QC {cat}::{titles}")
 
 

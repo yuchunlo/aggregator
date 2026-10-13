@@ -3,8 +3,16 @@
 Podcast episodes (小宇宙, Firstory) go straight to ASR on their mp3/m4a.
 
 Files are {item_id}.{orig_lang}.{sub_lang}.vtt (yt-dlp's naming), which is all
-summarize_feed looks at. ASR = yt-dlp audio + faster-whisper (CPU int8), with
-a per-run budget in audio-seconds -- the unit that actually has to fit.
+summarize_feed looks at (pick_subtitle). ASR = faster-whisper (CPU int8) on
+audio from yt-dlp (YouTube) or common.download (podcasts), with a per-run
+budget in audio-seconds -- the unit that actually has to fit.
+
+Track priority, shared with summarize_feed: no machine translation beats
+everything (MT mangles proper nouns), then manual beats auto (auto tracks lack
+punctuation), then language:
+
+    0 manual zh   1 manual orig   2 manual other
+    3 auto orig   4 auto zh       5 auto other   6 chained (zh-Hant-en...)
 """
 
 from __future__ import annotations
@@ -18,22 +26,89 @@ import subprocess
 import sys
 import tempfile
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
+import common
 import podcast
-from common import BLANK_SUMMARY, is_youtube, load_doc, safe_lang, save_doc, valid_id
-from subtitle_priority import choose_track, track_rank
+from common import (BLANK_SUMMARY, STATUS_FILE_NAME, UTC, is_pending, is_youtube, load_doc,
+                    record_status, safe_lang, save_doc, valid_id)
 
-UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"   # yt-dlp only
 # The JS challenge solver comes from the pinned yt-dlp-ejs package (yt-dlp[default]);
 # `--remote-components ejs:github` would run unpinned code fetched at runtime.
 BASE_ARGS = ["--user-agent", UA, "--no-progress", "--socket-timeout", "30"]
 SUB_ARGS = ["--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
 AUDIO_ARGS = ["--extractor-args", "youtube:player_client=tv,web_safari,default",
               "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]
-# Direct audio files: yt-dlp's generic extractor, no cookies (they are YouTube's).
-PODCAST_ARGS = ["--no-playlist"]
 EXHAUSTED_UNDER = 10 * 60    # remaining ASR budget too small for any real video
+PODCAST_MAX_BYTES = 512 * 1024 * 1024
+
+
+# ---- track priority ------------------------------------------------------------
+NON_LANG = {"live-chat", "rechat"}          # yt-dlp lists chat replays as tracks
+ZH_REGIONS = {"tw", "hk", "cn", "mo", "sg"}
+ZH_BASE = {"zh", "zh-hant", "zh-hans", "zh-chs", "zh-cht"}
+RANKS = {(True, "zh"): 0, (True, "orig"): 1, (True, "other"): 2,
+         (False, "orig"): 3, (False, "zh"): 4, (False, "other"): 5, "chained": 6}
+# Filenames don't record manual/auto; zh on disk is probably manual anyway.
+FILE_RANKS = {"zh": 0, "orig": 1, "other": 2, "chained": 3}
+
+
+def norm(lang) -> str:
+    return (lang or "").strip().lower().replace("_", "-")
+
+
+def is_chained(lang) -> bool:
+    """zh-Hant-en is YouTube re-translating an auto track; zh-Hant-TW is a locale."""
+    l = norm(lang)
+    return any(l.startswith(b) and l[len(b):] not in ZH_REGIONS for b in ("zh-hant-", "zh-hans-"))
+
+
+def is_zh(lang) -> bool:
+    l = norm(lang)
+    return bool(l) and not is_chained(l) and (
+        l in ZH_BASE or (l.split("-")[0] == "zh" and l.split("-")[-1] in ZH_REGIONS))
+
+
+def lang_class(lang, orig) -> str:
+    if is_chained(lang):
+        return "chained"
+    if is_zh(lang):
+        return "zh"
+    return "orig" if norm(lang) and norm(lang) == norm(orig) else "other"
+
+
+def track_rank(lang, orig, manual: bool) -> int:
+    c = lang_class(lang, orig)
+    return RANKS["chained"] if c == "chained" else RANKS[(bool(manual), c)]
+
+
+def file_rank(sub_lang, orig) -> int:
+    return FILE_RANKS[lang_class(sub_lang, orig)]
+
+
+def choose_track(manual, auto, orig):
+    """(is_manual, lang) from yt-dlp's subtitles / automatic_captions, or None.
+    Ties: manual first, then language code, so the choice is stable."""
+    cands = [(track_rank(l, orig, m), not m, l, m)
+             for m, tracks in ((True, manual), (False, auto))
+             for l in (tracks or {}) if norm(l) not in NON_LANG]
+    if not cands:
+        return None
+    _, _, lang, is_manual = min(cands)
+    return is_manual, lang
+
+
+def pick_subtitle(sub_dir, item_id: str) -> Path | None:
+    """Best local .vtt for an item: {id}.{orig}.{sub}.vtt, by file_rank."""
+    best = None
+    for p in Path(sub_dir).glob(f"{item_id}.*.vtt") if valid_id(item_id) else ():
+        parts = p.name[len(item_id) + 1:].split(".")
+        if len(parts) == 3:
+            key = (file_rank(parts[1], parts[0]), p.name)
+            best = min(best or (key, p), (key, p))
+    return best[1] if best else None
 
 
 def run(cmd: list[str], timeout: float) -> tuple[int | None, str, str]:
@@ -103,45 +178,66 @@ def to_vtt(segments) -> str:
     return "\n".join(lines) if len(lines) > 2 else ""
 
 
-class Unavailable(RuntimeError):
-    """Environment problem (whisper missing): retry next run."""
+class NoSpeech(RuntimeError):
+    """The audio has nothing to transcribe: a fact about the item."""
+
+
+class TooLong(RuntimeError):
+    """Longer than --max-asr-duration: a fact about the item."""
 
 
 _models = {}
 
 
-def transcribe(url, cookies, out_dir: Path, item_id, orig, a, duration, cmd=None) -> tuple[Path, float]:
-    """(vtt path, audio seconds). `cmd` replaces the YouTube download command."""
-    try:
-        from faster_whisper import WhisperModel
-    except ImportError:
-        raise Unavailable("faster-whisper not installed")
+def transcribe(fetch, out_dir: Path, item_id, orig, a, duration) -> tuple[Path, float]:
+    """(vtt path, audio seconds). `fetch(dir, seconds)` puts the audio in dir
+    and returns its path. NoSpeech / TooLong are permanent; anything else
+    (missing whisper, download failure, timeout) is transient."""
+    from faster_whisper import WhisperModel
     with tempfile.TemporaryDirectory(prefix=f"asr-{item_id}-") as d:
-        # ~1s of download per 4s of audio, floor 5 min, cap 45 min
+        # ~1s of download per 4s of audio, floor --audio-timeout, cap 45 min
         timeout = min(max(a.audio_timeout, duration * 0.25), 45 * 60) if duration else a.audio_timeout
-        dl = (cmd or (lambda o: ytdlp(cookies, url, *AUDIO_ARGS, "-o", o)))(f"{d}/audio.%(ext)s")
-        rc, out, err = run(dl, timeout)
-        files = sorted(p for p in Path(d).glob("audio.*") if p.suffix != ".part")
-        if rc is None:
-            raise RuntimeError(f"audio download timed out after {timeout:.0f}s")
-        if rc != 0 or not files:
-            raise RuntimeError(f"audio download failed: {(out + err).strip()[-1500:]}")
+        audio = fetch(Path(d), timeout)
         key = (a.whisper_model, a.whisper_compute_type)
         if key not in _models:
             _models[key] = WhisperModel(a.whisper_model, device="cpu", compute_type=key[1],
                                         cpu_threads=os.cpu_count() or 2)
         # PyAV inside faster-whisper decodes the stream as-is; no ffmpeg needed.
-        segs, info = _models[key].transcribe(str(files[0]), beam_size=1, vad_filter=True,
+        segs, info = _models[key].transcribe(str(audio), beam_size=1, vad_filter=True,
                                              condition_on_previous_text=False)
         if a.max_asr_duration and (info.duration or 0) > a.max_asr_duration:
-            raise RuntimeError(f"too long for ASR: {info.duration / 60:.0f} min")
+            raise TooLong(f"too long for ASR: {info.duration / 60:.0f} min")
         detected = safe_lang(info.language)
         vtt = to_vtt((s.start, s.end, s.text) for s in segs)
     if not vtt:
-        raise RuntimeError("no speech segments")
+        raise NoSpeech("no speech segments")
     path = out_dir / f"{item_id}.{safe_lang(orig, detected)}.{detected}.vtt"
     path.write_text(vtt, encoding="utf-8")
     return path, float(info.duration or duration or 0)
+
+
+def youtube_audio(cookies: Path, url: str):
+    def fetch(d: Path, timeout: float) -> Path:
+        rc, out, err = run(ytdlp(cookies, url, *AUDIO_ARGS, "-o", f"{d}/audio.%(ext)s"), timeout)
+        files = sorted(p for p in d.glob("audio.*") if p.suffix != ".part")
+        if rc is None:
+            raise RuntimeError(f"audio download timed out after {timeout:.0f}s")
+        if rc != 0 or not files:
+            raise RuntimeError(f"audio download failed: {(out + err).strip()[-1500:]}")
+        return files[0]
+    return fetch
+
+
+def direct_audio(url: str):
+    """A podcast file, through common.download: every redirect hop and every
+    connection is held to public addresses, unlike a yt-dlp download."""
+    def fetch(d: Path, timeout: float) -> Path:
+        ext = Path(url.split("?", 1)[0]).suffix.lower()
+        dest = d / ("audio" + (ext if ext in (".mp3", ".m4a", ".aac") else ".bin"))
+        if not common.download(url, dest, timeout, PODCAST_MAX_BYTES):
+            raise RuntimeError("audio download failed, timed out or too large")
+        return dest
+    return fetch
 
 
 class Budget:
@@ -179,33 +275,29 @@ class Budget:
             f"/{self.a.max_asr_total / 60:.0f}min" if self.a.max_asr_total else "")
 
 
-def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n, cmd=None) -> bool:
-    """Returns whether the item changed. A permanent failure marks a video
-    blank; a podcast stays pending and is retried every run (no limit)."""
+def asr(item, orig, duration, live, a, budget, out_dir, n, fetch, is_podcast=False) -> bool:
+    """Returns whether the item changed. Only the item's own nature ends it
+    (BLANK): no speech, or -- for a video -- longer than the cap. A podcast
+    over the cap, and every run-level failure, stays pending."""
+    item_id = item["id"]
     refused = budget.refuse(duration, live)
-    permanent = False
     if refused:
         why, permanent = refused
-        print(f"[ASR-SKIP] {item_id}: {why}" + ("" if permanent else " (kept pending)"))
+        blank = permanent and not is_podcast
+        print(f"[ASR-SKIP] {item_id}: {why}" + ("" if blank else " (kept pending)"))
     else:
         try:
-            path, secs = transcribe(url, cookies, out_dir, item_id, orig, a, duration, cmd)
-            duration = secs or duration
+            path, secs = transcribe(fetch, out_dir, item_id, orig, a, duration)
             budget.count += 1
-            budget.spent += max(duration, 0.0)
+            budget.spent += max(secs or duration, 0.0)
             n["succeeded"] += 1
-            print(f"[ASR] {item_id}: {path.name} ({duration / 60:.0f}min, {budget})")
+            print(f"[ASR] {item_id}: {path.name} ({(secs or duration) / 60:.0f}min, {budget})")
             return False
-        except Unavailable as e:
-            print(f"[ASR-FAILED] {item_id}: {e} (kept pending)")
-        except Exception as e:                  # the video itself: don't retry
-            print(f"[ASR-FAILED] {item_id}: {e}")
-            permanent = True
+        except Exception as e:
+            blank = isinstance(e, NoSpeech) or (isinstance(e, TooLong) and not is_podcast)
+            print(f"[ASR-FAILED] {item_id}: {type(e).__name__}: {e}" + ("" if blank else " (kept pending)"))
         discard(out_dir, item_id)
-    if permanent and cmd is not None:         # podcast: retried next run, never blank
-        n["deferred"] += 1
-        return False
-    if permanent:
+    if blank:
         item["summary"] = BLANK_SUMMARY
         n["no_subs"] += 1
         return True
@@ -213,7 +305,7 @@ def asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n
     return False
 
 
-def podcast_asr(item, a, budget, out_dir, cookies, n) -> bool:
+def podcast_asr(item, a, budget, out_dir, n) -> bool:
     """Resolve the episode page to its mp3/m4a, then the shared ASR path."""
     url, item_id = item["url"], item["id"]
     try:
@@ -230,9 +322,8 @@ def podcast_asr(item, a, budget, out_dir, cookies, n) -> bool:
         item["length"] = int(ep.duration)          # stored for the frontend
         dirty = True
     print(f"[PODCAST] {item_id}: {ep.audio_url} ({ep.duration / 60:.0f}min)")
-    cmd = lambda o: ["yt-dlp", *BASE_ARGS, *PODCAST_ARGS, "-o", o, "--", ep.audio_url]
-    return asr(item, url, item_id, ep.lang, ep.duration, False, a, budget,
-               out_dir, cookies, n, cmd) or dirty
+    return asr(item, ep.lang, ep.duration, False, a, budget, out_dir, n,
+               direct_audio(ep.audio_url), is_podcast=True) or dirty
 
 
 def remove_orphans(out_dir: Path, ids: set) -> int:
@@ -260,8 +351,11 @@ def main(argv=None) -> int:
     ap.add_argument("--max-transcribe", type=int, default=20, help="0 = unlimited")
     ap.add_argument("--max-asr-total", type=float, default=4 * 3600, metavar="SECONDS",
                     help="audio-seconds to transcribe per run (0 = unlimited)")
+    ap.add_argument("--status-file", default=None,
+                    help=f"health flags for the reader (default: {STATUS_FILE_NAME} next to --archive)")
     a = ap.parse_args(argv)
 
+    status_file = a.status_file or Path(a.archive).with_name(STATUS_FILE_NAME)
     out_dir, cookies = Path(a.output_dir), Path(a.cookies_path)
     out_dir.mkdir(parents=True, exist_ok=True)
     doc = load_doc(a.archive)
@@ -269,23 +363,25 @@ def main(argv=None) -> int:
         print(f"Removed {n} orphaned subtitle file(s).")
     have = {p.name.split(".", 1)[0] for p in out_dir.glob("*.vtt")}
     budget, n, dirty = Budget(a), Counter(), False
+    cookies_expired = False
 
-    todo = [it for it in doc["items"] if valid_id(it.get("id")) and it.get("summary") is None
-            and (is_youtube(it.get("url", "")) or podcast.is_episode(it.get("url", "")))
-            and it["id"] not in have]
+    todo = [it for it in doc["items"] if valid_id(it.get("id")) and is_pending(it)
+            and (is_youtube(it["url"]) or podcast.is_episode(it["url"])) and it["id"] not in have]
     for item in todo[:a.max_items]:
+        if budget.stop():
+            print(f"[BUDGET] {budget.left() / 60:.0f} min of ASR left; rest stay pending")
+            break
         url, item_id = item["url"], item["id"]
         n["processed"] += 1
         if podcast.is_episode(url):
-            dirty |= podcast_asr(item, a, budget, out_dir, cookies, n)
-            if budget.stop():
-                print(f"[BUDGET] {budget.left() / 60:.0f} min of ASR left; rest stay pending")
-                break
+            dirty |= podcast_asr(item, a, budget, out_dir, n)
             continue
+        n["probed"] += 1                     # a YouTube probe: the only evidence about the cookies
         rc, out, err = run(ytdlp(cookies, url, *SUB_ARGS, "--skip-download", "--dump-json"),
                            a.probe_timeout)
         if cookies_rejected(err):
             print("[EXPIRED] cookies invalid")
+            cookies_expired = True
             break
         try:
             info = json.loads(out.strip().splitlines()[-1]) if rc == 0 else None
@@ -304,7 +400,7 @@ def main(argv=None) -> int:
         if duration and item.get("length") != int(duration):
             item["length"] = int(duration)          # stored for the frontend
             dirty = True
-        fallback = lambda: asr(item, url, item_id, orig, duration, live, a, budget, out_dir, cookies, n)
+        fallback = lambda: asr(item, orig, duration, live, a, budget, out_dir, n, youtube_audio(cookies, url))
 
         # track keys come from remote metadata and become a --sub-langs regex
         tracks = [{k: v for k, v in (info.get(f) or {}).items() if safe_lang(k, None)}
@@ -326,6 +422,7 @@ def main(argv=None) -> int:
             log = (out + err).lower()
             if cookies_rejected(err):
                 print("[EXPIRED] cookies invalid")
+                cookies_expired = True
                 break
             if rc is None:
                 n["failed"] += 1
@@ -337,12 +434,13 @@ def main(argv=None) -> int:
             else:
                 n["failed"] += 1
                 print(f"[FAILED] {item_id} (exit {rc}): {(out + err)[-1500:]}")
-        if budget.stop():
-            print(f"[BUDGET] {budget.left() / 60:.0f} min of ASR left; rest stay pending")
-            break
 
     if dirty:
         save_doc(a.archive, doc)
+    # No YouTube video was probed (podcasts use no cookies): leave the flag alone.
+    if cookies_expired or n["probed"]:
+        record_status(status_file, "cookies", "expired" if cookies_expired else "ok",
+                      datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
     print(f"Done. {dict(n)} ({budget})")
     return 0
 

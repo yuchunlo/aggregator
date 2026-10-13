@@ -6,21 +6,21 @@ Firstory open.firstory.fm|me/story/<id>     an audio url in the page, else the
                                              (feed.firstory.me/rss/user/<uid>),
                                              which the page links
 
-Only the episode page and the feed it names are fetched; the audio url must
-point at a known CDN host or carry an audio extension.
+Only the episode page and the feed it names are fetched. The audio url is
+remote data: it must resolve to public addresses here, and download_sub fetches
+it through common.download, which re-checks every hop.
 """
 
 from __future__ import annotations
 
 import html as html_mod
-import json
 import re
 from dataclasses import dataclass
 
 import feedparser
 
 import common
-from common import UA, host_in, make_session
+from common import UA, make_session, next_data, walk
 
 EPISODE_RE = re.compile(
     r"^https?://(?:www\.)?xiaoyuzhoufm\.com/episode/([0-9a-f]{16,32})"
@@ -31,10 +31,11 @@ OG_AUDIO_RE = re.compile(
     r"""|<meta[^>]+content\s*=\s*["']([^"']+)["'][^>]+(?:property|name)\s*=\s*["']og:audio(?::url|:secure_url)?["']""",
     re.I)
 FIRSTORY_RSS_RE = re.compile(r"https?://feed\.firstory\.me/rss/user/[0-9a-z]{10,40}", re.I)
-NEXT_DATA_RE = re.compile(r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>', re.S | re.I)
 MINUTES_RE = re.compile(r"(\d{1,4})\s*分钟")
 HMS_RE = re.compile(r"(?<![\d:])(\d{1,2}):(\d{2}):(\d{2})(?![\d:])")
 TIMEOUT = (5, 30)
+LANG = "zh-CN,zh-TW;q=0.9,en;q=0.8"
+_session = make_session(1, {"User-Agent": UA, "Accept-Language": LANG})
 
 
 @dataclass
@@ -46,11 +47,6 @@ class Episode:
 
 def is_episode(url: str) -> bool:
     return bool(EPISODE_RE.match(url or ""))
-
-
-def episode_id(url: str) -> str | None:
-    m = EPISODE_RE.match(url or "")
-    return (m[1] or m[2]) if m else None
 
 
 def hms(value) -> float:
@@ -68,32 +64,9 @@ def hms(value) -> float:
     return max(sec, 0.0)
 
 
-def _session():
-    return make_session(1, {"User-Agent": UA, "Accept-Language": "zh-CN,zh-TW;q=0.9,en;q=0.8"})
-
-
-def _get(url: str, s) -> str:
-    r = common.get(url, TIMEOUT, s, lang="zh-CN,zh-TW;q=0.9,en;q=0.8")
+def _get(url: str) -> str:
+    r = common.get(url, TIMEOUT, _session, lang=LANG)
     return r.text if r is not None and r.status == 200 else ""
-
-
-def _walk(node):
-    stack = [node]
-    while stack:
-        n = stack.pop()
-        if isinstance(n, dict):
-            yield n
-            stack.extend(n.values())
-        elif isinstance(n, list):
-            stack.extend(n)
-
-
-def _next_data(page: str):
-    m = NEXT_DATA_RE.search(page)
-    try:
-        return json.loads(m[1]) if m else None
-    except ValueError:
-        return None
 
 
 def _audio_in_page(page: str) -> str:
@@ -104,13 +77,13 @@ def _audio_in_page(page: str) -> str:
     return ""
 
 
-def _xiaoyuzhou(url: str, eid: str, s) -> Episode | None:
-    page = _get(url, s)
+def _xiaoyuzhou(url: str, eid: str) -> Episode | None:
+    page = _get(url)
     audio = _audio_in_page(page)
     if not audio:
         return None
     duration = 0.0
-    for d in _walk(_next_data(page)):
+    for d in walk(next_data(page)):
         if d.get("eid") == eid and isinstance(d.get("duration"), (int, float)):
             duration = float(d["duration"])
             break
@@ -119,8 +92,8 @@ def _xiaoyuzhou(url: str, eid: str, s) -> Episode | None:
     return Episode(audio, duration, "zh")
 
 
-def _firstory(url: str, sid: str, s) -> Episode | None:
-    page = _get(url, s)
+def _firstory(url: str, sid: str) -> Episode | None:
+    page = _get(url)
     duration = 0.0
     if m := HMS_RE.search(re.sub(r"<[^>]+>", " ", page)):      # "2024-06-04 00:43:08"
         duration = hms(m[0])
@@ -129,7 +102,7 @@ def _firstory(url: str, sid: str, s) -> Episode | None:
     feed = FIRSTORY_RSS_RE.search(page)
     if not feed:
         return None
-    parsed = feedparser.parse(_get(feed[0], s))
+    parsed = feedparser.parse(_get(feed[0]))
     for e in parsed.entries:
         where = " ".join(str(e.get(k, "")) for k in ("id", "link", "guid"))
         where += " " + " ".join(str(l.get("href", "")) for l in e.get("links", []))
@@ -147,10 +120,7 @@ def resolve(url: str) -> Episode | None:
     m = EPISODE_RE.match(url or "")
     if not m:
         return None
-    s = _session()
-    ep = _xiaoyuzhou(url, m[1], s) if m[1] else _firstory(url, m[2], s)
-    # yt-dlp connects outside common.get: the audio url (remote data) must
-    # pass the same public-address check before it is handed over.
+    ep = _xiaoyuzhou(url, m[1]) if m[1] else _firstory(url, m[2])
     if ep and common.safe_url(ep.audio_url):
         return ep
     return None

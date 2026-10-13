@@ -10,6 +10,7 @@ import os
 import re
 import time
 from collections import Counter
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote
 
@@ -70,6 +71,7 @@ def to_twp(text: str) -> str:
 _FOLD = str.maketrans({"臺": "台", "着": "著", "裏": "裡"})
 
 
+@lru_cache(maxsize=8192)
 def key_text(text: str) -> str:
     """Normalised form for rule matching: always 繁體, common variants folded."""
     if not text:
@@ -179,7 +181,7 @@ def fix_mojibake(text: str) -> str:
 # >=40 chars, or >=15 times however short ("小小小…"); or a cycle of 2-3 short
 # clauses repeated >=5 times ("在那裡，它是，在那裡，它是…"). Machine translation
 # and Whisper both fall into these.
-LOOP_MIN, LOOP_MIN_SHORT, LOOP_MIN_CYCLE = 10, 15, 5
+LOOP_MIN_SHORT, LOOP_MIN_CYCLE = 15, 5
 _CLAUSE_DELIM = re.compile(r"([，,、；;。.！!？?\s]+)")
 
 
@@ -435,5 +437,22 @@ def translate_many(texts: list[str], session, stop_after: int = 0) -> list[tuple
     return res
 
 
-def translate_one(text: str, session) -> tuple:
-    return translate_many([text], session)[0]
+def translate_keep_lines(texts: list[str], session, stop_after: int = 0) -> list[tuple]:
+    """translate_many, but each line goes as its own segment so the result has
+    the same line breaks (gtx joins chunks with spaces). A text whose lines
+    don't all translate is retried whole, without the breaks."""
+    parts = [[ln.strip() for ln in (t or "").split("\n") if ln.strip()] for t in texts]
+    flat = [ln for p in parts for ln in p]
+    got, res, pos = translate_many(flat, session, stop_after) if flat else [], [], 0
+    for t, p in zip(texts, parts):
+        lines, pos = got[pos:pos + len(p)], pos + len(p)
+        if len(p) > 1 and all(o for o, _ in lines):
+            res.append(("\n".join(o for o, _ in lines), ""))
+        elif len(p) == 1:
+            res.append(lines[0])
+        else:
+            res.append(None)                         # whole text below
+    if retry := [i for i, r in enumerate(res) if r is None]:
+        for i, r in zip(retry, translate_many([" ".join(parts[i]) for i in retry], session, stop_after)):
+            res[i] = r
+    return res

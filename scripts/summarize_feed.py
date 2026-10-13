@@ -20,19 +20,17 @@ import re
 import sys
 import time
 from collections import Counter
-from datetime import datetime
-from email.utils import parsedate_to_datetime
 from pathlib import Path
 
+import download_sub
 import extract
 import lang
 import podcast
-import subtitle_priority
 import summary_qc
 import textproc
 import thumbs
-from common import (BLANK_SUMMARY, drop_scratch, load_scratch, FALLBACK_MARK, GONE_SUMMARY, host_in, host_of,
-                    is_pending, is_youtube, load_doc, save_doc, valid_id)
+from common import (BLANK_SUMMARY, FALLBACK_MARK, GONE_SUMMARY, drop_scratch, host_in, host_of, is_pending,
+                    is_youtube, load_doc, load_scratch, parse_date, save_doc)
 
 SUBTITLES_DIR = Path(os.environ.get("SUBTITLES_DIR", "data/subtitles"))
 SLEEP = 1.5                   # polite delay after each network item
@@ -73,25 +71,11 @@ ROUTES = {
 
 
 def _ts(value) -> float:
-    s = str(value or "").strip()
-    for parse in (lambda: datetime.fromisoformat(s.replace("Z", "+00:00")),
-                  lambda: parsedate_to_datetime(s)):
-        try:
-            return parse().timestamp()
-        except Exception:
-            pass
-    return float("-inf")
+    return d.timestamp() if (d := parse_date(value)) else float("-inf")
 
 
 def pick_subtitle(item_id: str) -> Path | None:
-    """Best local .vtt for an item: {id}.{orig}.{sub}.vtt, by file_rank."""
-    best = None
-    for p in SUBTITLES_DIR.glob(f"{item_id}.*.vtt") if valid_id(item_id) else ():
-        parts = p.name[len(item_id) + 1:].split(".")
-        if len(parts) == 3:
-            key = (subtitle_priority.file_rank(parts[1], parts[0]), p.name)
-            best = min(best or (key, p), (key, p))
-    return best[1] if best else None
+    return download_sub.pick_subtitle(SUBTITLES_DIR, item_id)
 
 
 def route(it) -> str | None:
@@ -224,26 +208,17 @@ class Run:
             if m:
                 it["thumbnail"] = f"https://img.youtube.com/vi/{m.group(1)}/mqdefault.jpg"
                 self.touch()
-        path = pick_subtitle(it.get("id", ""))
-        if not path:                          # download_sub.py hasn't fetched one yet
-            return
-        self.head(it, "youtube")
-        text = textproc.vtt_to_text(path)
-        if len(text) < textproc.MIN_CAPTION_CHARS:
-            return self.done(it, BLANK_SUMMARY, f"{path.name}: no speech, blank")
-        s = textproc.build(text, "subtitle")
-        if s:
-            self.done(it, s, f"{path.name}, {len(text)} chars")
-        else:
-            self.n["failed"] += 1
+        if pick_subtitle(it.get("id", "")):          # else download_sub.py hasn't fetched one yet
+            self.head(it, "youtube")
+            self.do_podcast(it)
 
     def do_podcast(self, it):
+        """A local transcript (YouTube subtitle or podcast ASR) -> summary."""
         path = pick_subtitle(it.get("id", ""))
         text = textproc.vtt_to_text(path)
         if len(text) < textproc.MIN_CAPTION_CHARS:
             return self.done(it, BLANK_SUMMARY, f"{path.name}: no speech, blank")
-        s = textproc.build(text, "subtitle")
-        if s:
+        if s := textproc.build(text, "subtitle"):
             self.done(it, s, f"{path.name}, {len(text)} chars")
         else:
             self.n["failed"] += 1
@@ -322,7 +297,7 @@ def backfill(items, *, translate=True, deadline=None, save=None, limit=0) -> Cou
         batch = targets[pos:pos + BATCH]
         marks = [FALLBACK_MARK if it["summary"].rstrip().endswith(FALLBACK_MARK) else "" for it in batch]
         bodies = [it["summary"].rstrip().rstrip(FALLBACK_MARK).strip() for it in batch]
-        for it, mark, (out, why) in zip(batch, marks, lang.translate_many(
+        for it, mark, (out, why) in zip(batch, marks, lang.translate_keep_lines(
                 bodies, extract.session, stop_after=MAX_FAIL_STREAK - streak)):
             if out:
                 it["summary"] = (lang.to_twp(out) + " " + mark).rstrip()

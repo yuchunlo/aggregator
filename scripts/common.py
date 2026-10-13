@@ -11,12 +11,15 @@ import os
 import re
 import socket
 import tempfile
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import NamedTuple
 from urllib.parse import urljoin, urlparse
 
 import charset_normalizer
 import urllib3.util.connection
+from dateutil import parser as dtparser
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -101,6 +104,55 @@ def is_pending(item) -> bool:
     return isinstance(item, dict) and bool(item.get("url")) and not item.get("summary")
 
 
+# ---- dates / embedded JSON ----------------------------------------------------
+UTC = timezone.utc
+
+
+def iso(dt) -> str | None:
+    return dt.astimezone(UTC).isoformat().replace("+00:00", "Z") if dt else None
+
+
+def parse_date(value) -> datetime | None:
+    """Feed dates in any common shape (RFC 822, ISO, epoch s/ms) as aware UTC."""
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value.astimezone(UTC)
+    s = str(value).strip().removeprefix("$D")
+    try:
+        if re.fullmatch(r"\d{9,}(?:\.\d+)?", s) or isinstance(value, (int, float)):
+            n = float(s)
+            return datetime.fromtimestamp(n / 1000 if n > 1e10 else n, tz=UTC)
+        dt = dtparser.parse(s, tzinfos={"UT": 0, "UTC": 0, "GMT": 0})
+        return (dt if dt.tzinfo else dt.replace(tzinfo=UTC)).astimezone(UTC)
+    except Exception:
+        return None
+
+
+NEXT_DATA_RE = re.compile(r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>', re.S | re.I)
+
+
+def next_data(html: str):
+    """The __NEXT_DATA__ JSON of a Next.js page, or None."""
+    m = NEXT_DATA_RE.search(html or "")
+    try:
+        return json.loads(m[1]) if m else None
+    except ValueError:
+        return None
+
+
+def walk(node):
+    """Every dict inside a JSON tree, in document order."""
+    stack = [node]
+    while stack:
+        n = stack.pop()
+        if isinstance(n, dict):
+            yield n
+            stack.extend(reversed(list(n.values())))
+        elif isinstance(n, list):
+            stack.extend(reversed(n))
+
+
 # ---- hosts ------------------------------------------------------------------
 def host_of(url: str) -> str:
     try:
@@ -150,6 +202,32 @@ def write_atomic(path, payload) -> None:
     except BaseException:
         Path(tmp).unlink(missing_ok=True)
         raise
+
+
+STATUS_FILE_NAME = "status.json"
+
+
+def record_status(path, key: str, state: str, now: str) -> bool:
+    """Record one health flag (for example cookies "ok" / "expired") in the
+    status file the reader shows warnings from. Returns True when the file was
+    written. A flag is rewritten only when its state changes, or while it is
+    "expired" (the reader needs a fresh `checked_at` to tell a new, still
+    rejected cookies upload from an old one). That keeps a healthy run from
+    producing a commit every day. A missing or damaged status file starts
+    over: it is only a hint, never the archive."""
+    p = Path(path)
+    try:
+        doc = json.loads(p.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            doc = {}
+    except (OSError, ValueError):
+        doc = {}
+    current = doc.get(key) if isinstance(doc.get(key), dict) else {}
+    if current.get("state") == state and state != "expired":
+        return False
+    doc[key] = {"state": state, "checked_at": now}
+    write_atomic(p, doc)
+    return True
 
 
 def load_doc(path) -> dict:
@@ -259,7 +337,7 @@ def public_addrs(host: str, port: int) -> list[str]:
     except (OSError, UnicodeError):
         return []
     out = []
-    for fam, *_, addr in infos:
+    for *_, addr in infos:
         ip = ipaddress.ip_address(addr[0].split("%", 1)[0])
         ip = getattr(ip, "ipv4_mapped", None) or ip
         if not ip.is_global or ip.is_multicast:
@@ -327,14 +405,16 @@ def make_session(retries: int, headers: dict, *, read_retry=True,
     return s
 
 
-def _read(r) -> bytes | None:
-    if int(r.headers.get("Content-Length") or 0) > MAX_BYTES:
+def _read(r, limit: int, sink=None, deadline: float | None = None) -> bytes | None:
+    """The body (or b"" once streamed into `sink`), None past `limit` bytes or `deadline`."""
+    if int(r.headers.get("Content-Length") or 0) > limit:
         return None
-    buf = bytearray()
+    buf, size = bytearray(), 0
     for chunk in r.iter_content(65536):
-        buf += chunk
-        if len(buf) > MAX_BYTES:
+        size += len(chunk)
+        if size > limit or (deadline and time.monotonic() > deadline):
             return None
+        sink(chunk) if sink else buf.extend(chunk)
     return bytes(buf)
 
 
@@ -352,7 +432,7 @@ def _open(url, timeout, session, impersonate, lang):
         pin = [f"{host}:{port}:{','.join(f'[{i}]' if ':' in i else i for i in ips)}"]
         with curl_requests.Session(curl_options={CurlOpt.RESOLVE: pin}) as cs:
             r = cs.get(url, timeout=timeout, impersonate=IMPERSONATE, stream=True,
-                       headers={"Accept-Language": lang}, allow_redirects=False)
+                       headers={"Accept-Language": lang or "en"}, allow_redirects=False)
             try:
                 yield r
             finally:
@@ -360,7 +440,8 @@ def _open(url, timeout, session, impersonate, lang):
             return
     token = _GUARD.set(True)
     try:
-        r = (session or _default).get(url, timeout=timeout, stream=True, allow_redirects=False)
+        r = (session or _default).get(url, timeout=timeout, stream=True, allow_redirects=False,
+                                      headers={"Accept-Language": lang} if lang else None)
         try:
             yield r
         finally:
@@ -369,12 +450,13 @@ def _open(url, timeout, session, impersonate, lang):
         _GUARD.reset(token)
 
 
-def get(url: str, timeout, session: requests.Session | None = None,
-        impersonate=False, lang="en") -> Resp | None:
-    """GET with redirects followed by hand (each hop re-checked, each
-    connection pinned to a checked address), or None when the url is unsafe,
-    the body too large, the transport fails, or (with impersonate) curl_cffi
-    is missing."""
+REDIRECT = (301, 302, 303, 307, 308)
+
+
+def _fetch(url, timeout, session, impersonate, lang, consume):
+    """Follow redirects by hand (each hop re-checked, each connection pinned to
+    a checked address) and hand the final response to `consume`; None when the
+    url is unsafe, the transport fails, or curl_cffi is wanted but missing."""
     if impersonate and curl_requests is None:
         return None
     for _ in range(MAX_REDIRECTS + 1):
@@ -382,12 +464,41 @@ def get(url: str, timeout, session: requests.Session | None = None,
             return None
         try:
             with _open(url, timeout, session, impersonate, lang) as r:
-                if r.status_code in (301, 302, 303, 307, 308) and r.headers.get("Location"):
+                if r.status_code in REDIRECT and r.headers.get("Location"):
                     url = urljoin(url, r.headers["Location"])
                     continue
-                body = _read(r)
-                return None if body is None else Resp(r.status_code, body, dict(r.headers), url)
+                return consume(r, url)
         except Exception:
             return None
     return None
 
+
+def get(url: str, timeout, session: requests.Session | None = None,
+        impersonate=False, lang: str | None = None) -> Resp | None:
+    """GET a page (at most MAX_BYTES), or None (unsafe url, too large, failed)."""
+    def consume(r, final):
+        body = _read(r, MAX_BYTES)
+        return None if body is None else Resp(r.status_code, body, dict(r.headers), final)
+    return _fetch(url, timeout, session, impersonate, lang, consume)
+
+
+def download(url: str, dest, seconds: float, max_bytes: int) -> bool:
+    """Stream a 200 response into `dest` under the same address checks as get();
+    False (and no file) on any failure, over `max_bytes`, or past `seconds`."""
+    dest, deadline = Path(dest), time.monotonic() + seconds
+
+    def consume(r, _):
+        if r.status_code != 200:
+            return False
+        try:
+            with open(dest, "wb") as f:
+                ok = _read(r, max_bytes, f.write, deadline) is not None
+        except OSError:
+            ok = False
+        if not ok:
+            dest.unlink(missing_ok=True)
+        return ok
+    ok = bool(_fetch(url, (10, 60), None, False, None, consume))
+    if not ok:
+        dest.unlink(missing_ok=True)
+    return ok
