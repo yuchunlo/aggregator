@@ -93,6 +93,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -- data/subtitles data/archive.json
+          # status.json (cookies health for the reader) only exists after the first probe.
+          if [ -f data/status.json ]; then git add -- data/status.json; fi
           if stray=$(git status --porcelain --untracked-files=all -- data/ | grep -v '^[MADRC] '); then
             echo "::error::Unstaged generated files under data/"; echo "$stray"; exit 1
           fi
