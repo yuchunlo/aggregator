@@ -1,0 +1,556 @@
+{
+ "_comment": [
+  "三個區段各自獨立：boilerplate 在產生摘要時刪除文字；qc_chrome 用來偵測「整篇只剩介面文字」，",
+  "兩者不可合併（否則介面文字在 QC 看到之前就被刪掉）；sites 是站台表。測試時以 RULES_FILE 換掉整份檔案。"
+ ],
+ "version": 4,
+ "boilerplate": {
+  "_comment": [
+   "摘要階段的非內容移除規則（textproc）。行程內只讀一次。",
+   "",
+   "action 決定動作，四種：",
+   "  remove_block  … text 是字面字串，整塊移除（str.replace）",
+   "  remove_inline … pattern 命中的部分從句子裡刪掉，句子其餘保留。",
+   "                  用於「綜合外媒報導，」這種贅詞——整句丟掉會連內容一起丟。",
+   "                  以 re.M 編譯（有規則用 ^…$ 錨定整行）。",
+   "  cut_to_end    … 從最早命中處截斷到文字結尾（頁尾、留言區）。",
+   "                  受 min_keep_after_cut 保護：命中點太靠前就不截斷，",
+   "                  否則一個誤中的早期匹配會把整篇文章清空。",
+   "  drop_unit     … 整句或整段丟棄。level = sentence | paragraph，scope 對應材料來源。",
+   "",
+   "執行順序由程式固定（remove_block → remove_inline → cut_to_end → drop_unit），",
+   "不是檔案裡的排列順序；同一個 action 內部才依檔案順序。",
+   "",
+   "scope：page=抓取的網頁正文, meta=og/meta description, feed=RSS feed_content,",
+   "subtitle=YouTube 字幕與 podcast 逐字稿, all=不分來源。",
+   "remove_block / remove_inline / cut_to_end 一律不分來源。",
+   "",
+   "字形：remove_block / remove_inline / cut_to_end 作用在尚未轉繁的原文上，規則必須用來源本身的字形；",
+   "只有 drop_unit 先正規化成繁體（規則寫繁體即可，簡體來源同樣命中）。",
+   "字幕的 [音樂]/[掌聲] 註記由 textproc.clean_caption 處理，不要寫在這裡。",
+   "新增 drop_unit 規則請用 `summarize_feed.py --mine-boilerplate N` 從實際語料挖掘後挑選。"
+  ],
+  "min_keep_after_cut": 80,
+  "rules": [
+   {
+    "action": "remove_block",
+    "text": "Matrix 是少数派的写作社区，我们主张分享真实的产品体验，有实用价值的经验与思考。我们会不定期挑选 Matrix 最优质的文章，展示来自用户的最真实的体验和观点。"
+   },
+   {
+    "action": "remove_block",
+    "text": "文章代表作者个人观点，少数派仅对标题和排版略作修改。"
+   },
+   {
+    "action": "remove_block",
+    "text": "欢迎收看本期《派评》。你可以通过文章目录快速跳转到你感兴趣的内容。如果发现了其它感兴趣的 App 或者关注的话题，也欢迎在评论区和我们讨论。"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "最核心的一句話[:：]"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "綜合外媒報導，"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "結果顯示，"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "換言之，"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "相較之下，"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "更?值得注意的是，"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "事實上，情況比這更糟——"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "（前情提要：[^）]*）"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "（背景補充：[^）]*）"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "（首圖來源：[^）]*）"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "美股探路客 PressPlay.*?訂閱！"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "美股探路客推薦.*訂閱專案"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "虽然大部分有意思的输入会在[^\\n]*感觉更像一个\\s*newsletter\\s*了。",
+    "_note": "空白改為可選：實測資料是「感觉更像一个newsletter了。」（無空白），原規則要求空白因此失效"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "我把\\s*Telegram\\s*Channel\\s*消息[^\\n]*可以更方便浏览了。"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "^[ \\t]*標籤[:：][^\\n]*$"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "Cite this work"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "Continue reading this post"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "Advertise here with Carbon Ads"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "謝謝你閱讀到這裡"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "（本文由 MoneyDJ新聞 授權轉載"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "相關報導"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "大叔美股筆記歡迎各位投資同好共襄盛舉"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "「食驗室」是《食力foodNEXT》推出的全台最大飲食新品試用平台"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "文章ID："
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "^(?:商業合作|廣告(?:宣告|聲明)|業務合作|投稿|轉載聲明)[:：]"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "微信(?:公眾號|號|助手)[:：]|新增微信|加微信"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "(?:訂閱|追蹤|關注)(?:我們|本(?:站|頻道|節目))|按讚(?:並)?訂閱"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "歡迎(?:透過|來信|寄信).{0,20}(?:推薦|投稿|來訊)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "^關心How和Why"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "(?:電子報|newsletter).{0,15}(?:每週|每日|收件匣)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "本(?:人|站|文).{0,30}不負任何(?:損害賠償|法律)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "all",
+    "pattern": "(?:投資|加密貨幣).{0,20}(?:具有|存在)高度風險"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "發表評論前.{0,20}顯示名稱"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "請登出並重新登入"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "詳細瞭解您的(?:廣告|隱私)選擇"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "(?:探索|發現).{0,10}我們(?:全系列的)?訂閱"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "預付(?:一年|一個月)費用可省"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "檢查您是否已經可以透過您的(?:大學|組織)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "在以前稱為Twitter的社交網路上關注"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "page",
+    "pattern": "^(?:相關(?:文章|閱讀)|延伸閱讀|更多報導)[:：]?$"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "feed",
+    "pattern": "^(?:繼續閱讀|閱讀全文|Read more|Continue reading)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "feed",
+    "pattern": "(?:appeared first on|原文刊登於|首發於)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "subtitle",
+    "pattern": "(?:訂閱|按讚|分享|開啟小鈴鐺).{0,15}(?:頻道|影片)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "sentence",
+    "scope": "subtitle",
+    "pattern": "本(?:影片|集|節目)由.{0,20}(?:贊助|贊助播出)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "paragraph",
+    "scope": "all",
+    "pattern": "^(?:關於作者|作者簡介|About the author)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "paragraph",
+    "scope": "all",
+    "pattern": "^(?:免責聲明|免責宣告|Disclaimer)"
+   },
+   {
+    "action": "drop_unit",
+    "level": "paragraph",
+    "scope": "page",
+    "pattern": "我們透過讀者的贊助支持來營運"
+   },
+   {
+    "action": "drop_unit",
+    "level": "paragraph",
+    "scope": "page",
+    "pattern": "堅持以非營利組織的模式投入公共領域"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "Read more\\s*»\\s*",
+    "_note": "Blogspot/自架站的「Read more »」續讀連結，常是 meta description 的結尾"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "(?<![A-Za-z])READ MORE(?![A-Za-z])",
+    "_note": "Rest of World 把全大寫的 READ MORE 連結標籤直接嵌在句中；限全大寫才不會誤傷 read more than 30,000 words 這種正文"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "Read more (?:of|about) [^.\\n]{0,60}stor(?:y|ies)\\.",
+    "_note": "「Read more of X's story.」文末導流句。規則寫英文：strip_boilerplate 早於翻譯，此時還是原文"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "(?:[Rr]ead|[Ee]xplore) more insights[^.\\n]{0,80}\\.",
+    "_note": "顧問公司文末的「read more insights, visit our X page.」"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "Continue reading [^\\n]{0,150}?→",
+    "_note": "WordPress 的「Continue reading <標題>→」，標題本身也是重複資訊"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "本文尚未結束，請繼續閱讀",
+    "_note": "付費牆截斷提示，之後接重複標題"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "本文尚未结束，请继续阅读"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "(?:…|\\.\\.\\.)\\s*繼續閱讀",
+    "_note": "摘要被截成「…繼續閱讀[標題]」。要求前面有刪節號，才不會誤傷「請繼續閱讀下去」「繼續閱讀莎士比亞」這類正文"
+   },
+   {
+    "action": "cut_to_end",
+    "pattern": "(?:…|\\.\\.\\.)\\s*继续阅读"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "(?i:Only those (?:that|who) risk going too far,? can possibly know how far (?:he|you|one) can go\\.?)[ \\t]*(?:\\d{4}年\\d{1,2}月\\d{1,2}日)?",
+    "_note": "mcclin.blogspot.com 的部落格標語，常與其後緊貼的日期（2026年9月21日）一起被當成正文。整段移除；移除後若什麼都不剩，條目留白"
+   },
+   {
+    "action": "remove_inline",
+    "pattern": "^[ \\t]*\\d{4}年\\d{1,2}月\\d{1,2}日[ \\t]*$",
+    "_note": "獨佔一行的日期（Blogger 日期標頭）。只匹配整行，「2026年9月21日，央行宣布…」這種句中日期不受影響"
+   }
+  ]
+ },
+ "qc_chrome": {
+  "_comment": [
+   "介面文字樣式，兩處使用（textproc.chrome_re）：抽取時，正文去掉這些樣式後不到 MIN_BODY 就視為沒有正文、改走下一個退路；QC 的 scrape 檢查中，摘要命中這些樣式且很短（或命中 3 次以上）就判定為只剩介面文字，刪回 pending 重抓。",
+   "樣式中的空白會轉成 \\s*。QC 另以 textproc.JUNK_RE（擋頁）一併檢查；抽取時兩者分開判定，介面文字不會讓整站暫停。"
+  ],
+  "patterns": [
+   "Sign up Sign in",
+   "Open in app",
+   "Get the app",
+   "Sitemap Open in app",
+   "網站地圖 在應用程式中開啟",
+   "在應用程式中開啟 註冊 登入",
+   "You signed in with another tab",
+   "You switched accounts on another tab",
+   "你已在另一個分頁或視窗登入",
+   "Reload to refresh your session",
+   "Sign in to GitHub",
+   "Get the Steam Mobile App",
+   "取得 Steam 行動應用程式",
+   "Install Steam .{0,40}(?:Bahasa|Deutsch|Español)",
+   "簡體中文 繁體中文 日本語 한국어",
+   "This site requires JavaScript",
+   "本網站需要啟用 JavaScript",
+   "需要啟用 JavaScript",
+   "You need to enable JavaScript",
+   "Claim my free post",
+   "領取免費文章",
+   "Keep reading with a \\d+-day free trial",
+   "Subscribe Sign in",
+   "訂閱 登入",
+   "This post is for paid subscribers",
+   "403 Forbidden",
+   "404 Not Found",
+   "Page not found",
+   "找不到頁面",
+   "Sorry, you have been blocked",
+   "Skip to (?:main )?content",
+   "跳至主要內容",
+   "Toggle navigation"
+  ]
+ },
+ "sites": {
+  "_comment": [
+   "站台表。網域比對含子網域（host 等於或以 .網域 結尾）。",
+   "feed_first_hosts   summarize_feed 只用 feed 副本，不抓頁面",
+   "slow_hosts         extract 直接從 curl 指紋開始，逾時較長",
+   "pause_domains      被擋時整個網域本輪暫停（各子網域同一套骨架頁）",
+   "skip_hosts         summarize_feed 完全不處理（feed 副本是轉址殘骸，頁面無用）",
+   "feed_replace       OPML xmlUrl -> 實際抓取的 feed",
+   "feed_skip / feed_skip_prefix   OPML 中不抓的 feed",
+   "feed_content_skip  不保留 feed 副本的媒體站（由字幕／ASR 處理）",
+   "origin_fixups      來源名稱（小寫）-> 正確 origin，用於 feed 給出 localhost 連結時",
+   "thumb_skip_hosts   這些頁面不取縮圖，回填時移除已存的縮圖",
+   "thumb_deny         明列拒絕的縮圖網址（小寫、不含 query）",
+   "thumb_trusted_hosts 只放文章上傳圖、檔名無意義的圖床（Blogger、Telegram 的 telesco.pe）"
+  ],
+  "feed_first_hosts": [
+   "abei.club",
+   "aftermath.site",
+   "ageofinvention.xyz",
+   "artincontext.org",
+   "attlin.com",
+   "beartalking.com",
+   "bestblogs.dev",
+   "bituzi.com",
+   "blocktempo.com",
+   "buttondown.com",
+   "caffes.me",
+   "careher.net",
+   "cashchou.com",
+   "chaidarun.com",
+   "cityofsound.com",
+   "cocktail4party.com",
+   "coolshell.cn",
+   "curtismchale.ca",
+   "davidoks.blog",
+   "devtang.com",
+   "esence.travel",
+   "first-cafe.com",
+   "firstround.com",
+   "fomosoc.com",
+   "fs.blog",
+   "gilifedesigner.com",
+   "honest-broker.com",
+   "huli.tw",
+   "hunterwalk.com",
+   "joestudwell.com",
+   "kopu.chat",
+   "limboy.me",
+   "lipperalpha.refinitiv.com",
+   "lostmagazine.org",
+   "louie.lu",
+   "lutaonan.com",
+   "matters.town",
+   "maxjamesread.com",
+   "mcclin.blogspot.com",
+   "medium.com",
+   "meiguinfo.com",
+   "mickzh.com",
+   "noswag.tw",
+   "notesbylex.com",
+   "personaljournal.ca",
+   "polgeonow.com",
+   "pseudoyu.com",
+   "readtrung.com",
+   "ruanyifeng.com",
+   "samaltman.com",
+   "shenlvmeng.github.com",
+   "shiuncorner.com",
+   "sirupsen.com",
+   "sive.rs",
+   "smallbooks.com.tw",
+   "soidid.tw",
+   "starrocket.io",
+   "steveblank.com",
+   "substack.com",
+   "t.me",
+   "techcabal.com",
+   "techmeme.com",
+   "thepaper.cn",
+   "tiaodao.typlog.io",
+   "travelwithbook.com",
+   "trensse.com",
+   "unchartedterritories.tomaspueyo.com",
+   "uselessetymology.com",
+   "vox.com",
+   "waitbutwhy.com",
+   "werner.wiki",
+   "whogovernstw.org",
+   "yuanyu.idv.tw",
+   "zmonster.me"
+  ],
+  "slow_hosts": [
+   "mckinsey.com",
+   "bcg.com",
+   "deloitte.com",
+   "hbr.org"
+  ],
+  "pause_domains": [
+   "douban.com"
+  ],
+  "skip_hosts": [
+   "news.google.com"
+  ],
+  "feed_replace": {
+   "https://rsshub.app/infoq/recommend": "https://www.infoq.cn/feed",
+   "https://rsshub.app/huggingface/blog-zh": "https://huggingface.co/blog/feed.xml",
+   "https://rsshub.app/readhub/daily": "https://readhub.cn/rss",
+   "https://rsshub.app/36kr/hot-list": "https://36kr.com/feed",
+   "https://rsshub.app/sspai/index": "https://sspai.com/feed",
+   "https://rsshub.app/sspai/matrix": "https://sspai.com/feed",
+   "https://rsshub.app/meituan/tech": "https://tech.meituan.com/feed",
+   "https://mjg59.dreamwidth.org/data/rss": "http://mjg59.dreamwidth.org/data/rss"
+  },
+  "feed_skip": [
+   "https://flak.tedunangst.com/rss",
+   "https://rachelbythebay.com/w/atom.xml"
+  ],
+  "feed_skip_prefix": [
+   "https://rsshub.app/telegram/channel/",
+   "https://rsshub.app/jike/",
+   "https://rsshub.app/bilibili/",
+   "https://rsshub.app/zhihu/",
+   "https://rsshub.app/xiaoyuzhou/podcast/",
+   "https://rsshub.app/xyzrank",
+   "https://rsshub.app/mittrchina/hot",
+   "https://wechat2rss.bestblogs.dev/",
+   "https://werss.bestblogs.dev/",
+   "http://47.122.94.119:18080/"
+  ],
+  "feed_content_skip": [
+   "youtube.com",
+   "youtu.be",
+   "soundon.fm",
+   "firstory.me",
+   "xiaoyuzhoufm.com"
+  ],
+  "origin_fixups": {
+   "notesbylex.com": "https://notesbylex.com"
+  },
+  "thumb_skip_hosts": [
+   "finance.technews.tw",
+   "douban.com",
+   "granitefirm.com",
+   "blocktempo.com",
+   "oreilly.com",
+   "mckinsey.com"
+  ],
+  "thumb_deny": [
+   "https://gmhjohnny.wordpress.com/wp-content/uploads/2020/09/cropped-j102.png",
+   "https://gmhjohnny.wordpress.com/wp-content/uploads/2020/09/j102.png",
+   "https://ibw.bwnet.com.tw/file/img/smart-white.png",
+   "https://image.blocktempo.com/2025/03/foresight-news.png",
+   "https://image.blocktempo.com/2025/03/foresight-ventures.png",
+   "https://image.blocktempo.com/2026/04/mexc-logo-v2.png",
+   "https://maxjamesread.com/wp-content/uploads/2021/04/s__46555156-scaled.jpg",
+   "https://pudding.cool/assets/stickers/donate-footer-square@2x.png",
+   "https://rickhw.github.io/images/about/aws-Hero/community-heroes_logo.png",
+   "https://ritholtz.com/wp-content/uploads/2024/04/at-the-money.jpg",
+   "https://ritholtz.com/wp-content/uploads/2016/01/barry02-1-1.png",
+   "https://ritholtz.com/wp-content/uploads/2024/12/barrons.jpg",
+   "https://ritholtz.com/wp-content/uploads/2025/05/mib_2025.png",
+   "https://storage.ghost.io/c/30/f5/30f5b1bb-84ee-4c26-b446-fb9a5e512994/content/images/size/w30/2025/08/ghostop.png",
+   "https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/size/w1200/2024/01/1500x500-1.jpeg",
+   "https://storage.ghost.io/c/a0/4c/a04c7225-d919-4d78-9b7c-a3fdd071349b/content/images/2024/05/floating_linebreak_600px-1.png",
+   "https://www.thepaper.cn/_next/static/media/logo_light.4da59bed.png"
+  ],
+  "thumb_trusted_hosts": [
+   "blogger.googleusercontent.com",
+   "bp.blogspot.com",
+   "telesco.pe"
+  ]
+ }
+}
