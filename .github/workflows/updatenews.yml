@@ -13,9 +13,17 @@ concurrency:
 permissions: {}
 
 env:
+  # Line-by-line log: a job killed at its timeout keeps its last lines.
+  PYTHONUNBUFFERED: "1"
   # Items whose last_seen_at is older than this many days are deleted from
   # data/archive.json (their subtitles are removed by the next downloadsub run).
   ARCHIVE_DAYS: 60
+  # Scraped sources without RSS
+  SCRAPED_SOURCES: "off"
+  # Fallbacks after the page and the feed copy: reader (r.jina.ai, which sees
+  # every url sent to it), wayback, reader-meta. Empty = none. Their effect is
+  # countable in the log: `via=reader ok|miss`, `via=wayback ok|miss`.
+  FALLBACKS: "reader,wayback"
 
 jobs:
   update:
@@ -34,13 +42,19 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
+      # This job needs no ASR or yt-dlp (downloadsub.yml does): skip those pins,
+      # same file and versions for the rest.
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          grep -vE '^(faster-whisper|yt-dlp|bgutil-ytdlp-pot-provider)[=\[]' requirements.txt > "$RUNNER_TEMP/req.txt"
+          pip install -r "$RUNNER_TEMP/req.txt"
 
       - name: Self-test
         run: python scripts/selftest.py
 
-      - name: Aggregate feeds
+      # Collect, then summarize + backfill in the same process: feed copies
+      # stay in memory and never touch the disk. Tuning is all in `env`.
+      - name: Aggregate and summarize
         env:
           FOLLOW_OPML_B64: ${{ secrets.FOLLOW_OPML_B64 }}
           FOLLOW_OPML_B64_2: ${{ secrets.FOLLOW_OPML_B64_2 }}
@@ -48,18 +62,11 @@ jobs:
           FOLLOW_OPML_B64_4: ${{ secrets.FOLLOW_OPML_B64_4 }}
           FOLLOW_OPML_B64_5: ${{ secrets.FOLLOW_OPML_B64_5 }}
           RSS_MAX_FEEDS: ${{ vars.RSS_MAX_FEEDS || 400 }}
-        run: |
-          python scripts/update_news.py --output-dir data --archive-days "$ARCHIVE_DAYS" \
-            --require-opml --rss-max-feeds "$RSS_MAX_FEEDS"
-
-      - name: Summarize
-        env:
-          ITEMS_FILE: data/archive.json
           MAX_ITEMS: "200"
           TIME_BUDGET_SECONDS: "5400"
           SUMMARY_RATIO: "1"
           DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
-        run: python scripts/summarize_feed.py
+        run: python scripts/collect.py
 
       - name: Commit and push
         env:
