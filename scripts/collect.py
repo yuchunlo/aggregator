@@ -3,7 +3,7 @@
 Telegram/Jike bridges, YouTube channels, the reader's inbox and, when
 SCRAPED_SOURCES is on, BestBlogs and 澎湃) into DATA_DIR/archive.json:
 canonical urls, stable ids, dedupe, retention. Then summarize.run in this same
-process (unless --collect-only), so the feed copies (feed_content /
+process (unless --no-summarize), so the feed copies (feed_content /
 feed_images) are handed over in memory, never on disk."""
 
 from __future__ import annotations
@@ -26,7 +26,6 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urljoin, urlparse, urlunparse
-
 
 import net
 import store
@@ -177,13 +176,12 @@ def compact(text: str, limit: int = 96) -> str:
 # Telegram preview page (t.me/s/NAME), read in one streaming pass (no tree).
 # Each .tgme_widget_message[data-post] gives one post:
 #   title  the first .tgme_widget_message_text, get_text(" ", strip=True) then
-#          compact(): unchanged from the BeautifulSoup version, because the id
+#          compact(): unchanged from the earlier tree-parser version, because the id
 #          hashes it (a different title would fork every stored post)
 #   text   the post's own text (a quoted reply left out), line breaks kept,
 #          plus the link preview's title and description: the feed copy
 #   images photo / video thumbnail / link preview image, from the inline
 #          background-image style
-_TG_VOID = frozenset("area base br col embed hr img input link meta source track wbr".split())
 _TG_BLOCK = frozenset("div p li blockquote pre h1 h2 h3 h4 h5 h6 tr".split())
 _TG_IMAGE = ("tgme_widget_message_photo_wrap", "tgme_widget_message_video_thumb",
              "link_preview_image", "link_preview_right_image")
@@ -209,12 +207,12 @@ class _TelegramPage(HTMLParser):
     def handle_starttag(self, tag, attrs):
         cls = self._classes(attrs)
         a = dict(attrs)
-        if tag not in _TG_VOID:
+        if tag not in textproc.VOID:
             self.stack.append((tag, cls))
             self.open[tag] += 1
         depth = len(self.stack)
         if self.post is None:
-            if "tgme_widget_message" in cls and tag not in _TG_VOID:
+            if "tgme_widget_message" in cls and tag not in textproc.VOID:
                 self.post = {"post": (a.get("data-post") or "").strip(), "title": None, "text": [],
                              "preview": [], "images": [], "when": None}
                 self.post_depth = depth
@@ -224,7 +222,7 @@ class _TelegramPage(HTMLParser):
             for c in self.cap:
                 c[2].append("\n")
             return
-        if not self.reply_at and "tgme_widget_message_reply" in cls and tag not in _TG_VOID:
+        if not self.reply_at and "tgme_widget_message_reply" in cls and tag not in textproc.VOID:
             self.reply_at = depth
         in_reply = bool(self.reply_at)
         if tag == "time" and p["when"] is None and not in_reply and a.get("datetime"):
@@ -537,14 +535,11 @@ def bestblogs_issue(n: int, now: datetime) -> tuple[str, str, datetime | None] |
     r = fetch(f"{BESTBLOGS}/newsletter/issue{n}")
     if r is None or r.status != 200:
         return None
-    soup = BeautifulSoup(r.text, "html.parser")
-    meta = lambda prop: (soup.select_one(f'meta[property="{prop}"]') or {}).get("content") or ""
-    title = meta("og:title") or (soup.title.get_text(" ", strip=True) if soup.title else "")
+    page = r.text
+    meta = lambda prop: html_mod.unescape(textproc.meta_first(page, (prop,)))
+    title = textproc.page_title(page)
     title = re.sub(r"\s*\|\s*BestBlogs\.dev\s*$", "", title.strip())
-    root = soup.select_one("main") or soup.select_one("article") or soup.body or soup
-    for t in root.find_all(("nav", "header", "footer", "noscript")):
-        t.decompose()
-    text = html_to_text(str(root))
+    text = textproc.region_text(page)
     date = None
     if m := re.search(r"(20\d{2})-(\d{2})-(\d{2})(?!\d)", text):
         date = parse_date(m[0])
@@ -634,11 +629,11 @@ def thepaper_listing(html: str, now: datetime) -> list[tuple[str, str, datetime 
         if cid.isdigit() and cid not in out:
             out[cid] = (name.strip(), _thepaper_date(d, now))
     if not out:
-        soup = BeautifulSoup(html or "", "html.parser")
-        for a in soup.find_all("a", href=True):
-            if not (m := THEPAPER_ARTICLE.match(a["href"])) or "commTag" in a["href"]:
+        for a in textproc.elements(html or ""):
+            href = a.attrs.get("href") if a.tag == "a" else None
+            if not href or not (m := THEPAPER_ARTICLE.match(href)) or "commTag" in href:
                 continue
-            text = re.sub(r"\s+", " ", a.get_text(" ", strip=True))
+            text = re.sub(r"\s+", " ", a.text(" "))
             half = len(text) // 2                  # "标题 标题" (img alt + caption)
             if half and text[:half].strip() == text[half:].strip():
                 text = text[:half].strip()
@@ -664,15 +659,17 @@ def thepaper_article(cid: str, now: datetime):
                 other = c
         when = when or (_thepaper_date(d, now) if own else None)
     body = body or other
-    soup = BeautifulSoup(r.text, "html.parser")
+    page = r.text
+    doc = textproc.elements(page)
     if not body:
-        node = (soup.select_one("[class*=cententWrap]") or soup.select_one("[class*=contentWrap]")
-                or soup.select_one("article") or soup.select_one("main"))
-        body = str(node) if node else ""
+        node = doc.first(lambda e: e.has_class("cententWrap"), lambda e: e.has_class("contentWrap"),
+                         lambda e: e.tag == "article", lambda e: e.tag == "main")
+        body = page[node.start:node.end] if node else ""
     if when is None:
-        meta = soup.select_one('meta[property="article:published_time"]')
-        when = parse_date(meta.get("content")) if meta else None
-    if when is None and (m := re.search(r"(20\d{2}-\d{2}-\d{2} \d{2}:\d{2})", soup.get_text(" "))):
+        meta = textproc.meta_first(page, ("article:published_time",))
+        when = parse_date(html_mod.unescape(meta)) if meta else None
+    if when is None and (m := re.search(r"(20\d{2}-\d{2}-\d{2} \d{2}:\d{2})",
+                                        doc.text())):
         when = parse_date(m[1] + " +08:00")
     text = html_to_text(body)                     # plain text, like every other feed copy
     images = tuple(summarize.thumb_candidates(body, url)) + tuple(summarize.thumb_candidates(r.text[:60000], url)[:2])
@@ -836,7 +833,7 @@ def main(argv=None) -> int:
     RSS_MAX_FEEDS, SCRAPED_SOURCES, MAX_ITEMS, TIME_BUDGET_SECONDS, TRANSLATE..."""
     ap = argparse.ArgumentParser(description=main.__doc__)
     ap.add_argument("--rss-opml", default="", help="OPML file (local runs); default: the FOLLOW_OPML_B64* env vars")
-    ap.add_argument("--collect-only", action="store_true", help="no summaries, no backfill")
+    ap.add_argument("--no-summarize", action="store_true", help="collect only: no summaries, no backfill")
     a = ap.parse_args(argv)
 
     now = datetime.now(tz=UTC)
@@ -880,7 +877,7 @@ def main(argv=None) -> int:
            "items": kept}
     save_doc(path, doc)
     print(f"[ARCHIVE] wrote {path} ({len(kept)} items, fetched {len(raws)} raw)")
-    if not a.collect_only:
+    if not a.no_summarize:
         summarize.run(path, doc, cfg.max_items, cfg.time_budget)
     return 0
 

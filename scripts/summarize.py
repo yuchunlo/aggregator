@@ -1163,7 +1163,8 @@ def main(argv=None) -> int:
     how.add_argument("--dry-run", action="store_true", help="report only, write nothing")
     how.add_argument("--qc-only", action="store_true", help="summary QC fixes only")
     bf.add_argument("--limit", type=int, default=0, help="translate at most N")
-    bf.add_argument("--no-translate", dest="translate", action="store_false", default=None)
+    bf.add_argument("--no-translate", dest="translate", action="store_false", default=None,
+                    help="QC and boilerplate only, no translation (default: the TRANSLATE env var)")
     mn = sub.add_parser("mine", help="candidate drop_unit rules from the corpus")
     mn.add_argument("min_count", type=int, metavar="MIN_COUNT")
     a = ap.parse_args(argv)

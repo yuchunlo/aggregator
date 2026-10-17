@@ -237,6 +237,16 @@ def parse_date(value) -> datetime | None:
 # bounded number of times, to keep a hostile page linear. A tag ends at its
 # first `>`, the same boundary a `[^>]*>` pattern uses.
 # Possessive quantifiers: no backtracking inside a long attribute either.
+_ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
+
+
+def ascii_lower(text: str) -> str:
+    """Lower-case A-Z only. Unlike str.lower() the length never changes
+    ('İ'.lower() is two code points), so offsets found in the result index
+    the original text."""
+    return text.translate(_ASCII_LOWER)
+
+
 _ATTR = re.compile(r"""(?<![\w:-])([\w:-]++)\s*+=\s*+(?:"([^"]*+)"|'([^']*+)'|([^\s"'>]++))""")
 
 
@@ -271,8 +281,8 @@ def tag_text(html: str, name: str, attrs: dict, limit: int = 2_000_000) -> str |
     Linear like iter_tags: the `>` that closes a candidate is searched once
     and reused while later candidates start before it."""
     html = html or ""
-    low = html.lower()
-    pos, gt, open_, close = 0, -1, "<" + name, f"</{name}"
+    low = ascii_lower(html)
+    pos, gt, open_, close = 0, -1, "<" + ascii_lower(name), f"</{ascii_lower(name)}"
     while (i := low.find(open_, pos)) >= 0:
         j = i + len(open_)
         if j < len(low) and not (low[j].isspace() or low[j] in "/>"):
@@ -289,7 +299,7 @@ def tag_text(html: str, name: str, attrs: dict, limit: int = 2_000_000) -> str |
         pos = gt + 1
         a = {m[1].lower(): (m[2] if m[2] is not None else m[3] if m[3] is not None else m[4]) or ""
              for m in _ATTR.finditer(html, j, gt)}
-        if all(a.get(k, "").lower() == v.lower() for k, v in attrs.items()):
+        if all(a.get(k.lower(), "").lower() == v.lower() for k, v in attrs.items()):
             end = low.find(close, gt, gt + 1 + limit)
             return html[gt + 1:end] if end >= 0 else None
     return None

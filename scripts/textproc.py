@@ -4,6 +4,7 @@ then gtx), caption parsing, boilerplate removal and extractive summaries."""
 
 from __future__ import annotations
 
+import bisect
 import html as html_mod
 import math
 import re
@@ -16,7 +17,6 @@ from pathlib import Path
 from urllib.parse import quote
 
 import trafilatura
-from bs4 import BeautifulSoup
 
 import net
 import store
@@ -54,7 +54,7 @@ def page_title(html: str) -> str:
 # ---- streaming HTML readers ---------------------------------------------------
 # One parser core, two outputs: html_to_text (every block, one line each) and
 # paragraph_text (<p>/<li> only, scoped to <article>/<main>). Both are single
-# passes with no tree: BeautifulSoup's append() walks to the last descendant
+# passes with no tree: a tree builder's append() walks to the last descendant
 # and get_text() per paragraph rescans nested ones, both quadratic on deeply
 # nested markup.
 class _Stream(HTMLParser):
@@ -98,7 +98,13 @@ class _Text(_Stream):
 
     def _emit(self, s):
         if not self.skip:
-            (self.code[-1] if self.code else self.out).append(s)
+            if self.code:
+                self.code[-1].append(s)
+            else:
+                self._sink(s)
+
+    def _sink(self, s):
+        self.out.append(s)
 
     def open(self, tag):
         if tag == "code":
@@ -138,14 +144,61 @@ def html_to_text(raw: str) -> str:
     multi-line code dropped. Linear in the input."""
     p = _Text()
     p.feed(raw or "")
-    text = p.text().replace("\u00a0", " ")
+    return _tidy(p.text())
+
+
+def region_text(raw: str, scopes=("main", "article", "body")) -> str:
+    """Like html_to_text, scoped to the first element of the first of `scopes`
+    the page has (else the whole page), with nav/header/footer/noscript left
+    out. One pass: every scope collects its text as it goes."""
+    p = _Region(scopes)
+    p.feed(raw or "")
+    return _tidy(p.text())
+
+
+def _tidy(text: str) -> str:
+    text = text.replace("\u00a0", " ")
     return re.sub(r"\n\s*\n+", "\n", re.sub(r"[ \t]+", " ", text)).strip()
+
+
+class _Region(_Text):
+    """_Text, also copying what it emits into the open scope buffers."""
+    SKIP = _Text.SKIP | frozenset(("nav", "header", "footer", "noscript"))
+
+    def __init__(self, scopes):
+        super().__init__()
+        self.scopes = tuple(scopes)
+        self.bufs: dict[str, list | None] = dict.fromkeys(self.scopes)
+        self.depth = dict.fromkeys(self.scopes, 0)
+
+    def open(self, tag):
+        if tag in self.depth and not self.skip:
+            if self.bufs[tag] is None:
+                self.bufs[tag], self.depth[tag] = [], 1
+            elif self.depth[tag]:
+                self.depth[tag] += 1
+        super().open(tag)
+
+    def shut(self, tag):
+        super().shut(tag)
+        if self.depth.get(tag) and not self.skip:
+            self.depth[tag] -= 1
+
+    def _sink(self, s):
+        self.out.append(s)
+        for k, d in self.depth.items():
+            if d:
+                self.bufs[k].append(s)
+
+    def text(self) -> str:
+        whole = super().text()
+        return next(("".join(b) for k in self.scopes if (b := self.bufs[k]) is not None), whole)
 
 
 class _Paras(_Stream):
     """<p>/<li> text cut into paragraphs at <p>/<li> boundaries; page chrome is
-    skipped; the first <article>, else <main>, scopes the result when the page
-    has one."""
+    skipped; the first <article>, else <main>, scopes the result when it holds
+    any paragraph (one inside skipped chrome never counts)."""
     SKIP = frozenset(("script", "style", "nav", "header", "footer", "aside", "form"))
     PARA = frozenset(("p", "li"))
 
@@ -163,6 +216,8 @@ class _Paras(_Stream):
 
     def open(self, tag):
         if tag in self.depth:
+            if self.skip:                            # an <article> card inside <aside>
+                return
             self.depth[tag] += 1
             if not self.seen[tag]:
                 self.seen[tag] = 1
@@ -171,6 +226,8 @@ class _Paras(_Stream):
             self.cur = ([], self.seen["article"] == 1, self.seen["main"] == 1)
 
     def shut(self, tag):
+        if tag in self.depth and self.skip:
+            return
         if tag in self.depth and self.depth[tag]:
             self.depth[tag] -= 1
             if not self.depth[tag] and self.seen[tag] == 1:
@@ -186,9 +243,8 @@ class _Paras(_Stream):
         self.close()
         self._flush()
         for k in (1, 2):                             # article, then main, then all
-            if any(p[k] for p in self.paras) or (k == 1 and self.seen["article"]) \
-                    or (k == 2 and self.seen["main"]):
-                return [p[0] for p in self.paras if p[k]]
+            if scoped := [p[0] for p in self.paras if p[k]]:
+                return scoped
         return [p[0] for p in self.paras]
 
 
@@ -196,7 +252,7 @@ def paragraph_text(html: str) -> str:
     """The page's paragraphs, one per line: the fallback when trafilatura finds
     too little."""
     p = _Paras()
-    p.feed(html)
+    p.feed(html or "")
     return "\n".join(t for t in p.result() if len(t) >= 20 and not t.startswith(("©", "Powered by")))
 
 
@@ -239,44 +295,174 @@ _CODE_TAG = re.compile(r"<(?:pre|samp|kbd)[\s>]|<code[\s>]", re.I)
 
 
 def strip_code(html: str) -> tuple[str, bool]:
-    """Remove code blocks before extraction; the summary notes them instead."""
+    """Remove code blocks before extraction; the summary notes them instead.
+    Outermost <pre>/<samp>/<kbd>/<code> only: a block is cut, and so is a
+    <code> that holds one, is long or spans lines; a short inline <code>
+    keeps its text. The output is the source sliced around the cuts, never
+    re-serialised, so everything else reaches trafilatura byte for byte."""
     if not _CODE_TAG.search(html):
         return html, False
-    soup = BeautifulSoup(html, "html.parser")
-    removed, inside = 0, set()         # tags within one already handled are skipped
-    for tag in soup(["pre", "samp", "kbd"]):
-        if id(tag) not in inside:
-            inside.update(id(d) for d in tag.descendants)
-            tag.decompose()
-            removed += 1
-    for tag in soup("code"):
-        if tag.parent is None or id(tag) in inside:
-            continue
-        inside.update(id(d) for d in tag.descendants)   # each node once: linear
-        text = tag.get_text()
-        if len(text.strip()) > 40 or "\n" in text:
-            tag.decompose()
+    els = [e for e in elements(html) if e.tag in _CODE_BLOCKS or e.tag == "code"]
+    blocks = [e.start for e in els if e.tag in _CODE_BLOCKS]          # sorted: document order
+    out, pos, removed = [], 0, 0
+    for e in outermost(els):
+        out.append(html[pos:e.start])
+        pos = e.end
+        text = e.text("")
+        k = bisect.bisect_right(blocks, e.start)    # the first block opening inside e, if any
+        holds_block = k < len(blocks) and blocks[k] < e.end
+        if e.tag != "code" or holds_block or len(text.strip()) > 40 or "\n" in text:
             removed += 1
         else:
-            tag.replace_with(text.strip())
-    return str(soup), bool(removed)
+            out.append(html_mod.escape(text.strip(), quote=False))
+    out.append(html[pos:])
+    return "".join(out), bool(removed)
+
+
+_CODE_BLOCKS = frozenset(("pre", "samp", "kbd"))
+
+
+# ---- element spans ------------------------------------------------------------
+# A flat list of elements with their offsets in the source, from one pass of
+# the same _Stream core, for callers that need raw HTML slices rather than
+# text: enough for "first <main>", "drop every <nav>" and "the text of each
+# <a>" without building a tree. Unclosed elements end where an
+# enclosing one closes, or at the end of the document; a stray end tag with no
+# open element of that name is ignored (counted per name, so never a scan).
+VOID = frozenset(("area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+                   "meta", "param", "source", "track", "wbr"))
+
+
+class Element:
+    __slots__ = ("tag", "attrs", "start", "end", "_data", "_d0", "_d1")
+
+    def __init__(self, tag, attrs, start, data):
+        self.tag, self.attrs, self.start, self.end = tag, attrs, start, start
+        self._data, self._d0, self._d1 = data, len(data), len(data)
+
+    def text(self, sep: str = " ") -> str:
+        """Every text node inside, stripped and joined by `sep` (empty
+        nodes dropped); sep "" keeps the nodes as they are."""
+        parts = self._data[self._d0:self._d1]
+        return "".join(parts) if sep == "" else sep.join(t for t in (x.strip() for x in parts) if t)
+
+    def has_class(self, part: str) -> bool:
+        """Substring of the class attribute, on purpose: CSS-module names
+        such as `index_contentWrap__Jv8jK` carry the part inside a token."""
+        return part in (self.attrs.get("class") or "")
+
+
+class _Spans(_Stream):
+    """The _Stream core (nothing skipped), recording where each element sits."""
+
+    def __init__(self, html: str):
+        super().__init__()
+        self.html, self.els, self.data, self.stack = html, [], [], []
+        self.open_count: Counter = Counter()
+        self.lines = [0] + [m.end() for m in re.finditer("\n", html)]
+
+    def _pos(self) -> int:
+        line, col = self.getpos()
+        return self.lines[line - 1] + col
+
+    def _close(self, e: Element, end: int):
+        e.end, e._d1 = end, len(self.data)
+        self.open_count[e.tag] -= 1
+
+    def handle_starttag(self, tag, attrs):
+        self._attrs = attrs
+        super().handle_starttag(tag, attrs)          # -> open()
+
+    def open(self, tag):
+        start = self._pos()
+        e = Element(tag, {k: v or "" for k, v in self._attrs}, start, self.data)
+        self.els.append(e)
+        if tag in VOID:
+            e.end = start + len(self.get_starttag_text() or "")
+        else:
+            self.stack.append(e)
+            self.open_count[tag] += 1
+
+    def handle_startendtag(self, tag, attrs):
+        start = self._pos()
+        e = Element(tag, {k: v or "" for k, v in attrs}, start, self.data)
+        e.end = start + len(self.get_starttag_text() or "")
+        self.els.append(e)
+
+    def shut(self, tag):
+        if self.open_count[tag] <= 0:
+            return
+        start = self._pos()
+        gt = self.html.find(">", start)
+        end = gt + 1 if gt >= 0 else len(self.html)
+        while self.stack:
+            e = self.stack.pop()
+            self._close(e, start if e.tag != tag else end)
+            if e.tag == tag:
+                break
+
+    def handle_data(self, data):
+        self.data.append(data)
+
+    def finish(self) -> list[Element]:
+        self.close()
+        while self.stack:
+            self._close(self.stack.pop(), len(self.html))
+        return self.els
+
+
+class Doc:
+    """The elements of one document, in order, and its text nodes."""
+    __slots__ = ("els", "_data")
+
+    def __init__(self, els: list[Element], data: list[str]):
+        self.els, self._data = els, data
+
+    def __iter__(self):
+        return iter(self.els)
+
+    def first(self, *tests) -> Element | None:
+        """The first element passing the first test any element passes."""
+        return next((e for t in tests for e in self.els if t(e)), None)
+
+    def text(self) -> str:
+        """Every text node of the document, joined by spaces."""
+        return " ".join(self._data)
+
+
+def elements(html: str) -> Doc:
+    """Every element of `html` in document order (see Element)."""
+    p = _Spans(html or "")
+    p.feed(html or "")
+    return Doc(p.finish(), p.data)
+
+
+def outermost(els) -> list[Element]:
+    """Those of `els` (in document order) not inside another of them."""
+    out, end = [], -1
+    for e in els:                                   # elements() order: by start
+        if e.start >= end:
+            out.append(e)
+            end = e.end
+    return out
+
+
+def _extract(html: str, **kw) -> str:
+    """trafilatura on untrusted markup: any failure is "found nothing"."""
+    try:
+        return trafilatura.extract(html, include_comments=False, favor_recall=True, **kw) or ""
+    except Exception:
+        return ""
 
 
 def from_html(html: str) -> tuple[str, str, bool, bool]:
     """(body, meta, has_table, has_code). has_table is scoped to the article
     region trafilatura identifies, not to any <table> in the page chrome."""
-    table = False
-    if "<table" in html.lower():
-        try:
-            xml = trafilatura.extract(html, include_comments=False, include_tables=True,
-                                      favor_recall=True, output_format="xml")
-            table = bool(xml) and "<table" in xml.lower()
-        except Exception:
-            pass
+    html = html or ""
+    table = "<table" in store.ascii_lower(html) and "<table" in store.ascii_lower(
+        _extract(html, include_tables=True, output_format="xml"))
     html, code = strip_code(html)
-    body = trafilatura.extract(html, include_comments=False, include_tables=False,
-                               favor_recall=True) or ""
-    body = fix_mojibake(unescape(body))
+    body = fix_mojibake(unescape(_extract(html, include_tables=False)))
     if len(body) < MIN_BODY:
         alt = fix_mojibake(unescape(paragraph_text(html)))
         if len(alt) > len(body):
@@ -290,9 +476,8 @@ def from_html(html: str) -> tuple[str, str, bool, bool]:
 
 
 # ---- shared text primitives -------------------------------------------------
-# Used by page extraction (extract), summary building (textproc) and summary QC
-# (QC); kept here so none of them has to import another for them.
-# Interstitials / challenge pages / generic site blurbs, in both scripts: the
+# Used by page extraction, summary building and summary QC (summarize.py).
+# Interstitials / challenge pages / generic site blurbs, in either script: the
 # test runs on the *unconverted* source text.
 JUNK_RE = re.compile(
     r"Just a moment|Checking your browser|Verify you are human|Enable JavaScript and cookies"
@@ -323,17 +508,21 @@ _ORPHAN_TAIL = re.compile(r'\]\(\s*+(?:"[^"\n]{0,120}")?\s*+\)')      # `](\"per
 
 
 def _cut_spans(text: str, start: str, end: str) -> str:
-    """Remove every `start`...`end` span (case-insensitive), by find: linear.
-    An unclosed `start` is left as it is, like the regex it replaces."""
-    low, out, pos = text.lower(), [], 0
+    """Remove every `start`...`end` span (ASCII case-insensitive): linear. An
+    end tag reaches its `>`. An unclosed `start` is left as it is. Offsets come
+    from `text` itself: str.lower() can change the length ('İ')."""
+    low, out, pos = store.ascii_lower(text), [], 0
     while (i := low.find(start, pos)) >= 0:
         j = low.find(end, i + len(start))
         if j < 0:
             break
-        k = low.find(">", j)
-        k = len(text) if k < 0 else k + 1
+        if end.startswith("</"):
+            k = low.find(">", j)
+            k = len(text) if k < 0 else k + 1
+        else:
+            k = j + len(end)
         out.append(text[pos:i])
-        pos = k if end.startswith("</") else j + len(end)
+        pos = k
     return "".join(out) + text[pos:]
 
 
@@ -359,16 +548,13 @@ def sanitize_markup(text: str) -> str:
     return squeeze(text)
 
 
-
-
-
+# ---- OpenCC -----------------------------------------------------------------
 try:
     import opencc
     _S2TWP, _T2S = opencc.OpenCC("s2twp"), opencc.OpenCC("t2s")
 except Exception:                      # degrade to identity, never to 簡體
     opencc = _S2TWP = _T2S = None
 
-# ---- OpenCC -----------------------------------------------------------------
 
 def _doubled_repairs():
     """s2twp maps e.g. 程序->程式 even inside text that already reads 程式,
@@ -593,6 +779,16 @@ def collapse_loops(text: str) -> str:
     return text
 
 
+def _utf8_pairs(text: str, m: dict, run: re.Pattern) -> int:
+    """UTF-8 lead bytes followed by a continuation byte, in the runs of
+    `text` that read as one single-byte charset."""
+    n = 0
+    for mo in run.finditer(text):
+        b = [m[c] for c in mo.group()]
+        n += sum(x in _LEAD and y in _CONT for x, y in zip(b, b[1:]))
+    return n
+
+
 def garbled(text: str) -> bool:
     """Unrepaired mojibake, replacement characters, or a degenerate loop
     (machine translation of garbage repeats one phrase dozens of times)."""
@@ -601,10 +797,7 @@ def garbled(text: str) -> bool:
     chars = max(1, sum(not c.isspace() for c in text))
     if text.count("\ufffd") / chars > 0.02:
         return True
-    def pairs(m, run):           # UTF-8 lead byte followed by a continuation byte
-        return sum(x in _LEAD and y in _CONT for mo in run.finditer(text)
-                   for b in [[m[c] for c in mo.group()]] for x, y in zip(b, b[1:]))
-    if max(pairs(m, run) for m, run in _MOJI.values()) * 2 / chars > 0.05:
+    if max(_utf8_pairs(text, m, run) for m, run in _MOJI.values()) * 2 / chars > 0.05:
         return True
     return next(_unit_loops(text), None) is not None
 
@@ -664,16 +857,38 @@ DEEPL_BATCH, DEEPL_MAX_CHARS = 50, 20_000
 _SENT = re.compile(r"(?<=[.!?。！？])\s*")      # zero-width: CJK has no spaces
 
 deepl_disabled = False              # set for good on a quota/auth failure
+PROVIDERS: Counter = Counter()       # successful texts per backend
+FAILURES: Counter = Counter()        # DeepL failures that fell back to gtx
+_count_lock = threading.Lock()       # summaries are built on several threads
+
+
+def count(counter: Counter, key: str, n: int = 1) -> None:
+    """counter[key] += n, safe across worker threads."""
+    with _count_lock:
+        counter[key] += n
 
 
 def deepl_active() -> bool:
     return bool(store.CFG.deepl_key) and not deepl_disabled
-PROVIDERS: Counter = Counter()       # successful texts per backend
-FAILURES: Counter = Counter()        # DeepL failures that fell back to gtx
 
 
 class TranslateError(Exception):
-    pass
+    """A failed translation. kind "fatal" (DeepL quota or auth: DeepL stays
+    off for the rest of the run) or "transient" (anything else). The message
+    is for the log and the STATS keys only; nothing branches on it."""
+
+    def __init__(self, reason: str, kind: str = "transient"):
+        super().__init__(reason)
+        self.kind = kind
+
+
+class Skipped(str):
+    """A result reason meaning gtx was never asked: it is refusing this run.
+    Recognised by type, not by its text."""
+
+
+SKIPPED = Skipped("skipped: gtx refusing this run")
+DEEPL_FATAL = {401: "deepl HTTP 401", 403: "deepl HTTP 403", 456: "deepl quota exceeded (456)"}
 
 
 def short_reason(reason: str, limit: int = 160) -> str:
@@ -724,8 +939,9 @@ _gtx_lock, _gtx_next = threading.Lock(), 0.0
 
 
 def _gtx_wait() -> None:
-    """GTX_SLEEP between any two gtx requests of this process: summaries are
-    built on several worker threads, and a per-thread sleep multiplied the rate."""
+    """GTX_SLEEP between any two gtx requests of this process. The wait is
+    shared, not per thread: summaries are built on several worker threads, and
+    a per-thread sleep would multiply the request rate by the thread count."""
     global _gtx_next
     with _gtx_lock:
         now = time.monotonic()
@@ -755,26 +971,34 @@ def _deepl_call(method, path, **kw):
     return _call(method, host + path, headers={"Authorization": f"DeepL-Auth-Key {key}"}, **kw)
 
 
-def _deepl(texts: list[str]) -> list[str]:
-    """One POST; a 413 halves the batch (DeepL limits bytes, we count chars)."""
+def _deepl(texts: list[str]) -> tuple[list, TranslateError | None]:
+    """([translation | None] aligned with `texts`, the error if any is None).
+    A 413 halves the batch (DeepL limits bytes, we count chars); a half that
+    succeeds keeps its results, which DeepL has already billed. Whether an
+    error is fatal is decided here, from the status code."""
+    none = [None] * len(texts)
     try:
         r = _deepl_call("POST", "/v2/translate", json_body={"text": texts, "target_lang": "ZH-HANT"})
     except TranslateError as e:
-        raise TranslateError(f"deepl {e}") from e
+        return none, TranslateError(f"deepl {e}")
     if r.status == 413 and len(texts) > 1:
         mid = len(texts) // 2
-        return _deepl(texts[:mid]) + _deepl(texts[mid:])
-    if r.status == 456:
-        raise TranslateError("deepl quota exceeded (456)")
+        head, err = _deepl(texts[:mid])
+        if err and err.kind == "fatal":             # the other half would fail the same way
+            return head + [None] * (len(texts) - mid), err
+        tail, err2 = _deepl(texts[mid:])
+        return head + tail, err or err2
+    if r.status in DEEPL_FATAL:
+        return none, TranslateError(DEEPL_FATAL[r.status], "fatal")
     if r.status != 200:
-        raise TranslateError(f"deepl HTTP {r.status}")
+        return none, TranslateError(f"deepl HTTP {r.status}")
     try:
         out = [t["text"] for t in r.json()["translations"]]
     except Exception as e:
-        raise TranslateError(f"deepl bad payload: {type(e).__name__}") from e
+        return none, TranslateError(f"deepl bad payload: {type(e).__name__}")
     if len(out) != len(texts):          # misaligned results would cross-write items
-        raise TranslateError(f"deepl returned {len(out)} of {len(texts)} segments")
-    return out
+        return none, TranslateError(f"deepl returned {len(out)} of {len(texts)} segments")
+    return out, None
 
 
 def deepl_usage():
@@ -811,41 +1035,46 @@ def translate_many(texts: list[str], stop_after: int = 0) -> list[tuple]:
     requests; the rest come back as skipped (the endpoint is refusing us).
     """
     global deepl_disabled
-    res = [(None, "empty input")] * len(texts)
-    todo = [i for i, t in enumerate(texts) if (t or "").strip()]
-    for i in [i for i in todo if garbled(texts[i])]:     # never pay to translate garbage
-        res[i] = (None, "garbled input")
-        todo.remove(i)
-    streak = 0
-    while todo:
+    res: list = [(None, "empty input")] * len(texts)
+    todo = []
+    for i, t in enumerate(texts):
+        if (t or "").strip():
+            if garbled(t):                          # never pay to translate garbage
+                res[i] = (None, "garbled input")
+            else:
+                todo.append(i)
+    streak, pos = 0, 0                              # streak: consecutive gtx refusals
+    while pos < len(todo):
         batch, chars = [], 0
-        while todo and len(batch) < DEEPL_BATCH and not (
-                batch and chars + len(texts[todo[0]]) > DEEPL_MAX_CHARS):
-            chars += len(texts[todo[0]])
-            batch.append(todo.pop(0))
+        while pos < len(todo) and len(batch) < DEEPL_BATCH and not (
+                batch and chars + len(texts[todo[pos]]) > DEEPL_MAX_CHARS):
+            chars += len(texts[todo[pos]])
+            batch.append(todo[pos])
+            pos += 1
         if deepl_active():
-            try:
-                for i, o in zip(batch, _deepl([texts[i].strip() for i in batch])):
-                    res[i] = _accept(o)
-                PROVIDERS["deepl"] += len(batch)
-                continue
-            except TranslateError as e:
-                FAILURES[short_reason(str(e))] += 1
-                if any(k in str(e) for k in ("quota", "403", "401")):
+            outs, err = _deepl([texts[i].strip() for i in batch])
+            done = [(i, o) for i, o in zip(batch, outs) if o is not None]
+            for i, o in done:
+                res[i] = _accept(o)
+            if done:
+                count(PROVIDERS, "deepl", len(done))
+            if err:
+                count(FAILURES, short_reason(str(err)))
+                if err.kind == "fatal":
                     deepl_disabled = True
+            batch = [i for i, o in zip(batch, outs) if o is None]
         for i in batch:
             if stop_after and streak >= stop_after:
-                res[i] = (None, "skipped: gtx refusing this run")
+                res[i] = (None, SKIPPED)
                 continue
             try:
                 res[i] = _accept(_gtx(texts[i]))
+                streak = 0                          # gtx answered, whatever the content
             except TranslateError as e:
                 res[i] = (None, str(e))
-            if res[i][0]:
-                streak = 0
-                PROVIDERS["gtx"] += 1
-            else:
                 streak += 1
+            if res[i][0]:
+                count(PROVIDERS, "gtx")
     return res
 
 
@@ -855,20 +1084,24 @@ def translate_keep_lines(texts: list[str], stop_after: int = 0) -> list[tuple]:
     don't all translate is retried whole, without the breaks."""
     parts = [[ln.strip() for ln in (t or "").split("\n") if ln.strip()] for t in texts]
     flat = [ln for p in parts for ln in p]
-    got, res, pos = translate_many(flat, stop_after) if flat else [], [], 0
-    for t, p in zip(texts, parts):
+    got = translate_many(flat, stop_after) if flat else []
+    res, pos = [], 0
+    for p in parts:
         lines, pos = got[pos:pos + len(p)], pos + len(p)
-        if len(p) > 1 and all(o for o, _ in lines):
-            res.append(("\n".join(o for o, _ in lines), ""))
+        if not p:
+            res.append((None, "empty input"))
         elif len(p) == 1:
             res.append(lines[0])
+        elif all(o for o, _ in lines):
+            res.append(("\n".join(o for o, _ in lines), ""))
+        elif any(isinstance(why, Skipped) for _, why in lines):
+            res.append((None, SKIPPED))              # gtx is refusing: a retry only adds requests
         else:
             res.append(None)                         # whole text below
     if retry := [i for i, r in enumerate(res) if r is None]:
         for i, r in zip(retry, translate_many([" ".join(parts[i]) for i in retry], stop_after)):
             res[i] = r
     return res
-
 
 
 FOREIGN_BUDGET = 1.2          # translation shrinks text; select a bit more
@@ -1013,37 +1246,43 @@ def vtt_to_text(path) -> str:
 # ============================================================== boilerplate
 KINDS = ("page", "meta", "feed", "subtitle")
 _rules: dict | None = None
+_rules_lock = threading.Lock()
 
 
 def boiler_rules() -> dict:
     """rules.json `boilerplate`, compiled once. Actions run in a fixed order:
     remove_block, remove_inline, cut_to_end (on source text), drop_unit (on
-    繁體-normalised text, per sentence/paragraph and source kind)."""
+    繁體-normalised text, per sentence/paragraph and source kind). Each pattern
+    is compiled and applied on its own: joined into one alternation, a
+    backreference would point at another rule's group, and an inline flag or a
+    repeated group name would fail the whole set."""
     global _rules
-    if _rules is None:
-        data = store.rules().get("boilerplate") or {}
-        blocks, inline, cut, units = [], [], [], {}
-        for r in data.get("rules") or []:
-            act, pat = r.get("action"), r.get("pattern") or ""
-            if act == "remove_block" and r.get("text"):
-                blocks.append(r["text"])
-            elif act in ("remove_inline", "cut_to_end", "drop_unit") and pat:
-                try:
-                    rx = re.compile(pat)
-                except re.error as e:
-                    print(f"WARNING: bad boilerplate regex {pat!r} ({e})")
-                    continue
-                if act == "drop_unit":
-                    units.setdefault((r.get("level") or "sentence", r.get("scope") or "all"), []).append(rx)
-                else:
-                    (inline if act == "remove_inline" else cut).append(pat)
-            else:
-                print(f"WARNING: bad boilerplate rule {r!r}")
-        _rules = {"blocks": blocks, "units": units,
-                  "inline": re.compile("|".join(inline), re.M) if inline else None,
-                  "cut": re.compile("|".join(cut)) if cut else None,
-                  "min_keep": int(data.get("min_keep_after_cut", 80))}
+    with _rules_lock:
+        if _rules is None:
+            _rules = _compile_rules(store.rules().get("boilerplate") or {})
     return _rules
+
+
+def _compile_rules(data: dict) -> dict:
+    out = {"blocks": [], "inline": [], "cut": [], "units": {},
+           "min_keep": int(data.get("min_keep_after_cut", 80))}
+    for r in data.get("rules") or []:
+        act, pat = r.get("action"), r.get("pattern") or ""
+        if act == "remove_block" and r.get("text"):
+            out["blocks"].append(r["text"])
+        elif act in ("remove_inline", "cut_to_end", "drop_unit") and pat:
+            try:
+                rx = re.compile(pat, re.M if act == "remove_inline" else 0)
+            except re.error as e:
+                print(f"WARNING: bad boilerplate regex {pat!r} ({e})")
+                continue
+            if act == "drop_unit":
+                out["units"].setdefault((r.get("level") or "sentence", r.get("scope") or "all"), []).append(rx)
+            else:
+                out["inline" if act == "remove_inline" else "cut"].append(rx)
+        else:
+            print(f"WARNING: bad boilerplate rule {r!r}")
+    return out
 
 
 # Markup in the text is the article's subject (a tutorial's <form> sample), not
@@ -1065,10 +1304,14 @@ def strip_boilerplate(text: str, markup: bool = True) -> str:
         text = sanitize_markup(text)
     for b in r["blocks"]:
         text = text.replace(b, "")
-    if r["inline"]:
-        text = r["inline"].sub("", text)
-    if r["cut"] and (m := r["cut"].search(text)) and m.start() >= r["min_keep"]:
-        text = text[:m.start()]
+    for rx in r["inline"]:
+        text = rx.sub("", text)
+    # cut_to_end: the earliest marker that leaves min_keep chars; one nearer
+    # the start (a title that quotes it) does not hide a real one further on.
+    cuts = [m.start() for rx in r["cut"]
+            if (m := next((m for m in rx.finditer(text) if m.start() >= r["min_keep"]), None))]
+    if cuts:
+        text = text[:min(cuts)]
     return text.strip()
 
 
@@ -1188,7 +1431,7 @@ def extractive(text: str, cjk: bool, budget: int, kind: str, lines: bool = False
         return trim_to_sentences(text, budget)
     keep = [(no, s) for no, s in pairs if not is_boilerplate(s, kind)]
     if keep and len(keep) < len(pairs):
-        STATS[f"boiler:{kind}:sentence"] += len(pairs) - len(keep)
+        count(STATS, f"boiler:{kind}:sentence", len(pairs) - len(keep))
         pairs = keep
     uniq = {}                                   # verbatim repeats: first wins
     for no, s in pairs:
@@ -1258,12 +1501,11 @@ def tidy(text: str, keep_lines: bool = True) -> str:
     return "\n".join(out)
 
 
-
 def _translate(text: str) -> str | None:
     """zh-TW translation, line breaks kept, recording why it failed."""
     out, reason = translate_keep_lines([text])[0]
     if not out:
-        STATS[f"translate-fail:{short_reason(reason) or 'unknown'}"] += 1
+        count(STATS, f"translate-fail:{short_reason(reason) or 'unknown'}")
     return out
 
 
@@ -1279,7 +1521,7 @@ def build(content: str, kind: str = "page", table=False, code=False, meta=False,
     """
     content = collapse_loops(fix_mojibake(content))   # Whisper/MT loops: keep one copy
     if garbled(content):
-        STATS["garbled"] += 1
+        count(STATS, "garbled")
         return None
     content = re.sub(r"\((?:\d{1,2}:)?\d{1,2}:\d{2}\)\s*[:：]?", ": ", content)
     content = strip_boilerplate(content)
@@ -1294,7 +1536,7 @@ def build(content: str, kind: str = "page", table=False, code=False, meta=False,
     paras = re.split(r"\n\s*\n|\n", content)
     kept = [p for p in paras if not is_boilerplate(p.strip(), kind, "paragraph")]
     if len(kept) < len(paras) and any(p.strip() for p in kept):
-        STATS[f"boiler:{kind}:paragraph"] += len(paras) - len(kept)
+        count(STATS, f"boiler:{kind}:paragraph", len(paras) - len(kept))
         content = "\n".join(kept)
 
     src = detect(content)
@@ -1306,7 +1548,7 @@ def build(content: str, kind: str = "page", table=False, code=False, meta=False,
         raw = extractive(content, src == "ja", int(budget * FOREIGN_BUDGET), kind, lines)
         summary = _translate(raw) if (store.CFG.translate if translate is None else translate) else None
         if not summary:                   # stored as-is; backfill retries later
-            STATS[f"untranslated:{src}"] += 1
+            count(STATS, f"untranslated:{src}")
             summary = raw
     summary = tidy(to_twp(summary), keep_lines=lines)
     summary = trim_to_sentences(summary, budget)

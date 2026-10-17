@@ -265,7 +265,7 @@ def _audio_in_page(page: str) -> str:
     if tags := textproc.meta_tags(page, OG_AUDIO_KEYS):
         return html_mod.unescape(tags[0][1])
     for tok in _TOKEN_SPLIT.split(page.replace("\\u002F", "/").replace("\\/", "/")):
-        if (i := tok.lower().find("http")) >= 0 and is_audio_url(tok[i:]):
+        if (i := store.ascii_lower(tok).find("http")) >= 0 and is_audio_url(tok[i:]):
             return html_mod.unescape(tok[i:])
     return ""
 

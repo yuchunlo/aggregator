@@ -222,6 +222,14 @@ def _once(method, url, ips, deadline, sink, limit, *, headers, impersonate, data
         return r.status_code, hdrs, hdrs.get("location") or hdrs.get("Location")
 
 
+_CREDENTIALS = frozenset(("authorization", "proxy-authorization", "cookie"))
+
+
+def _origin(url: str) -> tuple:
+    u = urlparse(url)
+    return u.scheme.lower(), (u.hostname or "").lower(), u.port
+
+
 def _fetch(method, url, timeout, sink, limit, *, headers, impersonate=False, data=None,
            retries=0, retry_status=RETRY_STATUS):
     """Follow redirects by hand (each hop checked and pinned); retry transport
@@ -231,7 +239,7 @@ def _fetch(method, url, timeout, sink, limit, *, headers, impersonate=False, dat
     deadline = time.monotonic() + (sum(timeout) if isinstance(timeout, tuple) else timeout)
     attempt = 0
     while True:
-        cur, meth, body = url, method, data       # a 303 rewrites this attempt only
+        cur, meth, body, hdrs_out = url, method, data, headers   # a redirect rewrites this attempt only
         try:
             for _ in range(MAX_REDIRECTS + 1):
                 t = _target(cur)
@@ -240,10 +248,13 @@ def _fetch(method, url, timeout, sink, limit, *, headers, impersonate=False, dat
                     return None
                 sink(None)
                 status, hdrs, loc = _once(meth, cur, ips, deadline, sink, limit,
-                                          headers=headers, impersonate=impersonate, data=body)
+                                          headers=hdrs_out, impersonate=impersonate, data=body)
                 if status in REDIRECT and loc:
-                    cur = urljoin(cur, loc)
-                    if status == 303:
+                    nxt = urljoin(cur, loc)
+                    if _origin(nxt) != _origin(cur):    # credentials never follow to another origin
+                        hdrs_out = {k: v for k, v in hdrs_out.items() if k.lower() not in _CREDENTIALS}
+                    cur = nxt
+                    if status == 303 or (status in (301, 302) and meth == "POST"):
                         meth, body = "GET", None
                     continue
                 break

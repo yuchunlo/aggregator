@@ -207,6 +207,115 @@ def check_translate():
         textproc.deepl_disabled, net.request = saved, real
 
 
+def check_translate_partial_and_refusals():
+    """A DeepL half that succeeded keeps its (billed) results; only transport
+    refusals count toward gtx's stop_after, not results that weren't Chinese."""
+    textproc.GTX_SLEEP = 0
+    saved, real = textproc.deepl_disabled, net.request
+    ok = lambda payload: net.Resp(200, json.dumps(payload).encode(), {}, "u")
+    try:
+        store.CFG.deepl_key = "test-key"
+        textproc.deepl_disabled = False
+
+        def deepl(m, url, kw):
+            texts = kw["json_body"]["text"]
+            if len(texts) > 1:
+                return net.Resp(413, b"", {}, url)
+            return ok({"translations": [{"text": "譯" + texts[0]}]}) if texts[0] == "a" else net.Resp(500, b"", {}, url)
+        net.request = n = Net({"deepl": deepl, "translate_a": lambda m, url, kw: ok([[["譯" + kw["params"]["q"], ""]]])})
+        out = textproc.translate_many(["a", "b"])
+        eq(([o for o, _ in out], sum("translate_a" in c[1] for c in n.calls)), (["譯a", "譯b"], 1),
+           "deepl 413: the half that translated is kept, only the failed half goes to gtx")
+        store.CFG.deepl_key = ""
+        net.request = n = Net({"translate_a": lambda m, url, kw: ok([[["still english words here " * 3, ""]]])})
+        out = textproc.translate_many(list("abcdef"), stop_after=2)
+        eq((sum("translate_a" in c[1] for c in n.calls), any(w == textproc.SKIPPED for _, w in out)), (6, False),
+           "gtx answering with non-Chinese is not a refusal: nothing skipped")
+    finally:
+        textproc.deepl_disabled, net.request = saved, real
+
+
+def check_deepl_fatal_by_status():
+    """Only 401/403/456 switch DeepL off; a transient failure whose message
+    happens to contain those digits does not."""
+    saved, real = textproc.deepl_disabled, net.request
+    try:
+        store.CFG.deepl_key = "test-key"
+        for status, fatal in ((403, True), (456, True), (500, False)):
+            net.request = lambda *a, **k: net.Resp(status, b"", {}, "u")
+            _, err = textproc._deepl(["a"])
+            eq(err.kind, "fatal" if fatal else "transient", f"deepl HTTP {status} kind")
+        net.request = lambda *a, **k: net.Resp(200, json.dumps({"translations": [{"text": "x"}] * 401}).encode(), {}, "u")
+        _, err = textproc._deepl(["a"])
+        eq((err.kind, "401" in str(err)), ("transient", True), "deepl: '401' in a message is not an auth error")
+    finally:
+        store.CFG.deepl_key = ""
+        textproc.deepl_disabled, net.request = saved, real
+    eq((isinstance(textproc.SKIPPED, textproc.Skipped), isinstance(str(textproc.SKIPPED), textproc.Skipped)),
+       (True, False), "SKIPPED is told apart by type, not text")
+
+
+def check_strip_code_edges():
+    """Sliced, never re-serialised; a <code> holding a block goes whole; an
+    unclosed block runs to the end, as a browser would render it."""
+    got, cut = textproc.strip_code('<p a="x&amp;y">t <code>k</code></p><code><pre>long\nblock</pre></code><!--c-->z')
+    eq((got, cut), ('<p a="x&amp;y">t k</p><!--c-->z', True), "strip_code: block inside code")
+    eq(textproc.strip_code("<p>a</p><pre>x\ny"), ("<p>a</p>", True), "strip_code: unclosed pre")
+
+
+def check_offsets_survive_unicode_case():
+    """Offsets found in a lower-cased copy must index the original. The copy
+    lowers A-Z only: 'İ'.lower() is two code points and would shift every cut
+    after it."""
+    eq(textproc.sanitize_markup("İstanbul <script>x</script> keep"), "İstanbul keep", "cut_spans: İ before a script")
+    eq(textproc.sanitize_markup("İİ<!-- c -->tail"), "İİtail", "cut_spans: İ before a comment")
+    eq(store.tag_text("<p>İİİ</p><title>T</title>", "title", {}), "T", "tag_text: İ before the tag")
+    eq(store.ascii_lower("İA"), "İa", "ascii_lower keeps length")
+
+
+def check_paragraph_scopes():
+    body = "".join(f"<p>正文第{i}段的內容寫得夠長足以成為一個段落</p>" for i in range(3))
+    got = textproc.paragraph_text(f"<main>{body}</main><aside><article><div>card</div></article></aside>")
+    eq(got.count("\n"), 2, "paragraph_text: an <article> inside skipped chrome does not scope the page")
+    got = textproc.paragraph_text(f"<article><div>no paragraphs</div></article><main>{body}</main>")
+    eq(got.count("\n"), 2, "paragraph_text: an empty <article> falls back to <main>")
+
+
+def check_boilerplate_rules_compile_alone():
+    rules = textproc._compile_rules({"min_keep_after_cut": 10, "rules": [
+        {"action": "remove_inline", "pattern": "(x)y"},
+        {"action": "remove_inline", "pattern": r"(a)\1"},
+        {"action": "remove_inline", "pattern": "(?i)zz"},
+        {"action": "cut_to_end", "pattern": "END"},
+    ]})
+    saved = textproc._rules
+    textproc._rules = rules
+    try:
+        eq(textproc.strip_boilerplate("xy ab aa ZZ keep", markup=False), "ab   keep",
+           "boilerplate: backreference and inline flag work per rule")
+        eq(textproc.strip_boilerplate("END title, then the body text END footer", markup=False),
+           "END title, then the body text", "boilerplate: an early marker does not hide the real one")
+    finally:
+        textproc._rules = saved
+
+
+def check_redirect_drops_credentials():
+    seen, real = [], (net._once, net.public_addrs)
+    hops = {"https://api.example/a": "https://other.example/b", "https://other.example/b": None}
+
+    def once(meth, url, ips, deadline, sink, limit, *, headers, impersonate, data):
+        seen.append((url, dict(headers)))
+        return (302, {}, hops[url]) if hops[url] else (200, {}, None)
+    try:
+        net._once, net.public_addrs = once, lambda *a: ["93.184.216.34"]
+        net._fetch("GET", "https://api.example/a", 5, lambda c: None, 100,
+                   headers={"Authorization": "secret", "Cookie": "c", "User-Agent": "u"})
+    finally:
+        net._once, net.public_addrs = real
+    eq([sorted(h) for _, h in seen], [["Authorization", "Cookie", "User-Agent"], ["User-Agent"]],
+       "redirect to another origin drops credentials")
+
+
 def check_thumbs():
     eq([u for u in summarize.deny() if u != u.lower()], [], "deny entries are lower-case")
     ok = lambda u: summarize.thumb_usable(u)[0]
@@ -398,11 +507,11 @@ def check_inbox():
 
 
 def check_routes_douban_blogspot():
-    """2026-10: douban 看过/读过/听过 went to the page (a login skeleton), got
-    'blocked' and stayed pending forever; every mark (想X too) now uses the
-    feed note or goes blank. blogspot.com left FEED_FIRST_HOSTS: its feed copy
-    is plain text, so image-only posts (mcclin) lost their thumbnail; it is back
-    as feed-first now that collect keeps the entry's image urls (feed_images)."""
+    """Every douban mark (想X, 看过/读过/听过) uses the feed note or goes
+    blank, never the page: the page is a login skeleton that reads as
+    'blocked' and would leave the item pending forever. blogspot.com is
+    feed-first, with thumbnails from the entry's image urls (feed_images),
+    so image-only posts (mcclin) keep their picture."""
     db = "https://movie.douban.com/subject/1/"
     eq([summarize.route({"url": db, "title": t, "feed_content": ""}) for t in ("想看 X", "想读 X", "看过 X", "读过 X", "听过 X", "看過 X")],
        ["douban"] * 6, "every douban mark with a feed copy takes the douban route")
@@ -681,8 +790,8 @@ def check_telegram_channels():
     eq(un.telegram_page_url("https://t.me/name?x=%2e%2e#frag"), "https://t.me/s/name", "query and fragment are dropped, never passed through")
     eq(un.bridge("https://t.me/madchuwin", ""), ("telegram", page), "xmlUrl t.me/NAME bridges to the preview page")
     eq(un.bridge("https://t.me/s/madchuwin", ""), ("telegram", page), "xmlUrl t.me/s/NAME bridges to the preview page")
-    eq(un.bridge("https://example.com/rss", "https://t.me/madchuwin"), ("telegram", page), "htmlUrl t.me/NAME still bridges (old form)")
-    eq(un.bridge("https://rsshub.app/telegram/channel/madchuwin", ""), ("telegram", page), "rsshub telegram route still bridges")
+    eq(un.bridge("https://example.com/rss", "https://t.me/madchuwin"), ("telegram", page), "htmlUrl t.me/NAME bridges to the preview page")
+    eq(un.bridge("https://rsshub.app/telegram/channel/madchuwin", ""), ("telegram", page), "rsshub telegram route bridges to the preview page")
     eq(un.bridge("https://example.com/rss", "https://example.com/"), None, "ordinary feeds are not bridged")
     opml = (b'<opml><body><outline title="T" xmlUrl="https://t.me/madchuwin" category="news"/>'
             b'<outline title="J" xmlUrl="https://t.me/joinchat/AAAA"/></body></opml>')
@@ -841,10 +950,10 @@ def check_merge_and_id():
             {"id": "a" * 40, "title": "old", "url": "https://x.example/1", "last_seen_at": ago(61)},
             {"id": "b" * 40, "title": "new", "url": "https://x.example/2", "last_seen_at": ago(59)},
             {"id": "c" * 40, "title": "legacy", "url": "https://x.example/3", "published_at": ago(10)}]})
-        collect(d, "--collect-only", ARCHIVE_DAYS=None)
+        collect(d, "--no-summarize", ARCHIVE_DAYS=None)
         kept = lambda: sorted(r["title"] for r in store.load_doc(Path(d) / "archive.json")["items"])
         eq(kept(), ["legacy", "new"], "default retention: 60 days of last_seen_at")
-        collect(d, "--collect-only", ARCHIVE_DAYS=5)
+        collect(d, "--no-summarize", ARCHIVE_DAYS=5)
         eq(kept(), [], "retention days configurable (ARCHIVE_DAYS)")
 
 
@@ -995,7 +1104,16 @@ def check_summary_lines():
     eq(got[:3], [("譯:one\n譯:two", ""), ("譯:single", ""), ("譯:bad OK", "")],
        "translate_keep_lines: per-line, single, whole-text retry")
     eq(got[3][0], None, "translate_keep_lines: empty stays empty")
-    eq(calls, [["one", "two", "single", "bad", "OK"], ["bad OK", ""]], "translate_keep_lines: one batch, one retry")
+    eq(calls, [["one", "two", "single", "bad", "OK"], ["bad OK"]],
+       "translate_keep_lines: one batch, one retry, nothing sent for an empty text")
+    calls.clear()
+    textproc.translate_many = lambda texts, stop_after=0: (calls.append(list(texts)) or
+                                                          [(None, textproc.SKIPPED)] * len(texts))
+    try:
+        got = textproc.translate_keep_lines(["a\nb"], stop_after=1)
+    finally:
+        textproc.translate_many = real
+    eq((got, len(calls)), ([(None, textproc.SKIPPED)], 1), "translate_keep_lines: no retry while gtx refuses")
     body = ("<p>研究人員在報告中指出，這項技術可以大幅降低資料中心的耗電量。</p>\n"
             "<p>預計明年開始量產，價格也會比現有方案便宜三成以上，業界相當期待。</p>") * 2
     f = summarize.qc_inspect({"summary": body, "title": "t"})
@@ -1230,7 +1348,7 @@ def check_scraped_sources_switch():
     try:
         for on in ("off", "on"):
             calls.clear()
-            collect(d, "--collect-only", SCRAPED_SOURCES=on)
+            collect(d, "--no-summarize", SCRAPED_SOURCES=on)
             eq(calls, ["bestblogs", "thepaper"] if on == "on" else [], f"scraped sources with the switch {on}")
     finally:
         un.fetch_bestblogs, un.fetch_thepaper = real
