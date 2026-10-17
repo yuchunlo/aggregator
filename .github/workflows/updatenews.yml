@@ -19,7 +19,7 @@ env:
   # data/archive.json (their subtitles are removed by the next downloadsub run).
   ARCHIVE_DAYS: 60
   # Scraped sources without RSS
-  SCRAPED_SOURCES: "off"
+  SCRAPED_SOURCES: "on"
   # Fallbacks after the page and the feed copy: reader (r.jina.ai, which sees
   # every url sent to it), wayback, reader-meta. Empty = none. Their effect is
   # countable in the log: `via=reader ok|miss`, `via=wayback ok|miss`.
