@@ -134,10 +134,9 @@ def check_vtt_and_process():
         a = types.SimpleNamespace(no_transcribe=False, max_transcribe=0, max_asr_duration=3600,
                                   max_asr_total=7200)
         b = ds.Budget(a)
-        eq(b.refuse(4000, False)[1], True, "too long for ASR is permanent")
-        eq(b.refuse(100, True)[1], False, "live is not permanent")
+        eq(b.refuse(4000)[1], True, "too long for ASR is permanent")
         b.spent = 7000
-        eq((b.refuse(1000, False)[1], b.stop()), (False, True), "budget wall is not permanent; stops run")
+        eq((b.refuse(1000)[1], b.stop()), (False, True), "budget wall is not permanent; stops run")
     finally:
         importlib.util.find_spec = real
 
@@ -1043,6 +1042,75 @@ def check_podcast():
     eq(summarize.route(dict(ep, feed_content="show notes " * 50)), None, "podcast never falls back to show notes")
 
 
+def check_firstory_duration():
+    """The page's clock times are publish times, never the length: duration
+    comes from itunes:duration, else it is unknown (the audio measures it)."""
+    sid = "clwysgs8128dq01uk5tt621ha"
+    url = f"https://open.firstory.fm/story/{sid}"
+    feed_url = "https://feed.firstory.me/rss/user/ckabcdefghij0123456789"
+    page = (f'<span>2024-06-04 14:23:08</span><a href="{feed_url}">RSS</a>'
+            '{"audio":"https:\\/\\/cdn.firstory.me\\/a.mp3"}')
+    rss = (f'<?xml version="1.0"?><rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel>'
+           f'<item><guid>{sid}</guid><link>{url}</link><itunes:duration>00:43:08</itunes:duration>'
+           f'<enclosure url="https://cdn.firstory.me/a.mp3" type="audio/mpeg" length="1"/></item>'
+           f'</channel></rss>').encode()
+    real_get = net.get
+    try:
+        net.get = lambda u, *a, **k: net.Resp(200, rss if u == feed_url else page.encode(), {}, u)
+        ep = ds._firstory(url, sid)
+        eq((ep.audio_url, ep.duration), ("https://cdn.firstory.me/a.mp3", 2588.0), "firstory: itunes:duration, not the publish time")
+        net.get = lambda u, *a, **k: (net.Resp(503, b"", {}, u) if u == feed_url else net.Resp(200, page.encode(), {}, u))
+        ep = ds._firstory(url, sid)
+        eq((ep.audio_url, ep.duration), ("https://cdn.firstory.me/a.mp3", 0.0), "firstory: feed down -> page audio, duration unknown")
+        net.get = lambda u, *a, **k: (net.Resp(503, b"", {}, u) if u == feed_url
+                                      else net.Resp(200, f'<a href="{feed_url}">RSS</a>'.encode(), {}, u))
+        try:
+            ds._firstory(url, sid)
+            eq(False, True, "firstory: feed down, no page audio -> unreachable")
+        except ds.EpisodeUnreachable:
+            pass
+    finally:
+        net.get = real_get
+    # A successful ASR stores the measured length, whatever the page claimed.
+    class A:
+        no_transcribe, max_transcribe, max_asr_duration, max_asr_total = False, 0, 0, 0
+    real_t, real_spec = ds.transcribe, ds.importlib.util.find_spec
+    try:
+        ds.transcribe = lambda *a, **k: (Path("x.vtt"), 2588.4)
+        ds.importlib.util.find_spec = lambda name: object()
+        ds.prune_subtitles = (lambda f: (lambda *a: []))(ds.prune_subtitles)
+        it = {"id": "f" * 40, "url": url, "length": 51788}
+        changed = ds.asr(it, "zh", 51788, A, ds.Budget(A), Path("."),
+                         __import__("collections").Counter(), None, is_podcast=True)
+        eq((changed, it["length"]), (True, 2588), "asr: measured audio length overwrites the estimate")
+    finally:
+        ds.transcribe, ds.importlib.util.find_spec = real_t, real_spec
+        ds.prune_subtitles = store.prune_subtitles
+
+
+def check_not_yet_available():
+    """A premiere or a live stream is probed but never captioned, transcribed
+    or given a length: it waits, untouched, until the recording exists."""
+    with tempfile.TemporaryDirectory() as d:
+        archive = Path(d) / "archive.json"
+        item = {"id": "a" * 40, "title": "t", "source": "s", "category": "c",
+                "url": "https://www.youtube.com/watch?v=040kHBjrWOk"}
+        for info in ({"live_status": "is_upcoming", "duration": 0, "automatic_captions": {"en": {}}},
+                     {"is_live": True, "live_status": "is_live", "duration": 5000}):
+            archive.write_text(json.dumps({"items": [item]}))
+            calls = []
+            real_run, real_asr = ds.run_cmd, ds.asr
+            ds.run_cmd = lambda cmd, t, info=info: (calls.append(cmd) or (0, json.dumps(info), ""))
+            ds.asr = lambda *a, **k: calls.append("asr") or False
+            try:
+                subs(archive, d, "--no-summarize")
+            finally:
+                ds.run_cmd, ds.asr = real_run, real_asr
+            got = json.loads(archive.read_text())["items"][0]
+            eq((len(calls), "summary" in got, "length" in got), (1, False, False),
+               f"{info['live_status']}: probe only, kept pending")
+
+
 def check_status_ignores_podcasts():
     """A run that only handled podcasts says nothing about the YouTube cookies."""
     with tempfile.TemporaryDirectory() as d:
@@ -1141,7 +1209,7 @@ def check_asr_permanence():
             ds.transcribe = boom
             it, n = {"id": "a" * 40}, __import__("collections").Counter()
             with tempfile.TemporaryDirectory() as d:
-                ds.asr(it, None, 60, False, a, ds.Budget(a), Path(d), n, None, is_podcast=podcast_)
+                ds.asr(it, None, 60, a, ds.Budget(a), Path(d), n, None, is_podcast=podcast_)
             eq(it.get("summary"), want, f"asr: {type(exc).__name__} podcast={podcast_}")
     finally:
         ds.transcribe, importlib.util.find_spec = real_t, real_spec
@@ -1565,6 +1633,49 @@ def check_cookies_rejected():
         "")], [True, True, False, False, False], "cookies rejection is matched narrowly")
 
 
+def check_members_only():
+    """Members-only is the video's nature: blanked wherever yt-dlp says so
+    (probe, audio), never from stdout, never confused with expired cookies."""
+    err = ("ERROR: [youtube] 0imagd_kdA8: This video is available to this channel's members on level: "
+           "Tier 1. Join this channel to get access to members-only content")
+    eq((ds.restricted(err), ds.restricted("WARNING: " + err[7:]), ds.cookies_rejected(err)),
+       ("members only", None, False), "members-only: ERROR lines only, not a cookies failure")
+    with tempfile.TemporaryDirectory() as d:
+        archive = Path(d) / "archive.json"
+        item = {"id": "b" * 40, "title": "t", "source": "s", "category": "c",
+                "url": "https://www.youtube.com/watch?v=0imagd_kdA8"}
+        for label, reply, want in (("probe", (1, "", err), store.BLANK_SUMMARY),
+                                   ("title in stdout", (1, err, "ERROR: [youtube] x: HTTP Error 500"), None)):
+            archive.write_text(json.dumps({"items": [item]}))
+            real = ds.run_cmd
+            ds.run_cmd = lambda cmd, t, reply=reply: reply
+            try:
+                subs(archive, d, "--no-summarize")
+            finally:
+                ds.run_cmd = real
+            eq(json.loads(archive.read_text())["items"][0].get("summary"), want, f"members-only: {label}")
+    class A:
+        no_transcribe, max_transcribe, max_asr_duration, max_asr_total = False, 0, 0, 0
+        audio_timeout = 300
+    real_run, real_spec = ds.run_cmd, ds.importlib.util.find_spec
+    import types
+    stub = "faster_whisper" not in sys.modules
+    if stub:                     # transcribe imports it before fetching; never reached here
+        sys.modules["faster_whisper"] = types.SimpleNamespace(WhisperModel=None)
+    try:
+        ds.run_cmd = lambda cmd, t: (1, "", err)
+        ds.importlib.util.find_spec = lambda name: object()
+        it = {"id": "b" * 40, "url": item["url"]}
+        with tempfile.TemporaryDirectory() as d:
+            changed = ds.asr(it, None, 60, A, ds.Budget(A), Path(d), __import__("collections").Counter(),
+                             ds.youtube_audio(None, item["url"]))
+        eq((changed, it.get("summary")), (True, store.BLANK_SUMMARY), "members-only: audio download -> blank")
+    finally:
+        ds.run_cmd, ds.importlib.util.find_spec = real_run, real_spec
+        if stub:
+            sys.modules.pop("faster_whisper", None)
+
+
 def check_subtitle_from_info_json():
     """One extraction per video: the subtitle comes from the probe's info JSON;
     the url is tried again only when that fails for another reason."""
@@ -1831,12 +1942,6 @@ def check_tag_text_linear():
     eq(store.tag_text("<title>A</title>", "title", {}), "A", "tag_text: bare tag")
     eq(store.tag_text('<script a<script id="__NEXT_DATA__">{"x":1}</script>', "script",
                       {"id": "__NEXT_DATA__"}), '{"x":1}', "tag_text: unclosed tag before the real one")
-
-
-def check_firstory_tag_strip_linear():
-    t = time.monotonic()
-    ds.HMS_RE.search(__import__("re").sub(r"<[^<>]*+>", " ", "<a" * 200_000))
-    eq(time.monotonic() - t < 2, True, "firstory tag strip: unclosed tags stay linear")
 
 
 def check_thepaper_dates():
