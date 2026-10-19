@@ -39,7 +39,7 @@ import net
 import store
 import summarize
 import textproc
-from store import (BLANK_SUMMARY, UTC, choose_track, prune_subtitles, is_episode, is_pending, is_youtube, load_doc,
+from store import (youtube_watch_url, BLANK_SUMMARY, UTC, choose_track, prune_subtitles, is_episode, is_pending, is_youtube, load_doc,
                    next_data, safe_lang, save_doc, track_rank, valid_id, walk, write_atomic)
 
 # The JS challenge solver comes from the pinned yt-dlp-ejs package (yt-dlp[default]);
@@ -139,10 +139,13 @@ def run_cmd(cmd: list[str], timeout: float) -> tuple[int | None, str, str]:
 
 
 def ytdlp(cookies: Path | None, url: str | None, *args) -> list[str]:
-    """`--` ends option parsing: a url can never be read as a flag. url=None
-    for --load-info-json runs (the video comes from the info file)."""
+    """`--` ends option parsing: a url can never be read as a flag. The url
+    yt-dlp gets is rebuilt from the validated video id, so it names exactly
+    one video (a stored `?list=` would expand into the whole playlist and
+    probe every entry until the timeout). url=None for --load-info-json runs
+    (the video comes from the info file)."""
     auth = ["--cookies", str(cookies)] if cookies else []
-    return ["yt-dlp", *auth, *BASE_ARGS, *args, *(["--", url] if url else [])]
+    return ["yt-dlp", *auth, *BASE_ARGS, *args, *(["--", youtube_watch_url(url)] if url else [])]
 
 
 # yt-dlp's own words when the account cookies are refused. Narrow on purpose:

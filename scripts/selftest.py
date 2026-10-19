@@ -381,6 +381,10 @@ def check_encoding():
     decode as Chinese: guessed from the prefix alone it reads as cp1256, and
     that mojibake would be 'translated' into nonsense and stored as its
     summary."""
+    # The input gate itself: replacement characters left by a lossy decode.
+    zh = "研究人員在烏克蘭南部發掘一座古墓，出土大量青銅器與陶器。"
+    eq((textproc.garbled(zh + "\ufffd" * 10 + zh), textproc.garbled(zh * 2)), (True, False),
+       "garbled: U+FFFD residue is refused, clean text passes")
     zh = "考古學家發現一座擁有兩百年歷史的古墓。" * 4
     page = ("<script>" + "x" * 250_000 + "</script><p>" + zh + "</p>").encode()
     eq(zh in net.decode_body(page, {}), True, "utf-8 past a long ascii prefix")
@@ -668,13 +672,15 @@ def check_child_env():
     """yt-dlp children never see secrets."""
     old = dict(os.environ)
     os.environ.update({"DEEPL_API_KEY": "k", "FOLLOW_OPML_B64": "o", "GITHUB_TOKEN": "t", "YT_COOKIES": "c",
-                       "HF_HOME": "/hf", "KEEP_ME": "1"})
+                       "HF_HOME": "/hf", "KEEP_ME": "1",
+                       # allowlisted names that still carry secrets: the second filter's job
+                       "DENO_AUTH_TOKENS": "d", "XDG_SECRET_DIR": "x"})
     try:
         rc, out, _ = ds.run_cmd(["sh", "-c", "env"], 30)
     finally:
         os.environ.clear()
         os.environ.update(old)
-    eq((rc, "HF_HOME=/hf" in out and "PATH=" in out, "KEEP_ME" in out, [k for k in ("DEEPL", "OPML", "TOKEN", "YT_COOKIES") if k in out]), (0, True, False, []),
+    eq((rc, "HF_HOME=/hf" in out and "PATH=" in out, "KEEP_ME" in out, [k for k in ("DEEPL", "OPML", "TOKEN", "YT_COOKIES", "XDG_SECRET") if k in out]), (0, True, False, []),
        "subprocess env: allowlist only, no secrets")
 
 
@@ -763,8 +769,13 @@ def check_security():
        [True, False, False, False], "item ids are sha1 hex only")
     eq([store.safe_lang(x) for x in ("zh-Hant", "en", "../../x", "", ".*", None)],
        ["zh-Hant", "en", "und", "und", "und", "und"], "language codes fit for filenames")
-    cmd = ds.ytdlp(Path("c"), "--exec=rm -rf ~", "--skip-download")
-    eq(cmd[-2:], ["--", "--exec=rm -rf ~"], "url passed after --")
+    cmd = ds.ytdlp(Path("c"), "https://youtu.be/pInMVyeh6jY?list=PLW4nBexRDfRWS3QimUkgp2H2tvKWQxgBW", "--skip-download")
+    eq(cmd[-2:], ["--", "https://www.youtube.com/watch?v=pInMVyeh6jY"], "url after --, one video, no playlist")
+    try:
+        ds.ytdlp(Path("c"), "--exec=rm -rf ~", "--skip-download")
+        eq(False, True, "a non-video string never reaches yt-dlp")
+    except ValueError:
+        pass
     arch = {}
     un.ingest(arch, [un.Raw("c", "s", "t", u, None) for u in ("javascript:alert(1)", "httpx://a", "https://ok.example/a")],
               un.parse_date("2026-01-01"))
@@ -1109,6 +1120,30 @@ def check_not_yet_available():
             got = json.loads(archive.read_text())["items"][0]
             eq((len(calls), "summary" in got, "length" in got), (1, False, False),
                f"{info['live_status']}: probe only, kept pending")
+
+
+def check_youtube_video_url():
+    """Only a YouTube *video* goes to media, and yt-dlp is given exactly that
+    one video: a stored `?list=` once made the probe walk the whole playlist
+    until it timed out. The stored url drops playlist and share parameters."""
+    vid = "pInMVyeh6jY"
+    for u, want in ((f"https://youtu.be/{vid}?list=PLW4nBexRDfRWS3QimUkgp2H2tvKWQxgBW", vid),
+                    (f"https://www.youtube.com/watch?v={vid}&list=PLx&index=3", vid),
+                    (f"https://m.youtube.com/shorts/{vid}?si=abc", vid),
+                    ("https://www.youtube.com/playlist?list=PLx", None),
+                    ("https://www.youtube.com/@npr", None),
+                    ("https://www.youtube.com/watch?v=short", None),
+                    ("https://notyoutube.com/watch?v=pInMVyeh6jY", None)):
+        eq(store.youtube_video_id(u), want, f"video id of {u}")
+    eq(ds.ytdlp(None, f"https://youtu.be/{vid}?list=PLx", "--dump-json")[-1],
+       f"https://www.youtube.com/watch?v={vid}", "yt-dlp gets one video")
+    eq([un.canonical_url(u) for u in (f"https://youtu.be/{vid}?list=PLx&si=q",
+                                      f"https://www.youtube.com/watch?v={vid}&list=PLx&t=42s",
+                                      f"https://www.youtube.com/shorts/{vid}?feature=share",
+                                      "https://www.youtube.com/playlist?list=PLx")],
+       [f"https://youtu.be/{vid}", f"https://www.youtube.com/watch?v={vid}",
+        f"https://www.youtube.com/shorts/{vid}", "https://www.youtube.com/playlist?list=PLx"],
+       "stored YouTube video urls carry no playlist")
 
 
 def check_status_ignores_podcasts():
@@ -1697,14 +1732,14 @@ def check_subtitle_from_info_json():
         real = ds.run_cmd
         try:
             ds.run_cmd = fake([(0, True)])
-            ds.fetch_track(None, "https://youtu.be/x", out_dir, item, "en", True, "en", info, 5)
-            eq((len(calls), "--load-info-json" in calls[0], calls[0][-2:] != ["--", "https://youtu.be/x"],
+            ds.fetch_track(None, "https://youtu.be/xxxxxxxxxxx", out_dir, item, "en", True, "en", info, 5)
+            eq((len(calls), "--load-info-json" in calls[0], calls[0][-2:] != ["--", "https://www.youtube.com/watch?v=xxxxxxxxxxx"],
                 "--sleep-interval" in calls[0]), (1, True, True, False), "subtitle from the info JSON, no sleep")
             calls.clear()
             (out_dir / f"{item}.en.en.vtt").unlink()
             ds.run_cmd = fake([(1, False), (0, True)])
-            ds.fetch_track(None, "https://youtu.be/x", out_dir, item, "en", True, "en", info, 5)
-            eq((len(calls), calls[1][-2:]), (2, ["--", "https://youtu.be/x"]), "failed info-json run retried from the url")
+            ds.fetch_track(None, "https://youtu.be/xxxxxxxxxxx", out_dir, item, "en", True, "en", info, 5)
+            eq((len(calls), calls[1][-2:]), (2, ["--", "https://www.youtube.com/watch?v=xxxxxxxxxxx"]), "failed info-json run retried from the url")
         finally:
             ds.run_cmd = real
 
@@ -1955,20 +1990,176 @@ def check_thepaper_dates():
        "thepaper relative time")
 
 
+# ---- the checks themselves ------------------------------------------------
+# A green run only says nothing violates a contract today, not that its check
+# would notice a violation. Each mutation breaks one contract in a scratch
+# copy of the project; the named check must then fail. `old` must occur once
+# in its file (check_contracts), so a mutation cannot rot into a no-op.
+# Files are relative to scripts/.
+MUTATIONS = (
+    # (contract, check, file, old, new)
+    ("C1", "check_scratch_never_left", "store.py",
+     'items = [{k: v for k, v in it.items() if k in ITEM_FIELDS} for it in doc["items"]]',
+     'items = [dict(it) for it in doc["items"]]'),
+    ("C3", "check_asr_permanence", "media.py",
+     "blank = isinstance(e, (NoSpeech, Restricted)) or",
+     "blank = isinstance(e, Restricted) or"),
+    ("C12", "check_encoding", "textproc.py",
+     'if text.count("\\ufffd") / chars > 0.02:',
+     "if False:"),
+    ("C17", "check_cookies_rejected", "media.py",
+     'return bool(COOKIES_REJECTED.search(stderr or ""))',
+     "return False"),
+    ("C18", "check_not_yet_available", "media.py",
+     'NOT_YET_AVAILABLE = {"is_upcoming": "not yet premiered", "is_live": "still live"}',
+     "NOT_YET_AVAILABLE = {}"),
+    ("C19", "check_members_only", "media.py",
+     'return next((why for why, rx in RESTRICTED if rx.search(stderr or "")), None)',
+     "return None"),
+    ("C20", "check_firstory_duration", "media.py",
+     'return Episode(href, hms(e.get("itunes_duration")), "zh")',
+     'return Episode(href, 0.0, "zh")'),
+    ("C20", "check_firstory_duration", "media.py",
+     'if secs and item.get("length") != int(secs):',
+     "if False:"),
+    ("C21", "check_security", "net.py",
+     "if not ip.is_global or ip.is_multicast or",
+     "if ip.is_multicast or"),
+    ("C21", "check_redirect_drops_credentials", "net.py",
+     "if k.lower() not in _CREDENTIALS}",
+     "if True}"),
+    ("C24", "check_feed_body_is_data", "store.py",
+     'feedparser.parse(io.BytesIO(data if isinstance(data, bytes) else str(data).encode("utf-8")))',
+     "feedparser.parse(data)"),
+    ("C25", "check_child_env", "media.py",
+     "if CHILD_ENV.fullmatch(k) and not SECRET_ENV.search(k)}",
+     "if CHILD_ENV.fullmatch(k)}"),
+    ("C25", "check_security", "media.py",
+     '*(["--", youtube_watch_url(url)] if url else [])',
+     "*([youtube_watch_url(url)] if url else [])"),
+    ("C35", "check_youtube_video_url", "media.py",
+     '*(["--", youtube_watch_url(url)] if url else [])',
+     '*(["--", url] if url else [])'),
+    ("C35", "check_youtube_video_url", "collect.py",
+     'return urlunparse(p._replace(query=f"v={vid}" if p.path.rstrip("/") == "/watch" else "", fragment=""))',
+     "return url"),
+    # the two checks that keep this machinery honest
+    ("C32", "check_contracts", "../ARCHITECTURE.md",
+     "`check_members_only` |",
+     "`check_members_only_gone` |"),
+    ("C33", "check_doc_history", "media.py",
+     "# live_status values whose video has no finished recording yet",
+     "# live_status values (previously only is_live) whose video has no finished recording yet"),
+)
+
+ROOT = Path(__file__).resolve().parent.parent
+CONTRACT_ROW = re.compile(r"^\| (C\d+) \|(.*)\|$", re.M)
+
+
+def contracts(doc: str) -> dict[str, list[str]]:
+    """ARCHITECTURE.md §11: contract id -> the checks named in its last
+    column ([] when that column marks it as not automated)."""
+    sect = doc.split("\n## 11.", 1)[1].split("\n## ", 1)[0]
+    rows = {}
+    for cid, rest in CONTRACT_ROW.findall(sect):
+        last = rest.rsplit("|", 1)[-1]
+        rows[cid] = re.findall(r"`(check_\w+)`", last) if "未自動化" not in last else []
+    return rows
+
+
+def check_contracts():
+    """The contract table and the checks cannot drift apart: every check
+    belongs to a contract, every named check exists, every contract has a
+    check or says it has none, every mutation still applies."""
+    doc = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    rows = contracts(doc)
+    named = {c for cs in rows.values() for c in cs}
+    defined = {n for n in globals() if n.startswith("check_")}
+    eq(sorted(named - defined), [], "contracts: table names checks that do not exist")
+    eq(sorted(defined - named), [], "contracts: checks that belong to no contract")
+    sect = doc.split("\n## 11.", 1)[1].split("\n## ", 1)[0]
+    bare = [cid for cid, rest in CONTRACT_ROW.findall(sect)
+            if not rows[cid] and "未自動化" not in rest.rsplit("|", 1)[-1]]
+    eq(bare, [], "contracts: a row with neither a check nor 未自動化")
+    for cid, check, f, old, new in MUTATIONS:
+        eq((cid in rows, check in rows.get(cid, ())), (True, True), f"mutation {cid}/{check}: listed in its contract")
+        eq((ROOT / "scripts" / f).read_text(encoding="utf-8").count(old), 1, f"mutation {cid}: {old[:40]!r} occurs once in {f}")
+
+
+# Words that narrate how the code came to be rather than what it does. That
+# history has one place, ARCHITECTURE.md §12; elsewhere it crowds out "what
+# happens if this is written otherwise".
+HISTORY_WORDS = re.compile(r"不再|(?<!出)現在|原本|原先|以前|舊版|後來|修正後|這次|曾經"
+                           r"|\b(?:previously|used to|no longer|was changed|we changed)\b", re.I)
+
+
+def check_doc_history():
+    """No development history in comments or in ARCHITECTURE.md outside §12."""
+    import tokenize
+    doc = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    # Quoted text (`...`) is what a program says, not what this document narrates.
+    body = re.sub(r"`[^`\n]*`", lambda m: " " * len(m[0]), doc.split("\n## 12.", 1)[0])
+    hits = [f"ARCHITECTURE.md:{body[:m.start()].count(chr(10)) + 1} {m[0]}" for m in HISTORY_WORDS.finditer(body)]
+    for f in sorted((ROOT / "scripts").glob("*.py")):
+        if f.name == "selftest.py":           # names the words it forbids
+            continue
+        src = f.read_text(encoding="utf-8")
+        for t in tokenize.generate_tokens(io.StringIO(src).readline):
+            if t.type == tokenize.COMMENT and (m := HISTORY_WORDS.search(t.string)):
+                hits.append(f"{f.name}:{t.start[0]} {m[0]}")
+    eq(hits, [], "history belongs in ARCHITECTURE.md §12")
+
+
+def run_checks(only: str | None) -> None:
+    for name, fn in list(globals().items()):
+        if name.startswith("check_") and (only is None or name == only):
+            store.configure()                 # every check starts from the environment
+            before = len(FAILS)
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    fn()
+            except Exception:
+                FAILS.append("crashed:\n" + traceback.format_exc(limit=4))
+            FAILS[before:] = [f"[{name}] {f}" for f in FAILS[before:]]
+
+
+def run_mutations() -> None:
+    """Each mutation in a scratch copy of scripts/ + ARCHITECTURE.md; the
+    named check must fail there. A mutation it survives is a check that
+    guards nothing."""
+    import shutil
+    import subprocess
+    for cid, check, f, old, new in MUTATIONS:
+        with tempfile.TemporaryDirectory() as d:
+            shutil.copytree(ROOT / "scripts", Path(d) / "scripts",
+                            ignore=shutil.ignore_patterns("__pycache__"))
+            shutil.copy(ROOT / "ARCHITECTURE.md", Path(d) / "ARCHITECTURE.md")
+            target = Path(d) / "scripts" / f
+            src = target.read_text(encoding="utf-8")
+            if src.count(old) != 1:
+                continue                      # reported by check_contracts
+            target.write_text(src.replace(old, new), encoding="utf-8")
+            try:
+                r = subprocess.run([sys.executable, str(Path(d) / "scripts" / "selftest.py"), "--only", check],
+                                   capture_output=True, text=True, timeout=600)
+                caught = r.returncode != 0 and f"[{check}]" in r.stdout
+            except subprocess.TimeoutExpired:
+                caught = False
+            if not caught:
+                FAILS.append(f"[mutation {cid}] {check} still passes with {f}: {old[:60]!r} -> {new[:60]!r}")
+
+
 if __name__ == "__main__":
     # Checks run the real scripts, which narrate as they go ("no OPML",
     # "[RETENTION] dropped ..."): that is test scaffolding, not the real run,
     # so it is swallowed; only failures are printed.
     for n in un.OPML_SECRETS:                 # never fetch real feeds from a test
         os.environ.pop(n, None)
-    for name, fn in list(globals().items()):
-        if name.startswith("check_"):
-            store.configure()                 # every check starts from the environment
-            try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    fn()
-            except Exception:
-                FAILS.append(f"{name} crashed:\n" + traceback.format_exc(limit=4))
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
+    run_checks(only)
+    # Mutations only on a clean full run: a failing check would "catch" them all.
+    if only is None and not FAILS:
+        run_mutations()
     for f in FAILS:
         print("FAIL:", f)
     print("selftest:", "FAILED" if FAILS else "ok")

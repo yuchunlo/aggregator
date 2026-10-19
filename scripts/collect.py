@@ -32,7 +32,7 @@ import store
 import summarize
 import textproc
 from net import BLOCK_STATUS, FEED_HEADERS, FEED_LANG
-from store import FALLBACK_MARK, UTC, host_in, host_of, iso, load_doc, next_data, parse_date, save_doc, site, walk
+from store import FALLBACK_MARK, UTC, youtube_video_id, host_in, host_of, iso, load_doc, next_data, parse_date, save_doc, site, walk
 from textproc import html_to_text
 
 FEED_TIMEOUT = 17                         # seconds per feed, in total
@@ -116,6 +116,8 @@ def canonical_url(raw: str, source: str = "", feed_url: str = "") -> str:
         return f"{m[1]}/article/{m[2]}{m[3]}"
     if m := BESTBLOGS_ISSUE.match(url):        # one spelling per issue, any language
         return f"{BESTBLOGS}/newsletter/issue{int(m[1])}"
+    if vid := youtube_video_id(url):           # one video: no playlist, start time or share token
+        return urlunparse(p._replace(query=f"v={vid}" if p.path.rstrip("/") == "/watch" else "", fragment=""))
     return url
 
 

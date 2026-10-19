@@ -13,7 +13,7 @@ import tempfile
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import feedparser
 from dateutil import parser as dtparser
@@ -347,8 +347,38 @@ def host_in(url: str, suffixes) -> bool:
     return any(h == s or h.endswith("." + s) for s in suffixes)
 
 
+# A YouTube *video*: the only kind media can caption and summarize uses a
+# transcript for. Channel pages and playlists are ordinary pages. The id is
+# the single source of what yt-dlp is given (youtube_watch_url): handing it
+# the stored url lets `?list=` expand into the whole playlist.
+YOUTUBE_VIDEO_ID = re.compile(r"[A-Za-z0-9_-]{11}")
+_YT_PATH_ID = re.compile(r"^/(?:shorts|live|embed|v)/([^/?#]+)/?$")
+
+
+def youtube_video_id(url: str) -> str | None:
+    """The 11-character video id of a YouTube video url, else None."""
+    if not host_in(url, ("youtube.com", "youtu.be")):
+        return None
+    p = urlparse(url)
+    if host_of(url) in ("youtu.be", "www.youtu.be"):
+        vid = p.path.strip("/")
+    elif p.path.rstrip("/") == "/watch":
+        vid = (parse_qs(p.query).get("v") or [""])[0]
+    else:
+        vid = (m[1] if (m := _YT_PATH_ID.match(p.path)) else "")
+    return vid if YOUTUBE_VIDEO_ID.fullmatch(vid) else None
+
+
 def is_youtube(url: str) -> bool:
-    return host_in(url, ("youtube.com", "youtu.be"))
+    return youtube_video_id(url) is not None
+
+
+def youtube_watch_url(url: str) -> str:
+    """The one-video url yt-dlp is given, rebuilt from the validated id."""
+    vid = youtube_video_id(url)
+    if vid is None:
+        raise ValueError(f"not a YouTube video url: {url!r}")
+    return f"https://www.youtube.com/watch?v={vid}"
 
 
 # Podcast episode pages (小宇宙, Firstory): transcribed by media,
