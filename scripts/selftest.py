@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline contract checks; CI runs this before touching any data. Each check
-pins one behaviour that keeps a known failure out (see ARCHITECTURE.md)."""
+pins one behaviour that keeps a known failure out; CONTRACTS lists them.
+Reads only scripts/: CI never depends on ARCHITECTURE.md."""
 
 from __future__ import annotations
 
@@ -1421,7 +1422,7 @@ def check_bestblogs():
 
 
 def check_thepaper_body():
-    """澎湃 article pages: the article's own body, as plain text, never another article's."""
+    """The Paper (thepaper.cn) article pages: the article's own body, as plain text, never another article's."""
     now = datetime(2026, 10, 13, tzinfo=timezone.utc)
     own = "<p>" + "上海書評這一期討論城市記憶與出版史，作者回顧了三十年來的書店變遷。" * 12 + "</p>"
     other = "<p>" + "推薦閱讀：另一篇完全不同的文章內容，篇幅更長。" * 40 + "</p>"
@@ -1439,7 +1440,7 @@ def check_thepaper_body():
 
 
 def check_scraped_sources_switch():
-    """BestBlogs and 澎湃 run only when SCRAPED_SOURCES is on (default off)."""
+    """BestBlogs and The Paper run only when SCRAPED_SOURCES is on (default off)."""
     eq([store.env_flag(v) for v in (None, "", "off", "0", "false", "no", "maybe", "on", "ON", " 1 ", "true", "Yes")],
        [False] * 7 + [True] * 5, "SCRAPED_SOURCES values; unset means off")
     eq([store.env_flag(v, True) for v in (None, "", "off", "on")], [True, True, False, True], "on-by-default flags")
@@ -1462,7 +1463,7 @@ def check_scraped_sources_switch():
 
 
 def check_thepaper_pending_refetched():
-    """A 澎湃 item still pending is fetched again (feed copies are not saved);
+    """A The Paper item still pending is fetched again (feed copies are not saved);
     one with a summary is not, and is re-emitted only to refresh last_seen_at."""
     listing_page = ('<html><body><a href="/newsDetail_forward_111111">甲</a>'
                     '<a href="/newsDetail_forward_222222">乙</a></body></html>')
@@ -1995,7 +1996,7 @@ def check_thepaper_dates():
 # would notice a violation. Each mutation breaks one contract in a scratch
 # copy of the project; the named check must then fail. `old` must occur once
 # in its file (check_contracts), so a mutation cannot rot into a no-op.
-# Files are relative to scripts/.
+# Files are relative to scripts/; only scripts/ is copied.
 MUTATIONS = (
     # (contract, check, file, old, new)
     ("C1", "check_scratch_never_left", "store.py",
@@ -2044,46 +2045,189 @@ MUTATIONS = (
      'return urlunparse(p._replace(query=f"v={vid}" if p.path.rstrip("/") == "/watch" else "", fragment=""))',
      "return url"),
     # the two checks that keep this machinery honest
-    ("C32", "check_contracts", "../ARCHITECTURE.md",
-     "`check_members_only` |",
-     "`check_members_only_gone` |"),
+    # (split so the text occurs once in this file: in CONTRACTS, not here)
+    ("C32", "check_contracts", "selftest.py",
+     "('check_members" "_only',)),",
+     "('check_members_only_gone',)),"),
     ("C33", "check_doc_history", "media.py",
      "# live_status values whose video has no finished recording yet",
      "# live_status values (previously only is_live) whose video has no finished recording yet"),
 )
 
 ROOT = Path(__file__).resolve().parent.parent
-CONTRACT_ROW = re.compile(r"^\| (C\d+) \|(.*)\|$", re.M)
 
-
-def contracts(doc: str) -> dict[str, list[str]]:
-    """ARCHITECTURE.md §11: contract id -> the checks named in its last
-    column ([] when that column marks it as not automated)."""
-    sect = doc.split("\n## 11.", 1)[1].split("\n## ", 1)[0]
-    rows = {}
-    for cid, rest in CONTRACT_ROW.findall(sect):
-        last = rest.rsplit("|", 1)[-1]
-        rows[cid] = re.findall(r"`(check_\w+)`", last) if "未自動化" not in last else []
-    return rows
+# The contracts: rule, what breaks (usually silently) when it is violated,
+# and the checks that hold it -- or, as a string, why none does yet. This
+# table is the source; `selftest.py --contracts` prints it as markdown. It
+# lives here, not in ARCHITECTURE.md, so CI checks it without reading docs.
+CONTRACTS = (
+    ('C1',
+     'archive.json: one line per item, only ITEM_FIELDS written; feed copies live in memory only; saves are throttled and the end of a run always writes',
+     'scratch fields or full feed text get committed and published; the diff becomes unreadable',
+     ('check_jsonio', 'check_scratch_never_left', 'check_throttled_save',)),
+    ('C2',
+     'the id formula is fixed; when url canonicalisation changes, ids are recomputed and duplicates merged, a colliding id never overwrites',
+     'the same story shows up twice, or one item overwrites another',
+     ('check_merge_and_id', 'check_archive_rekey_collision', 'check_firstory_host',)),
+    ('C3',
+     "a summary is left blank only for the item's own nature; blocked, timed out, over budget or missing packages stay pending",
+     'a transient failure becomes a permanent blank and the item never gets a summary',
+     ('check_asr_permanence', 'check_podcast_blank_is_saved', 'check_transcript_without_content_is_final', 'check_douban_waits_for_a_copy',)),
+    ('C4',
+     'environment variables are read by store.Config only; import reads no environment; page chrome means "no body", never "blocked"',
+     'tests and workflows see different settings; a chrome-only page pauses a whole site',
+     ('check_config', 'check_refactor_contracts',)),
+    ('C5',
+     'rules.json has three sections and every rule compiles on its own',
+     'one bad rule disables a whole rule group',
+     ('check_rules_file', 'check_boilerplate_rules_compile_alone',)),
+    ('C6',
+     'summarize routes (douban, youtube, podcast, feed, fetch), and feed copies exist only within the collecting process',
+     'an item takes the wrong route: a page is fetched that should not be, or an item waiting for a copy is blanked',
+     ('check_routes_douban_blogspot', 'check_feed_images', 'check_collect_then_summarize', 'check_offline_only',)),
+    ('C7',
+     'fetches run in parallel across hosts, one at a time per host; a refusal pauses that host for the run',
+     'concurrent requests to one site get us blocked',
+     ('check_parallel_fetch', 'check_blocked_host_paused',)),
+    ('C8',
+     'FALLBACKS decides which third parties see a url; every attempt is logged',
+     'urls go to third parties nobody agreed to; their value cannot be measured',
+     ('check_fallback_switch_and_log',)),
+    ('C9',
+     'summary QC and qc_gate before writing; each item is refetched at most once',
+     'bad summaries are published, or an item is refetched in an endless loop',
+     ('check_summary_qc', 'check_index_gate', 'check_index_within_run', 'check_backfill_qc_only',)),
+    ('C10',
+     'the full backfill runs only when the rules hash changes',
+     'every run re-processes the whole archive, or stored summaries never catch up with new rules',
+     ('check_backfill_once_per_rules',)),
+    ('C11',
+     'summary extraction: paragraph scope, <code> slicing, line breaks kept',
+     'summaries pick up navigation or code, or lose their line breaks',
+     ('check_text', 'check_summary_lines', 'check_strip_code_edges', 'check_paragraph_scopes',)),
+    ('C12',
+     'decoding order and mojibake detection; mojibake is never summarised or translated',
+     'mojibake is "translated" into nonsense and published',
+     ('check_encoding', 'check_large_non_utf8_body', 'check_language',)),
+    ('C13',
+     'translation: DeepL results already billed are kept, DeepL is disabled by status code; a gtx refusal is not re-sent',
+     'double billing; request volume doubles while the service is refusing',
+     ('check_translate', 'check_translate_partial_and_refusals', 'check_deepl_fatal_by_status',)),
+    ('C14',
+     'thumbnails are judged by url only, cloud resize parameters stripped, deny list applied',
+     'logos and ads become thumbnails',
+     ('check_thumbs', 'check_thumb_clean',)),
+    ('C15',
+     'subtitle track priority, one .vtt per id, adjacent duplicate cues merged',
+     'the summary uses a translation of a translation; an old file shadows a new one',
+     ('check_subtitle_priority', 'check_vtt_and_process',)),
+    ('C16',
+     'each video is extracted once (--load-info-json)',
+     'YouTube requests double and rate limiting gets more likely',
+     ('check_subtitle_from_info_json',)),
+    ('C17',
+     'expired cookies are recognised only from specific yt-dlp stderr messages; status.json changes only after a YouTube probe',
+     'a hostile video title stops the run; a podcast-only run misreports the cookies',
+     ('check_cookies_rejected', 'check_cookies_status', 'check_status_ignores_podcasts',)),
+    ('C18',
+     'is_upcoming / is_live videos are skipped right after the probe, no length written',
+     "a download that must fail is retried daily; a length that is not the video's is stored",
+     ('check_not_yet_available',)),
+    ('C19',
+     'members-only videos get BLANK_SUMMARY and are not a cookies failure',
+     'a video we can never open is retried every day',
+     ('check_members_only',)),
+    ('C20',
+     'podcast duration comes only from duration fields; after ASR length is the measured audio; an episode page without audio is blanked and saved',
+     'the publish time is taken as the duration (about 20x) and the episode is never transcribed for exceeding the cap',
+     ('check_podcast', 'check_firstory_duration',)),
+    ('C21',
+     'every connection goes through net: public addresses only, every hop re-checked, credentials dropped across origins, refusals not retried, a 303 does not leak into retries, audio downloads use the same path',
+     'SSRF: internal content is summarised and published; the API key follows a redirect off-site',
+     ('check_security', 'check_redirect_drops_credentials', 'check_refusal_is_not_retried', 'check_303_does_not_leak_into_retry', 'check_transport', 'check_download_guard',)),
+    ('C22',
+     'TLS certificates are always verified (plain and impersonated)',
+     'a man in the middle can feed us anything',
+     ('check_tls_verified',)),
+    ('C23',
+     'every parser of remote text runs in linear time',
+     'one hostile page stalls the run for hours',
+     ('check_no_backtracking', 'check_tag_text_linear', 'check_offsets_survive_unicode_case',)),
+    ('C24',
+     'feedparser only ever receives a stream',
+     'a body is taken as a local path or url and reads files on the runner',
+     ('check_feed_body_is_data',)),
+    ('C25',
+     'yt-dlp children get allowlisted environment variables only; the url goes after --',
+     'secrets leak to the child; a url is executed as an option',
+     ('check_child_env', 'check_security',)),
+    ('C26',
+     'channel names and ids taken from pages are allowlist-validated before building a url',
+     'a remote string becomes an arbitrary url',
+     ('check_telegram_channels', 'check_youtube_channel_urls', 'check_bridge_whitelist',)),
+    ('C27',
+     'the inbox accepts only safe urls within retention; collect only reads it',
+     'conflicts with the reader writing mid-run; javascript: and similar urls get stored',
+     ('check_inbox',)),
+    ('C28',
+     'the OPML is decoded in memory only',
+     'the subscription list lands on disk and gets committed',
+     ('check_opml_secret',)),
+    ('C29',
+     "scraped sources are off by default; The Paper takes only the article's own body and reads dates as Beijing time",
+     'unintended scraping; a summary mixes in another article',
+     ('check_scraped_sources_switch', 'check_bestblogs', 'check_thepaper_body', 'check_thepaper_pending_refetched', 'check_thepaper_dates',)),
+    ('C30',
+     'the language header is sent; the browser fingerprint carries only its own headers',
+     'the wrong language version is served; a mismatched fingerprint gets blocked',
+     ('check_accept_language',)),
+    ('C31',
+     'the CLI subcommands work; --dry-run writes nothing',
+     'maintenance commands are found broken only when needed',
+     ('check_cli_subcommands',)),
+    ('C32',
+     'CONTRACTS and the checks agree; every mutation still applies',
+     'rules sit in a table with no check behind them; mutations rot into no-ops unnoticed',
+     ('check_contracts',)),
+    ('C33',
+     'code comments carry no development history',
+     '"what happens if this is written otherwise" is crowded out by the story of how it got this way',
+     ('check_doc_history',)),
+    ('C34',
+     'workflows: permissions {}, persist-credentials false, actions pinned by SHA, one concurrency group',
+     'the token leaks, or concurrent writes overwrite each other',
+     'selftest does not parse the workflow yml (ARCHITECTURE.md §10)'),
+    ('C35',
+     'only YouTube *videos* (a valid 11-character id from store.youtube_video_id) reach media and the youtube route; the url yt-dlp gets is always rebuilt from the id (youtube_watch_url) and names that one video; stored video urls carry no list, index, si or t parameters',
+     'a ?list= url makes the probe walk the whole playlist until it times out, every day; one video shows up several times under different share parameters',
+     ('check_youtube_video_url', 'check_security',)),
+)
 
 
 def check_contracts():
     """The contract table and the checks cannot drift apart: every check
     belongs to a contract, every named check exists, every contract has a
-    check or says it has none, every mutation still applies."""
-    doc = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
-    rows = contracts(doc)
-    named = {c for cs in rows.values() for c in cs}
+    check or says why not, every mutation still applies."""
+    ids = [c[0] for c in CONTRACTS]
+    eq(sorted(i for i in set(ids) if ids.count(i) > 1), [], "contracts: duplicate ids")
+    named = {c for *_, cs in CONTRACTS if isinstance(cs, tuple) for c in cs}
     defined = {n for n in globals() if n.startswith("check_")}
     eq(sorted(named - defined), [], "contracts: table names checks that do not exist")
     eq(sorted(defined - named), [], "contracts: checks that belong to no contract")
-    sect = doc.split("\n## 11.", 1)[1].split("\n## ", 1)[0]
-    bare = [cid for cid, rest in CONTRACT_ROW.findall(sect)
-            if not rows[cid] and "未自動化" not in rest.rsplit("|", 1)[-1]]
-    eq(bare, [], "contracts: a row with neither a check nor 未自動化")
+    eq([cid for cid, *_, cs in CONTRACTS if not cs], [], "contracts: a row with neither a check nor a reason")
+    rows = {cid: cs for cid, *_, cs in CONTRACTS}
     for cid, check, f, old, new in MUTATIONS:
-        eq((cid in rows, check in rows.get(cid, ())), (True, True), f"mutation {cid}/{check}: listed in its contract")
+        eq((cid in rows, check in (rows.get(cid) or ()) and isinstance(rows[cid], tuple)), (True, True),
+           f"mutation {cid}/{check}: listed in its contract")
         eq((ROOT / "scripts" / f).read_text(encoding="utf-8").count(old), 1, f"mutation {cid}: {old[:40]!r} occurs once in {f}")
+
+
+def contracts_markdown() -> str:
+    out = ["| # | Contract | When violated | Checks |", "|---|---|---|---|"]
+    for cid, rule, cons, cs in CONTRACTS:
+        last = "、".join(f"`{c}`" for c in cs) if isinstance(cs, tuple) else f"not automated: {cs}"
+        out.append(f"| {cid} | {rule} | {cons} | {last} |")
+    return "\n".join(out)
 
 
 # Words that narrate how the code came to be rather than what it does. That
@@ -2093,13 +2237,17 @@ HISTORY_WORDS = re.compile(r"不再|(?<!出)現在|原本|原先|以前|舊版|�
                            r"|\b(?:previously|used to|no longer|was changed|we changed)\b", re.I)
 
 
-def check_doc_history():
-    """No development history in comments or in ARCHITECTURE.md outside §12."""
-    import tokenize
-    doc = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
-    # Quoted text (`...`) is what a program says, not what this document narrates.
+def history_in_doc(doc: str) -> list[str]:
+    """History words in ARCHITECTURE.md outside §12 (`--docs`, never in CI).
+    Quoted text (`...`) is what a program says, not what the document narrates."""
     body = re.sub(r"`[^`\n]*`", lambda m: " " * len(m[0]), doc.split("\n## 12.", 1)[0])
-    hits = [f"ARCHITECTURE.md:{body[:m.start()].count(chr(10)) + 1} {m[0]}" for m in HISTORY_WORDS.finditer(body)]
+    return [f"ARCHITECTURE.md:{body[:m.start()].count(chr(10)) + 1} {m[0]}" for m in HISTORY_WORDS.finditer(body)]
+
+
+def check_doc_history():
+    """No development history in code comments."""
+    import tokenize
+    hits = []
     for f in sorted((ROOT / "scripts").glob("*.py")):
         if f.name == "selftest.py":           # names the words it forbids
             continue
@@ -2108,6 +2256,7 @@ def check_doc_history():
             if t.type == tokenize.COMMENT and (m := HISTORY_WORDS.search(t.string)):
                 hits.append(f"{f.name}:{t.start[0]} {m[0]}")
     eq(hits, [], "history belongs in ARCHITECTURE.md §12")
+    eq(history_in_doc("a\n現在\n出現在 `no longer`\n## 12. x\n以前"), ["ARCHITECTURE.md:2 現在"], "doc scan: quotes and §12 exempt")
 
 
 def run_checks(only: str | None) -> None:
@@ -2124,7 +2273,7 @@ def run_checks(only: str | None) -> None:
 
 
 def run_mutations() -> None:
-    """Each mutation in a scratch copy of scripts/ + ARCHITECTURE.md; the
+    """Each mutation in a scratch copy of scripts/; the
     named check must fail there. A mutation it survives is a check that
     guards nothing."""
     import shutil
@@ -2133,7 +2282,6 @@ def run_mutations() -> None:
         with tempfile.TemporaryDirectory() as d:
             shutil.copytree(ROOT / "scripts", Path(d) / "scripts",
                             ignore=shutil.ignore_patterns("__pycache__"))
-            shutil.copy(ROOT / "ARCHITECTURE.md", Path(d) / "ARCHITECTURE.md")
             target = Path(d) / "scripts" / f
             src = target.read_text(encoding="utf-8")
             if src.count(old) != 1:
@@ -2155,6 +2303,15 @@ if __name__ == "__main__":
     # so it is swallowed; only failures are printed.
     for n in un.OPML_SECRETS:                 # never fetch real feeds from a test
         os.environ.pop(n, None)
+    if "--contracts" in sys.argv:             # the table for ARCHITECTURE.md §11
+        print(contracts_markdown())
+        sys.exit(0)
+    if "--docs" in sys.argv:                  # local only: CI never reads ARCHITECTURE.md
+        hits = history_in_doc((ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8"))
+        for h in hits:
+            print("FAIL: history belongs in §12:", h)
+        print("docs:", "FAILED" if hits else "ok")
+        sys.exit(1 if hits else 0)
     only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
     run_checks(only)
     # Mutations only on a clean full run: a failing check would "catch" them all.
