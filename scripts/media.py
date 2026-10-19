@@ -33,6 +33,7 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 import net
@@ -50,6 +51,19 @@ AUDIO_ARGS = ["--extractor-args", "youtube:player_client=tv,web_safari,default",
               "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]
 EXHAUSTED_UNDER = 10 * 60    # remaining ASR budget too small for any real video
 PODCAST_MAX_BYTES = 512 * 1024 * 1024
+# After this many failed items on one domain, the rest of that domain's items
+# are skipped for this run (kept pending, retried next run).
+DOMAIN_FAIL_LIMIT = 2
+
+
+def domain_of(url: str) -> str:
+    """Host used to group failures: lowercase, no www./m. prefix, youtu.be
+    folded into youtube.com."""
+    host = (urlsplit(url).hostname or "").lower()
+    for prefix in ("www.", "m."):
+        if host.startswith(prefix):
+            host = host[len(prefix):]
+    return "youtube.com" if host == "youtu.be" else host
 
 
 @dataclass
@@ -440,6 +454,8 @@ def asr(item, orig, duration, live, a, budget, out_dir, n, fetch, is_podcast=Fal
         except Exception as e:
             blank = isinstance(e, NoSpeech) or (isinstance(e, TooLong) and not is_podcast)
             print(f"[ASR-FAILED] {item_id}: {type(e).__name__}: {e}" + ("" if blank else " (kept pending)"))
+            if not blank:
+                n["asr_failed"] += 1
         discard(out_dir, item_id)
     if blank:
         item["summary"] = BLANK_SUMMARY
@@ -523,6 +539,7 @@ def main(argv=None, limits: Limits | None = None) -> int:
     have = {p.name.split(".", 1)[0] for p in out_dir.glob("*.vtt")}
     budget, n, dirty = Budget(a), Counter(), False
     cookies_expired = False
+    domain_fails: Counter = Counter()
 
     todo = [it for it in doc["items"] if valid_id(it.get("id")) and is_pending(it)
             and (is_youtube(it["url"]) or is_episode(it["url"])) and it["id"] not in have]
@@ -532,69 +549,22 @@ def main(argv=None, limits: Limits | None = None) -> int:
             print(f"[BUDGET] {budget.left() / 60:.0f} min of ASR left; rest stay pending")
             break
         url, item_id = item["url"], item["id"]
-        n["processed"] += 1
-        if is_episode(url):
-            dirty |= podcast_asr(item, a, budget, out_dir, n)
+        dom = domain_of(url)
+        if domain_fails[dom] >= DOMAIN_FAIL_LIMIT:
+            n["domain_skipped"] += 1
+            print(f"[DOMAIN-SKIP] {item_id}: {dom} failed {domain_fails[dom]}x this run (kept pending)")
             continue
-        n["probed"] += 1                     # a YouTube probe: the only evidence about the cookies
-        rc, out, err = run_cmd(ytdlp(cookies, url, *SUB_ARGS, "--skip-download", "--dump-json"), a.probe_timeout)
-        if cookies_rejected(err):
-            print("[EXPIRED] cookies invalid")
+        before = n["failed"] + n["asr_failed"]
+        try:
+            dirty, stop = _process(item, url, item_id, a, budget, out_dir, n, cookies, dirty)
+        finally:
+            if n["failed"] + n["asr_failed"] > before:
+                domain_fails[dom] += 1
+                if domain_fails[dom] == DOMAIN_FAIL_LIMIT:
+                    print(f"[DOMAIN-STOP] {dom}: {DOMAIN_FAIL_LIMIT} failures, skipping its remaining items this run")
+        if stop:
             cookies_expired = True
             break
-        try:
-            line = out.strip().splitlines()[-1] if rc == 0 else ""
-            info = json.loads(line) if line else None
-        except Exception:
-            info = None
-        if not isinstance(info, dict):
-            n["failed"] += 1
-            print(f"[FAILED] {item_id}: probe failed")
-            continue
-        orig = safe_lang(info.get("language"), None) if info.get("language") else None
-        try:
-            duration = max(float(info.get("duration") or 0), 0.0)
-        except (TypeError, ValueError):
-            duration = 0.0
-        live = bool(info.get("is_live") or info.get("live_status") == "is_live")
-        if duration and item.get("length") != int(duration):
-            item["length"] = int(duration)          # stored for the frontend
-            dirty = True
-        fallback = lambda: asr(item, orig, duration, live, a, budget, out_dir, n, youtube_audio(cookies, url))
-
-        # track keys come from remote metadata and become a --sub-langs regex
-        tracks = [{k: v for k, v in (info.get(f) or {}).items() if safe_lang(k, None)}
-                  for f in ("subtitles", "automatic_captions")]
-        choice = choose_track(*tracks, orig)
-        if choice is None:
-            dirty |= fallback()
-            continue
-        manual, lang = choice
-        print(f"[TRACK] {item_id}: {lang} ({'manual' if manual else 'auto'}, orig={orig}, "
-              f"rank={track_rank(lang, orig, manual)})")
-        # The info JSON can carry session cookies: it lives in a private (0700)
-        # temp dir outside the repository, never next to the committed files.
-        with tempfile.TemporaryDirectory(prefix="ytinfo-") as d:
-            info_file = Path(d) / "info.json"
-            info_file.write_text(line, encoding="utf-8")
-            rc, out, err = fetch_track(cookies, url, out_dir, item_id, orig, manual, lang, info_file,
-                                       a.download_timeout)
-        log = (out + err).lower()
-        if cookies_rejected(err):
-            print("[EXPIRED] cookies invalid")
-            cookies_expired = True
-            break
-        if rc is None:
-            n["failed"] += 1
-            print(f"[TIMEOUT] {item_id}: cleaned {discard(out_dir, item_id)}")
-        elif rc == 0 and any(out_dir.glob(f"{item_id}*.vtt")):
-            n["succeeded"] += 1
-            prune_subtitles(out_dir, item_id)
-        elif rc == 0 and "no subtitles for the requested languages" in log:
-            dirty |= fallback()
-        else:
-            n["failed"] += 1
-            print(f"[FAILED] {item_id} (exit {rc}): {(out + err)[-1500:]}")
 
     # No YouTube video was probed (podcasts use no cookies): leave the flag alone.
     if cookies_expired or n["probed"]:
@@ -607,6 +577,73 @@ def main(argv=None, limits: Limits | None = None) -> int:
     else:                                   # one archive write for both steps
         summarize.run(archive, doc, 0, offline_only=True, do_backfill=False)
     return 0
+
+
+def _process(item, url, item_id, a, budget, out_dir, n, cookies, dirty) -> tuple[bool, bool]:
+    """One pending item. Returns (dirty, cookies_expired)."""
+    n["processed"] += 1
+    if is_episode(url):
+        dirty |= podcast_asr(item, a, budget, out_dir, n)
+        return dirty, False
+    n["probed"] += 1                     # a YouTube probe: the only evidence about the cookies
+    rc, out, err = run_cmd(ytdlp(cookies, url, *SUB_ARGS, "--skip-download", "--dump-json"), a.probe_timeout)
+    if cookies_rejected(err):
+        print("[EXPIRED] cookies invalid")
+        return dirty, True
+    try:
+        line = out.strip().splitlines()[-1] if rc == 0 else ""
+        info = json.loads(line) if line else None
+    except Exception:
+        info = None
+    if not isinstance(info, dict):
+        n["failed"] += 1
+        print(f"[FAILED] {item_id}: probe failed")
+        return dirty, False
+    orig = safe_lang(info.get("language"), None) if info.get("language") else None
+    try:
+        duration = max(float(info.get("duration") or 0), 0.0)
+    except (TypeError, ValueError):
+        duration = 0.0
+    live = bool(info.get("is_live") or info.get("live_status") == "is_live")
+    if duration and item.get("length") != int(duration):
+        item["length"] = int(duration)          # stored for the frontend
+        dirty = True
+    fallback = lambda: asr(item, orig, duration, live, a, budget, out_dir, n, youtube_audio(cookies, url))
+
+    # track keys come from remote metadata and become a --sub-langs regex
+    tracks = [{k: v for k, v in (info.get(f) or {}).items() if safe_lang(k, None)}
+              for f in ("subtitles", "automatic_captions")]
+    choice = choose_track(*tracks, orig)
+    if choice is None:
+        dirty |= fallback()
+        return dirty, False
+    manual, lang = choice
+    print(f"[TRACK] {item_id}: {lang} ({'manual' if manual else 'auto'}, orig={orig}, "
+          f"rank={track_rank(lang, orig, manual)})")
+    # The info JSON can carry session cookies: it lives in a private (0700)
+    # temp dir outside the repository, never next to the committed files.
+    with tempfile.TemporaryDirectory(prefix="ytinfo-") as d:
+        info_file = Path(d) / "info.json"
+        info_file.write_text(line, encoding="utf-8")
+        rc, out, err = fetch_track(cookies, url, out_dir, item_id, orig, manual, lang, info_file,
+                                   a.download_timeout)
+    log = (out + err).lower()
+    if cookies_rejected(err):
+        print("[EXPIRED] cookies invalid")
+        return dirty, True
+    if rc is None:
+        n["failed"] += 1
+        print(f"[TIMEOUT] {item_id}: cleaned {discard(out_dir, item_id)}")
+    elif rc == 0 and any(out_dir.glob(f"{item_id}*.vtt")):
+        n["succeeded"] += 1
+        prune_subtitles(out_dir, item_id)
+    elif rc == 0 and "no subtitles for the requested languages" in log:
+        dirty |= fallback()
+    else:
+        n["failed"] += 1
+        print(f"[FAILED] {item_id} (exit {rc}): {(out + err)[-1500:]}")
+
+    return dirty, False
 
 
 if __name__ == "__main__":
