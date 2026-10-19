@@ -48,6 +48,10 @@ BASE_ARGS = ["--user-agent", net.UA, "--no-progress", "--socket-timeout", "30"]
 SUB_ARGS = ["--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
 AUDIO_ARGS = ["--extractor-args", "youtube:player_client=tv,web_safari,default",
               "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]
+# live_status values whose video has no finished recording yet (a scheduled
+# stream or premiere, or one still on air): nothing to fetch -- no captions,
+# and the audio download fails ("Premieres in 31 hours") -- until it ends.
+NOT_YET_AVAILABLE = {"is_upcoming": "not yet premiered", "is_live": "still live"}
 EXHAUSTED_UNDER = 10 * 60    # remaining ASR budget too small for any real video
 PODCAST_MAX_BYTES = 512 * 1024 * 1024
 
@@ -146,6 +150,25 @@ def ytdlp(cookies: Path | None, url: str | None, *args) -> list[str]:
 # one such video must not end the run and flag healthy cookies as expired.
 COOKIES_REJECTED = re.compile(r"cookies (?:are|is) no longer valid|cookies? (?:have|has) (?:likely )?been rotated"
                               r"|sign in to confirm you(?:'|’)?re not a bot", re.I)
+
+
+# yt-dlp's own words for a video our account may never open: it belongs to
+# the channel's members. A fact about the video (BLANK), not about this run,
+# so it is not retried daily. Only ERROR lines of stderr, as for cookies:
+# stdout carries remote metadata (a title could say anything).
+RESTRICTED = (
+    ("members only", re.compile(r"^ERROR: \[youtube\] [\w-]+: (?:This video is available to this channel's members"
+                                r"|Join this channel to get access to members-only content)", re.M)),
+)
+
+
+def restricted(stderr: str) -> str | None:
+    """Why the video is closed to us for good, or None."""
+    return next((why for why, rx in RESTRICTED if rx.search(stderr or "")), None)
+
+
+class Restricted(RuntimeError):
+    """The video is closed to our account (members only): a fact about the item."""
 
 
 def cookies_rejected(stderr: str) -> bool:
@@ -379,6 +402,8 @@ def transcribe(fetch, out_dir: Path, item_id, orig, a, duration) -> tuple[Path, 
 def youtube_audio(cookies: Path, url: str):
     def fetch(d: Path, timeout: float) -> Path:
         rc, out, err = run_cmd(ytdlp(cookies, url, *AUDIO_ARGS, "-o", f"{d}/audio.%(ext)s"), timeout)
+        if why := restricted(err):
+            raise Restricted(why)
         files = sorted(p for p in d.glob("audio.*") if p.suffix != ".part")
         if rc is None:
             raise RuntimeError(f"audio download timed out after {timeout:.0f}s")
@@ -411,7 +436,7 @@ class Budget:
         """Turned something away for budget, and what's left fits no video."""
         return self.hit_wall and self.left() <= EXHAUSTED_UNDER
 
-    def refuse(self, duration, live) -> tuple[str, bool] | None:
+    def refuse(self, duration) -> tuple[str, bool] | None:
         """(reason, permanent). Only the video's own length is permanent; the
         rest is about this run and must leave the item pending."""
         a = self.a
@@ -419,8 +444,6 @@ class Budget:
             return "transcription disabled", False
         if importlib.util.find_spec("faster_whisper") is None:
             return "faster-whisper not installed", False
-        if live:
-            return "still live", False
         if a.max_transcribe and self.count >= a.max_transcribe:
             return "per-run item cap reached", False
         if a.max_asr_duration and duration > a.max_asr_duration:
@@ -435,13 +458,13 @@ class Budget:
             f"/{self.a.max_asr_total / 60:.0f}min" if self.a.max_asr_total else "")
 
 
-def asr(item, orig, duration, live, a, budget, out_dir, n, fetch, is_podcast=False) -> bool:
+def asr(item, orig, duration, a, budget, out_dir, n, fetch, is_podcast=False) -> bool:
     """Returns whether the item changed (a blank summary, or the length
     measured from the transcribed audio). Only the item's own nature ends it
-    (BLANK): no speech, or -- for a video -- longer than the cap. A podcast
+    (BLANK): no speech, members only, or -- for a video -- longer than the cap. A podcast
     over the cap, and every run-level failure, stays pending."""
     item_id = item["id"]
-    refused = budget.refuse(duration, live)
+    refused = budget.refuse(duration)
     if refused:
         why, permanent = refused
         blank = permanent and not is_podcast
@@ -460,7 +483,7 @@ def asr(item, orig, duration, live, a, budget, out_dir, n, fetch, is_podcast=Fal
                 return True
             return False
         except Exception as e:
-            blank = isinstance(e, NoSpeech) or (isinstance(e, TooLong) and not is_podcast)
+            blank = isinstance(e, (NoSpeech, Restricted)) or (isinstance(e, TooLong) and not is_podcast)
             print(f"[ASR-FAILED] {item_id}: {type(e).__name__}: {e}" + ("" if blank else " (kept pending)"))
         discard(out_dir, item_id)
     if blank:
@@ -469,6 +492,18 @@ def asr(item, orig, duration, live, a, budget, out_dir, n, fetch, is_podcast=Fal
         return True
     n["deferred"] += 1
     return False
+
+
+def closed(item, item_id, err, out_dir, n) -> bool:
+    """True (item blanked) when yt-dlp's stderr says the video is closed to
+    our account for good; one rule for the probe and the track download."""
+    why = restricted(err)
+    if why:
+        discard(out_dir, item_id)
+        item["summary"] = BLANK_SUMMARY
+        n["no_subs"] += 1
+        print(f"[RESTRICTED] {item_id}: {why} -> blank")
+    return bool(why)
 
 
 def podcast_asr(item, a, budget, out_dir, n) -> bool:
@@ -490,7 +525,7 @@ def podcast_asr(item, a, budget, out_dir, n) -> bool:
         item["length"] = int(ep.duration)          # stored for the frontend
         dirty = True
     print(f"[PODCAST] {item_id}: {ep.audio_url} ({ep.duration / 60:.0f}min)")
-    return asr(item, ep.lang, ep.duration, False, a, budget, out_dir, n,
+    return asr(item, ep.lang, ep.duration, a, budget, out_dir, n,
                direct_audio(ep.audio_url), is_podcast=True) or dirty
 
 
@@ -570,19 +605,28 @@ def main(argv=None, limits: Limits | None = None) -> int:
         except Exception:
             info = None
         if not isinstance(info, dict):
+            if closed(item, item_id, err, out_dir, n):
+                dirty = True
+                continue
             n["failed"] += 1
-            print(f"[FAILED] {item_id}: probe failed")
+            print(f"[FAILED] {item_id}: probe failed (exit {rc}): {err.strip()[-1500:]}")
+            continue
+        # Before anything else: an upcoming or live video has no recording
+        # to caption or transcribe, and its duration is not the video's yet.
+        status = "is_live" if info.get("is_live") else str(info.get("live_status") or "")
+        if why := NOT_YET_AVAILABLE.get(status):
+            n["deferred"] += 1
+            print(f"[WAIT] {item_id}: {why} (kept pending)")
             continue
         orig = safe_lang(info.get("language"), None) if info.get("language") else None
         try:
             duration = max(float(info.get("duration") or 0), 0.0)
         except (TypeError, ValueError):
             duration = 0.0
-        live = bool(info.get("is_live") or info.get("live_status") == "is_live")
         if duration and item.get("length") != int(duration):
             item["length"] = int(duration)          # stored for the frontend
             dirty = True
-        fallback = lambda: asr(item, orig, duration, live, a, budget, out_dir, n, youtube_audio(cookies, url))
+        fallback = lambda: asr(item, orig, duration, a, budget, out_dir, n, youtube_audio(cookies, url))
 
         # track keys come from remote metadata and become a --sub-langs regex
         tracks = [{k: v for k, v in (info.get(f) or {}).items() if safe_lang(k, None)}
@@ -614,6 +658,8 @@ def main(argv=None, limits: Limits | None = None) -> int:
             prune_subtitles(out_dir, item_id)
         elif rc == 0 and "no subtitles for the requested languages" in log:
             dirty |= fallback()
+        elif closed(item, item_id, err, out_dir, n):
+            dirty = True
         else:
             n["failed"] += 1
             print(f"[FAILED] {item_id} (exit {rc}): {(out + err)[-1500:]}")
