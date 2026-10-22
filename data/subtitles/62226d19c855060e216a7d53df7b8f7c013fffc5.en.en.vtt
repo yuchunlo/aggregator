@@ -1,0 +1,1516 @@
+WEBVTT
+
+00:00:00.590 --> 00:00:03.590
+Oh, what's this?
+
+00:00:04.590 --> 00:00:07.590
+Oh no, let's pop this open.
+
+00:00:07.590 --> 00:00:11.840
+Dear Faithful, by order of the viewers,
+
+00:00:12.840 --> 00:00:14.840
+if you have been masked,
+
+00:00:15.840 --> 00:00:17.840
+looks like we're doing a traitors episode.
+
+00:00:18.840 --> 00:00:21.840
+Traitors is the reality TV show where people go into a castle
+
+00:00:21.840 --> 00:00:23.840
+and then a traitors or Faithfuls
+
+00:00:23.840 --> 00:00:25.840
+and for some reason in the UK
+
+00:00:25.840 --> 00:00:29.840
+the celebrity version, unlike other countries, contains actual celebrities.
+
+00:00:29.840 --> 00:00:37.280
+which this time includes TVs, Hannah Fry, famous mathematician here in the UK, who of course was
+
+00:00:37.280 --> 00:00:42.560
+going to try and maths her way through the game and for that she figured she could use some help.
+
+00:00:42.560 --> 00:00:48.080
+So before I went into the castle I had catch up with my good friend Matt Parker while we
+
+00:00:48.080 --> 00:00:53.600
+plotted the best strategies to use. Yes Hannah and I sat down before she went into the
+
+00:00:53.600 --> 00:00:59.400
+traders castle and discussed what mathematical techniques you could possibly use to identify
+
+00:00:59.400 --> 00:01:04.820
+traders. I'll link to her video full breakdown. I'm going to recap it here. Don't panic.
+
+00:01:04.820 --> 00:01:13.060
+This video is because, oh, spoilers, spoilers, because she's not been kicked out after
+
+00:01:13.060 --> 00:01:20.080
+six episodes. We're going to very quickly analyze all the data so far and see how
+
+00:01:20.080 --> 00:01:27.300
+well her techniques against spoilers would have worked if she hadn't been recruited as
+
+00:01:27.300 --> 00:01:28.300
+a traitor.
+
+00:01:28.300 --> 00:01:33.780
+Oh and if you're wondering why she's not in this video with me on my channel it's almost
+
+00:01:33.780 --> 00:01:39.740
+like there's some kind of contractual reason why she still can't do that.
+
+00:01:39.740 --> 00:01:42.300
+Hey just quick this video is sponsored by us.
+
+00:01:42.300 --> 00:01:43.380
+We're both doing shows.
+
+00:01:43.380 --> 00:01:47.940
+You can see me host an evening of a necessary detail on the set of Matilda in London on
+
+00:01:47.940 --> 00:01:52.160
+the 30th of November this year and hand us on to a multiple dates next year.
+
+00:01:52.160 --> 00:01:52.940
+It's going to be incredible.
+
+00:01:52.940 --> 00:01:57.060
+Stop watching us in pixelated form when you could go to the description by
+
+00:01:57.060 --> 00:02:00.500
+tickets. See us in real life. We have much higher resolution there.
+
+00:02:00.740 --> 00:02:03.420
+If you're not familiar with the game of traders and hypothetically,
+
+00:02:03.420 --> 00:02:05.980
+I never used to watch it. There it's pretty straightforward.
+
+00:02:05.980 --> 00:02:09.460
+It's like it's where Wolf or Mafia you've got in this case,
+
+00:02:09.460 --> 00:02:14.980
+21 people playing the game and typically three of them are selected to
+
+00:02:14.980 --> 00:02:17.140
+to be traitors and then there's the classic
+
+00:02:17.140 --> 00:02:20.260
+you vote people out, the traitors murder people every night,
+
+00:02:20.260 --> 00:02:21.460
+all that kind of stuff.
+
+00:02:21.460 --> 00:02:24.820
+But if you are a faithful, so not a traitor,
+
+00:02:24.820 --> 00:02:28.340
+your goal other than not being banished or murdered
+
+00:02:28.340 --> 00:02:32.540
+is to try and identify who the traitors are.
+
+00:02:32.540 --> 00:02:37.380
+And Hannah had two kind of broad strategies
+
+00:02:37.380 --> 00:02:38.900
+she was gonna try and deploy.
+
+00:02:38.900 --> 00:02:42.700
+The first one was to look for tells or signals.
+
+00:02:42.700 --> 00:02:44.580
+But none of those wishy washy ones.
+
+00:02:44.580 --> 00:02:47.820
+And the goal here is to determine who is a traitor.
+
+00:02:47.820 --> 00:02:51.020
+Yes, and I think that the way that people have played this in the past
+
+00:02:51.020 --> 00:02:52.980
+is they're looking for definites.
+
+00:02:52.980 --> 00:02:56.020
+You did this, therefore you must be a traitor.
+
+00:02:56.020 --> 00:02:56.540
+Right.
+
+00:02:56.540 --> 00:03:00.980
+And ultimately, I don't think that there are really,
+
+00:03:00.980 --> 00:03:04.500
+hardly any signals that are absolutely deterministic.
+
+00:03:04.500 --> 00:03:07.900
+I think you are looking at indications of direction.
+
+00:03:07.900 --> 00:03:08.300
+Right.
+
+00:03:08.300 --> 00:03:11.340
+So I wanted to run the maths on the cleanest,
+
+00:03:11.340 --> 00:03:13.500
+you know, verifiable signals.
+
+00:03:13.500 --> 00:03:17.600
+You only want unambiguous costly signals.
+
+00:03:17.600 --> 00:03:19.660
+None of this people just chatting.
+
+00:03:19.660 --> 00:03:21.140
+None of this human nonsense.
+
+00:03:21.140 --> 00:03:22.260
+Exactly, exactly.
+
+00:03:22.260 --> 00:03:26.660
+Like, as we all aspire to, you've approximated
+
+00:03:26.660 --> 00:03:31.660
+social interactions to a few key binary decisions.
+
+00:03:31.660 --> 00:03:32.160
+Great.
+
+00:03:32.160 --> 00:03:33.220
+That's exactly my term.
+
+00:03:33.220 --> 00:03:34.340
+So that's what Hannah did.
+
+00:03:34.340 --> 00:03:38.260
+She analyzed all the past UK seasons of the Traders,
+
+00:03:38.260 --> 00:03:41.220
+Celebrity, and regular humans, and looked
+
+00:03:41.220 --> 00:03:44.500
+for what unambiguously quantifiable actions
+
+00:03:44.500 --> 00:03:47.060
+had a meaningful signal to them,
+
+00:03:47.060 --> 00:03:49.780
+which is to say, were someone a traitor,
+
+00:03:49.780 --> 00:03:50.740
+does it change the probability
+
+00:03:50.740 --> 00:03:52.300
+that that's what they would do?
+
+00:03:52.300 --> 00:03:55.140
+And for each one, she assigned a score
+
+00:03:55.140 --> 00:03:57.900
+that she could accumulate for all the contestants
+
+00:03:57.900 --> 00:04:01.140
+to keep track of how many indications they have
+
+00:04:01.140 --> 00:04:03.700
+towards being a faithful versus a traitor.
+
+00:04:03.700 --> 00:04:05.980
+So here are the points as I work them out
+
+00:04:05.980 --> 00:04:07.500
+from the data.
+
+00:04:07.500 --> 00:04:10.300
+Right, one, if somebody makes a burn vote,
+
+00:04:11.220 --> 00:04:16.220
+That earns them plus 0.47 points.
+
+00:04:16.220 --> 00:04:20.220
+It doesn't sound like much, but you're looking at tiny little signals here.
+
+00:04:20.220 --> 00:04:25.220
+If somebody votes for a traitor on the night that a traitor goes down,
+
+00:04:25.220 --> 00:04:29.220
+that gets them plus 0.33 points.
+
+00:04:29.220 --> 00:04:32.220
+They get plus 0.4 points.
+
+00:04:32.220 --> 00:04:36.220
+By the way, that is 0.4 instead of 0.33.
+
+00:04:36.220 --> 00:04:41.900
+I've seen people online adding them together when they try to recreate Hannah's method.
+
+00:04:41.900 --> 00:04:43.900
+The intention was that it's one or the other.
+
+00:04:43.900 --> 00:04:45.060
+Here's the thing, right?
+
+00:04:45.060 --> 00:04:47.460
+Your traders are going to be hiding in that group.
+
+00:04:47.460 --> 00:04:50.140
+The problem is that there's a faithful hiding in that group as well, which makes it really
+
+00:04:50.140 --> 00:04:51.140
+hard to spot them.
+
+00:04:51.140 --> 00:04:52.140
+Okay.
+
+00:04:52.140 --> 00:04:57.740
+So these are all the really strong trader signals, but it turns out when you look
+
+00:04:57.740 --> 00:05:04.220
+at the data, the strongest signals of all are in the opposite direction towards
+
+00:05:04.220 --> 00:05:05.340
+people being faithful.
+
+00:05:05.340 --> 00:05:09.900
+you can account for that by taking points away. Trader is definitely going down, everyone's
+
+00:05:09.900 --> 00:05:15.380
+voting for them, only the faithful are stupid enough to stick their head above the parapet
+
+00:05:15.380 --> 00:05:22.300
+and say that they're still innocent. So you get minus 1.28 points if you do not vote
+
+00:05:22.300 --> 00:05:28.340
+for a traitor as they are banished. Next up, if a traitor is banished and you look
+
+00:05:28.340 --> 00:05:35.620
+back at who they voted for historically. If somebody's name appears on that list, that
+
+00:05:35.620 --> 00:05:45.900
+is a really good signal that they are faithful. So, you get minus 1.69. What a whopper! The
+
+00:05:45.900 --> 00:05:52.100
+biggest one involved is actually one that the internet sort of found. In the early
+
+00:05:52.100 --> 00:05:56.860
+versions of the show, people noticed that the last group in for breakfast were always
+
+00:05:56.860 --> 00:06:02.620
+faithful. So production started chucking in the occasional traitor in the last group of breakfast.
+
+00:06:02.620 --> 00:06:10.380
+However, they only ever chuck in one. So if you were in the last group of breakfast with somebody
+
+00:06:10.380 --> 00:06:15.660
+who is then revealed to be a traitor, that is the strongest possible signal that you are a faithful.
+
+00:06:16.940 --> 00:06:27.660
+Look, it gets convoluted. I'm not lying. That is minus 1.73.
+
+00:06:27.660 --> 00:06:35.300
+So it's not much to go on but it's something.
+
+00:06:35.300 --> 00:06:38.380
+Yes, Hannah really loves her Bayesian statistics.
+
+00:06:38.380 --> 00:06:41.780
+If you weren't aware of that update your confidence
+
+00:06:41.780 --> 00:06:43.460
+in how much she loves Bayesian statistics.
+
+00:06:43.460 --> 00:06:45.780
+In fact, we did a video together about that years ago.
+
+00:06:45.780 --> 00:06:46.900
+We went to the Bay's house.
+
+00:06:46.900 --> 00:06:48.220
+I'll link to it below.
+
+00:06:48.220 --> 00:06:49.420
+Go check it out.
+
+00:06:49.420 --> 00:06:50.620
+You might be wondering however,
+
+00:06:50.620 --> 00:06:53.700
+those scores, she's just adding them up.
+
+00:06:53.700 --> 00:06:55.580
+Surely statistics you have to multiply them.
+
+00:06:55.580 --> 00:06:57.060
+That's very true.
+
+00:06:57.060 --> 00:06:59.300
+But Hannah's gonna be trapped in this castle.
+
+00:06:59.300 --> 00:07:02.380
+Like multiplication is annoying and difficult.
+
+00:07:02.380 --> 00:07:03.940
+Addition, nice and easy.
+
+00:07:03.940 --> 00:07:06.860
+If only we had a way to get, we do logs.
+
+00:07:06.860 --> 00:07:11.520
+So she was using the logs of the probabilities
+
+00:07:11.520 --> 00:07:16.100
+to generate those rounded, I mean, slightly simplified,
+
+00:07:16.100 --> 00:07:18.260
+based on the data we got from the previous episodes,
+
+00:07:18.260 --> 00:07:22.020
+values, that's why she's able to add them together.
+
+00:07:22.020 --> 00:07:24.860
+It's because they're the logs of the probabilities
+
+00:07:24.860 --> 00:07:26.780
+that you would otherwise be multiplying.
+
+00:07:26.780 --> 00:07:29.020
+Very clever addition, way more straightforward.
+
+00:07:29.020 --> 00:07:31.500
+the sort of thing you can easily do on something
+
+00:07:31.500 --> 00:07:37.480
+like for example, an abacus.
+
+00:07:37.480 --> 00:07:38.840
+It's so ridiculous.
+
+00:07:38.840 --> 00:07:40.720
+The moment that shot was released,
+
+00:07:40.720 --> 00:07:42.040
+Eren was making memes of it.
+
+00:07:42.040 --> 00:07:44.600
+I saw it and I was all like, this.
+
+00:07:44.600 --> 00:07:46.240
+Hannah's other technique was to imagine
+
+00:07:46.240 --> 00:07:48.800
+all the possible parallel universes
+
+00:07:48.800 --> 00:07:51.520
+that the show she was in could be taking place in.
+
+00:07:51.520 --> 00:07:54.000
+And what I mean by that is every universe
+
+00:07:54.000 --> 00:07:56.280
+is a different three people who were picked
+
+00:07:56.280 --> 00:07:57.800
+to be the traitors.
+
+00:07:57.800 --> 00:08:00.200
+And if you've got 21 contestants,
+
+00:08:00.200 --> 00:08:05.200
+choose three, that's 1,330 possible universes.
+
+00:08:05.840 --> 00:08:07.880
+So when Hannah's going into the show,
+
+00:08:07.880 --> 00:08:10.280
+that's how many she has to choose from.
+
+00:08:10.280 --> 00:08:12.760
+However, whoever is doing the analysis,
+
+00:08:12.760 --> 00:08:16.420
+Hannah or otherwise, knows that they're not a traitor.
+
+00:08:16.420 --> 00:08:19.360
+So you do actually get one more person for free,
+
+00:08:19.360 --> 00:08:22.280
+but that change is based on who's doing the analysis.
+
+00:08:22.280 --> 00:08:24.680
+I wanna keep this nice in general.
+
+00:08:24.680 --> 00:08:26.920
+We'll deal with the person's point of view later.
+
+00:08:26.920 --> 00:08:31.400
+Let's start with all 1,330 universes.
+
+00:08:31.400 --> 00:08:34.680
+Hannah's theory was, assuming the players
+
+00:08:34.680 --> 00:08:36.360
+or the production company or whatever,
+
+00:08:36.360 --> 00:08:39.840
+are assigning them to groups,
+
+00:08:39.840 --> 00:08:42.920
+be it groups in a car, groups coming into breakfast,
+
+00:08:42.920 --> 00:08:45.920
+groups lining up the order which you're sat at breakfast.
+
+00:08:45.920 --> 00:08:49.560
+Her theory is, all three traders will never all be
+
+00:08:49.560 --> 00:08:52.240
+either all next to each other in a row at breakfast,
+
+00:08:52.240 --> 00:08:56.360
+or all in the same chosen group for a car ride
+
+00:08:56.360 --> 00:08:57.440
+or coming into breakfast.
+
+00:08:57.440 --> 00:09:00.440
+So for example, the very first car journey,
+
+00:09:00.440 --> 00:09:04.280
+all six cars set off, and in one of the cars,
+
+00:09:04.280 --> 00:09:07.520
+you've got Kenny, James, James A. Caster,
+
+00:09:07.520 --> 00:09:10.520
+henceforth James A, and you've got Maya,
+
+00:09:10.520 --> 00:09:11.680
+and you've got Leanne.
+
+00:09:11.680 --> 00:09:13.680
+Now, you think, well, that's four people.
+
+00:09:13.680 --> 00:09:15.880
+Well, within that, you've got
+
+00:09:15.880 --> 00:09:18.240
+your four different possible groups of three.
+
+00:09:18.240 --> 00:09:21.960
+And so you take all of those four universes,
+
+00:09:21.960 --> 00:09:23.760
+which is every grouping of three,
+
+00:09:23.760 --> 00:09:25.880
+and then you remove them from the big set,
+
+00:09:25.880 --> 00:09:28.400
+which doesn't sound like a lot.
+
+00:09:28.400 --> 00:09:29.840
+You've got rid of four.
+
+00:09:29.840 --> 00:09:31.960
+But in that journey, there were six different cars
+
+00:09:31.960 --> 00:09:33.680
+and so you had all the combinations for those.
+
+00:09:33.680 --> 00:09:36.880
+And then as time goes on, in theory,
+
+00:09:36.880 --> 00:09:39.680
+you exclude more and more and more groups down.
+
+00:09:39.680 --> 00:09:41.840
+You have fewer and fewer universes
+
+00:09:41.840 --> 00:09:44.920
+until hopefully before it's too late,
+
+00:09:44.920 --> 00:09:48.520
+you collapse onto who the traitors definitely are.
+
+00:09:48.520 --> 00:09:50.080
+So would these have actually worked?
+
+00:09:50.080 --> 00:09:52.880
+I'm using the word would because spoiler again,
+
+00:09:52.880 --> 00:09:54.460
+Hannah got recruited.
+
+00:09:54.460 --> 00:09:58.020
+Actually, very unfortunately, she was one of only two people
+
+00:09:58.020 --> 00:09:59.660
+who could have got murdered on one night.
+
+00:09:59.660 --> 00:10:01.220
+I don't know, I'll get into the details.
+
+00:10:01.220 --> 00:10:03.500
+And then she was recruited to be a traitor.
+
+00:10:03.500 --> 00:10:08.180
+So sadly, Hannah wasn't able to properly
+
+00:10:08.180 --> 00:10:09.620
+deploy her techniques.
+
+00:10:09.620 --> 00:10:12.300
+However, we're still gonna analyze
+
+00:10:12.300 --> 00:10:14.700
+the six episodes that are out now
+
+00:10:14.700 --> 00:10:19.260
+and see in theory how well they would have worked.
+
+00:10:19.260 --> 00:10:22.380
+And to do that, I got all six episodes
+
+00:10:22.380 --> 00:10:26.340
+and I used a Python library to do shot detection
+
+00:10:26.340 --> 00:10:29.100
+so it can tell when you're cutting from one shot to the next.
+
+00:10:29.100 --> 00:10:32.500
+And I split them all into their individual shots,
+
+00:10:32.500 --> 00:10:37.500
+10,663 individual shots, an average length of 2.2 seconds.
+
+00:10:39.780 --> 00:10:41.980
+I took the middle frame from every single one
+
+00:10:41.980 --> 00:10:44.020
+and I used those to find all the scenes
+
+00:10:44.020 --> 00:10:45.540
+where there were groups.
+
+00:10:45.540 --> 00:10:50.060
+In fact, I've just scrolled through endless, endless scenes.
+
+00:10:50.060 --> 00:10:55.020
+I'd find the shots which were the interior of a car and so I could get all of them together and
+
+00:10:55.420 --> 00:10:59.340
+Analyze them or also Lucy and I my wife. I've got her notes here
+
+00:10:59.340 --> 00:11:05.980
+We sat down and we also went through and did a bunch so we analyzed that's one of those car seats
+
+00:11:06.140 --> 00:11:08.740
+Breakfast groups we did that and produced a Nicole
+
+00:11:09.260 --> 00:11:11.860
+Produced a Nicole watched it all and did the data logging
+
+00:11:12.300 --> 00:11:17.140
+Which allegedly she says counts as billable hours. Oh, okay fine
+
+00:11:17.140 --> 00:11:24.020
+But the point is, we went over it algorithmically and by human eye and we have got every single
+
+00:11:24.020 --> 00:11:26.740
+thing that happened in every single episode.
+
+00:11:26.740 --> 00:11:31.300
+And now we can work out what Hannah's techniques have actually worked.
+
+00:11:31.300 --> 00:11:35.300
+We'll start by excluding some of our 1330 universes.
+
+00:11:35.300 --> 00:11:41.740
+The very first set of six car rides actually takes out 15 different groups, not a lot.
+
+00:11:41.740 --> 00:11:42.740
+Good start.
+
+00:11:42.740 --> 00:11:48.100
+Once we get to breakfast the groups coming in take away a massive 39 universes.
+
+00:11:48.100 --> 00:11:51.300
+That's a lot more because they're coming in at groups of five and five choose three.
+
+00:11:51.300 --> 00:11:57.340
+It's just a bigger number and we get eight more groups of three excluded in the order
+
+00:11:57.340 --> 00:12:02.380
+they're sat down at the table and they're ones that weren't already in the entrance
+
+00:12:02.380 --> 00:12:05.860
+group data set and then Amal has murdered.
+
+00:12:05.860 --> 00:12:08.380
+This is happened too young for this.
+
+00:12:08.380 --> 00:12:12.080
+That's a big, well not for Amal but for everyone else it's great because there
+
+00:12:12.080 --> 00:12:19.880
+There are 189 universes that he's in and if he's gone all of them disappear at once.
+
+00:12:19.880 --> 00:12:23.560
+And then we get six more the following day when they get in the cars, not many because
+
+00:12:23.560 --> 00:12:30.120
+there's a lot of repetition on previous groups, but that brings us down to 1,073 universes
+
+00:12:30.120 --> 00:12:31.120
+standing.
+
+00:12:31.120 --> 00:12:36.560
+Although for people who've actually watched the show, you might have noticed I glossed
+
+00:12:36.560 --> 00:12:37.560
+over something.
+
+00:12:37.560 --> 00:12:39.160
+So here's the thing.
+
+00:12:39.160 --> 00:12:40.240
+Just real quick.
+
+00:12:40.240 --> 00:12:45.080
+The actual traitors were Richard and Maya and Unknowing.
+
+00:12:45.080 --> 00:12:49.180
+In a bit of a twist, they only picked two traitors
+
+00:12:49.180 --> 00:12:52.620
+to start with and they let them pick one more traitor.
+
+00:12:52.620 --> 00:12:54.540
+They ended up being James A. Casta.
+
+00:12:54.540 --> 00:12:57.380
+So there are original three actual traitors.
+
+00:12:57.380 --> 00:12:59.140
+They're the ones we're trying to find.
+
+00:12:59.140 --> 00:13:01.740
+And originally I was like, oh no, I guess the players
+
+00:13:01.740 --> 00:13:04.740
+no, there's only two because they were told
+
+00:13:04.740 --> 00:13:06.660
+that the traitors weren't complete yet.
+
+00:13:06.660 --> 00:13:08.380
+So they've got to analyze it as two.
+
+00:13:08.380 --> 00:13:10.780
+But it turns out, you can either assume
+
+00:13:10.780 --> 00:13:12.720
+that James was always there
+
+00:13:12.720 --> 00:13:15.100
+and just follow that line through,
+
+00:13:15.100 --> 00:13:17.820
+or you can assume there are any two to start with
+
+00:13:17.820 --> 00:13:20.900
+and expand out to include a third later in the simulation.
+
+00:13:20.900 --> 00:13:22.440
+It's identical.
+
+00:13:22.440 --> 00:13:24.420
+It turns out the fact that James was picked
+
+00:13:24.420 --> 00:13:26.820
+a little bit later doesn't make any difference
+
+00:13:26.820 --> 00:13:27.660
+to the mathematics.
+
+00:13:27.660 --> 00:13:29.180
+Now at this point, you're thinking,
+
+00:13:29.180 --> 00:13:31.980
+great technique, wonderful data, lots of numbers,
+
+00:13:31.980 --> 00:13:34.380
+but it's coming down real slow.
+
+00:13:34.380 --> 00:13:36.740
+We've still got over a thousand universes left.
+
+00:13:36.740 --> 00:13:40.460
+If you look at the plot of universes remaining over time,
+
+00:13:40.460 --> 00:13:41.980
+it's now coming down very fast,
+
+00:13:41.980 --> 00:13:45.980
+but then they banish Richard, and Richard is a traitor.
+
+00:13:45.980 --> 00:13:47.300
+What are you?
+
+00:13:47.300 --> 00:13:48.300
+Traitor.
+
+00:13:48.300 --> 00:13:52.020
+That is super useful because now we can exclude
+
+00:13:52.020 --> 00:13:55.260
+all the universes that don't contain Richard,
+
+00:13:55.260 --> 00:13:58.300
+because we know Richard must have been in the universe
+
+00:13:58.300 --> 00:14:00.020
+that the game is actually taking place in,
+
+00:14:00.020 --> 00:14:04.820
+and that only leaves 159 universes left.
+
+00:14:04.820 --> 00:14:07.220
+They're just plummets and you're like, ah,
+
+00:14:07.220 --> 00:14:10.140
+this two episodes in, we're basically there.
+
+00:14:10.140 --> 00:14:12.540
+And we can even take out the ones that contain Hannah
+
+00:14:12.540 --> 00:14:14.940
+or whoever's technically doing the analysis.
+
+00:14:14.940 --> 00:14:19.100
+But what we're forgetting is that this is a TV show.
+
+00:14:19.100 --> 00:14:21.820
+We're imagining it's an actual game
+
+00:14:21.820 --> 00:14:23.980
+with like proper rules.
+
+00:14:23.980 --> 00:14:26.520
+But no, they can't have it wrap up suddenly.
+
+00:14:26.520 --> 00:14:28.180
+It's got a last 10 episodes.
+
+00:14:28.180 --> 00:14:29.340
+So what do they do?
+
+00:14:29.340 --> 00:14:32.260
+They put another traitor back in.
+
+00:14:32.260 --> 00:14:34.500
+And if you're in the game, you know that just happened.
+
+00:14:34.500 --> 00:14:40.180
+know, oh no, there's one more now. So what you have to do is take all the universes that now
+
+00:14:40.180 --> 00:14:45.460
+have two possible traitors and an empty third spot where we just got rid of Richard. These are the
+
+00:14:45.460 --> 00:14:50.900
+159 universes and for every single one of those you're thinking, well, hang on, they could have
+
+00:14:50.900 --> 00:14:57.860
+recruited any of the remaining faithfuls. So they all split into as many new sub-universes
+
+00:14:57.860 --> 00:15:06.820
+as there are possible recruits for every single one of them, you're back up to 964 universes.
+
+00:15:06.820 --> 00:15:12.340
+You plummet the possibilities and then the production company puts them basically right up
+
+00:15:12.340 --> 00:15:18.340
+to where you were. So thanks a lot. And then a bunch more stuff happens. All of this. We're back
+
+00:15:18.340 --> 00:15:23.780
+to whittling it down and down and down and down until Hannah is banished. This is why we're
+
+00:15:23.780 --> 00:15:28.180
+doing it in general, not Hannah specific because she was a traitor at this point. She gets banished,
+
+00:15:28.180 --> 00:15:34.260
+everyone knows she's a traitor. Only 72 of those universes had Hannah as a traitor and then they
+
+00:15:34.260 --> 00:15:41.220
+recruit another traitor and it goes right back up again. They get Kenny. And now they're back to
+
+00:15:41.220 --> 00:15:45.380
+three traitors and the possibilities have exploded again and it's whittled down a little bit more
+
+00:15:45.380 --> 00:15:54.820
+But as I speak now between episodes 6 and 7, we are back up to 260 possible universes.
+
+00:15:56.580 --> 00:16:06.660
+The technique, in theory, good, but against the reality of a narrative-driven celebrity reality TV show.
+
+00:16:08.500 --> 00:16:12.740
+Yeah, not so good. But hang on, we're still including everyone. Like, someone's got to be
+
+00:16:12.740 --> 00:16:17.660
+doing the analysis. So I looked at every single possible remaining faithful and
+
+00:16:17.660 --> 00:16:23.220
+worked out if they did the analysis how many universes can they remove because
+
+00:16:23.220 --> 00:16:28.220
+they are in them. And worst case scenario is Leanne. If Leanne does it, it goes from
+
+00:16:28.220 --> 00:16:34.100
+260 down to 203 and best case was Sharon. But Sharon only gets it down to
+
+00:16:34.100 --> 00:16:42.500
+194. It's about 200. Even if you take out, you pick a faith will take out all
+
+00:16:42.500 --> 00:16:46.660
+of their universes. For any single one of them, if they were keeping track, they're still looking
+
+00:16:46.660 --> 00:16:55.700
+down the barrel of 200 universes. It's too many. However, Hannah did have one other trick
+
+00:16:55.700 --> 00:17:01.060
+up her multiverse sleeve. I don't think that Claudia will pick three
+
+00:17:01.060 --> 00:17:05.140
+traitors who are just all the same person. I don't think there's going to be three
+
+00:17:05.140 --> 00:17:09.580
+male comedians. I don't think she's going to pick three mathematicians all between
+
+00:17:09.580 --> 00:17:16.220
+35 and 45 years old. You know, I don't think she is. So what I've done is I've gone through
+
+00:17:16.220 --> 00:17:22.700
+and I've worked out, called it a homogeneity flag. I've worked out all the universes in which
+
+00:17:22.700 --> 00:17:29.580
+all three traders share similar traits that are too similar for them to all be picked.
+
+00:17:29.580 --> 00:17:34.940
+Yes, if we use Hannah's technique of taking out any group that's too homogenous,
+
+00:17:34.940 --> 00:17:44.780
+the original 1,330 becomes 1,183. That's smaller. And if you take out all the groups that have one flag,
+
+00:17:44.780 --> 00:17:50.940
+not two, and don't contain a comedian, and her assumption was surely you're going to have a
+
+00:17:50.940 --> 00:17:57.820
+comedian because we all know those are the best type of people. And in no way have weird emotional
+
+00:17:57.820 --> 00:18:01.660
+issues that cause them to become a comedian anyway. Take that out of the edit. But the point is
+
+00:18:01.660 --> 00:18:09.660
+If you take out all of the additional kind of soft excluded ones, you're down to just 692
+
+00:18:09.660 --> 00:18:15.340
+starting groups. That's not bad. It's like almost half. I reran all the numbers from the first six
+
+00:18:15.340 --> 00:18:22.940
+episodes on those two scenarios in the case where you only exclude the universes that are very
+
+00:18:22.940 --> 00:18:29.020
+homogeneous and like they're pre-removed. Instead of ending up with 260 left at the end of
+
+00:18:29.020 --> 00:18:34.020
+of episode six, you end up with 260 left.
+
+00:18:34.160 --> 00:18:36.440
+Because of the way it shrinks and bounces back up again
+
+00:18:36.440 --> 00:18:39.100
+and the nature of what those groups happen to be,
+
+00:18:39.100 --> 00:18:41.200
+it makes no difference at all.
+
+00:18:41.200 --> 00:18:45.720
+Now, if you go overboard and exclude the second category
+
+00:18:45.720 --> 00:18:47.960
+as well and start with way fewer,
+
+00:18:47.960 --> 00:18:51.560
+then you end up with 148.
+
+00:18:51.560 --> 00:18:55.560
+I mean, that's fewer, but it's still a lot.
+
+00:18:55.560 --> 00:18:59.320
+In short, the universe elimination technique,
+
+00:18:59.320 --> 00:19:02.440
+while good in theory, doesn't work
+
+00:19:02.440 --> 00:19:04.800
+if the production company keep putting traders back in again
+
+00:19:04.800 --> 00:19:07.200
+because it just re-explodes the number of universes.
+
+00:19:07.200 --> 00:19:08.760
+I mean, it's not totally lost,
+
+00:19:08.760 --> 00:19:10.480
+we'll come back to that in a moment,
+
+00:19:10.480 --> 00:19:14.520
+but it did not work as well as it could have.
+
+00:19:14.520 --> 00:19:18.760
+So let's look at Hannah's accumulating Bayesian scores.
+
+00:19:18.760 --> 00:19:20.720
+Does that pick out who the traders are?
+
+00:19:20.720 --> 00:19:24.000
+And again, we can apply this to all 21 contestants.
+
+00:19:24.000 --> 00:19:26.940
+So it doesn't really matter that Hannah became a trader.
+
+00:19:26.940 --> 00:19:29.520
+We can still analyze her in the dataset
+
+00:19:29.520 --> 00:19:30.360
+along with everyone else.
+
+00:19:30.360 --> 00:19:31.320
+And I'm just gonna give you the,
+
+00:19:31.320 --> 00:19:33.440
+here's the whole results, here it is all at once.
+
+00:19:33.440 --> 00:19:36.680
+I mean, that's like the opposite of a reality TV show,
+
+00:19:36.680 --> 00:19:40.160
+isn't I should be like, ah, and we'll show you next episode.
+
+00:19:40.160 --> 00:19:42.000
+Then you gotta wait like a day or something,
+
+00:19:42.000 --> 00:19:45.560
+or we annoyingly put some ads in here,
+
+00:19:45.560 --> 00:19:46.880
+or something like that.
+
+00:19:46.880 --> 00:19:48.360
+No, here's the whole plot.
+
+00:19:48.360 --> 00:19:50.040
+And it worked.
+
+00:19:50.040 --> 00:19:50.920
+Check it out.
+
+00:19:50.920 --> 00:19:52.920
+See, see right at the top there?
+
+00:19:52.920 --> 00:19:55.160
+And that is James A. Caster.
+
+00:19:55.160 --> 00:20:01.320
+They had the highest score of being the most likely to be a traitor and sure enough they
+
+00:20:01.320 --> 00:20:03.000
+were the traitor.
+
+00:20:03.000 --> 00:20:04.800
+But what about Maya?
+
+00:20:04.800 --> 00:20:07.640
+Turns out Maya tied for second place.
+
+00:20:07.640 --> 00:20:08.840
+Isn't that great?
+
+00:20:08.840 --> 00:20:17.240
+Annoyingly though, tied with Michael and Miranda and Ross and Sharon.
+
+00:20:17.240 --> 00:20:21.800
+this five, this five, there just weren't enough indicators
+
+00:20:21.800 --> 00:20:25.080
+to really split people out very finely.
+
+00:20:25.080 --> 00:20:30.000
+So yes, the two, I guess, longest running traitors
+
+00:20:30.000 --> 00:20:34.400
+of James and Maya had risen to the top.
+
+00:20:34.400 --> 00:20:37.600
+Maya hadn't managed to separate out from the others,
+
+00:20:37.600 --> 00:20:41.840
+but probably would have soon and James was well above.
+
+00:20:41.840 --> 00:20:44.600
+So as things stand, literally right now,
+
+00:20:44.600 --> 00:20:45.920
+and if you wanna update this
+
+00:20:45.920 --> 00:20:49.240
+where the next two episodes come out, be my guest.
+
+00:20:49.240 --> 00:20:51.960
+Hannah's technique definitely worked.
+
+00:20:51.960 --> 00:20:54.640
+If someone was going off this with some confidence,
+
+00:20:54.640 --> 00:20:58.320
+they could pinpoint James A. Castor as being a traitor.
+
+00:20:58.320 --> 00:21:00.120
+But what about Kenny, the third traitor?
+
+00:21:00.120 --> 00:21:03.160
+They're sitting there with a score of 0.66,
+
+00:21:03.160 --> 00:21:05.960
+right in the middle of the faithful pack.
+
+00:21:05.960 --> 00:21:10.400
+And that's because Kenny had not long become a traitor.
+
+00:21:10.400 --> 00:21:13.240
+They were a faithful for most of the episodes.
+
+00:21:13.240 --> 00:21:17.040
+and they've got a lot of, I guess, inertia
+
+00:21:17.040 --> 00:21:20.440
+of their faithful score that being a traitor
+
+00:21:20.440 --> 00:21:21.400
+has to pull out of.
+
+00:21:21.400 --> 00:21:23.880
+Or rather, because the signals for being a traitor
+
+00:21:23.880 --> 00:21:25.920
+are quite small and the signals for being
+
+00:21:25.920 --> 00:21:28.420
+a faithful are much bigger, in reality,
+
+00:21:28.420 --> 00:21:30.640
+it's gonna take a bunch more episodes
+
+00:21:30.640 --> 00:21:33.640
+for the other players to filter down
+
+00:21:33.640 --> 00:21:35.680
+as being more and more faithful,
+
+00:21:35.680 --> 00:21:38.160
+leaving Kenny behind to identify them.
+
+00:21:38.160 --> 00:21:41.760
+But it would take a while, so we have an issue here
+
+00:21:41.760 --> 00:21:46.140
+Because they keep regenerating the traitors,
+
+00:21:46.140 --> 00:21:50.180
+not only does that sink our universe technique,
+
+00:21:50.180 --> 00:21:54.060
+but it means new traitors don't stand out
+
+00:21:54.060 --> 00:21:56.480
+in the Bayesian technique.
+
+00:21:56.480 --> 00:21:59.920
+But what if we combine the two?
+
+00:21:59.920 --> 00:22:02.840
+Here's the thing, not all universes
+
+00:22:02.840 --> 00:22:05.700
+that appear to be equal are equal.
+
+00:22:05.700 --> 00:22:09.840
+So when Richard was banished
+
+00:22:09.840 --> 00:22:12.920
+and we expanded out all the new possibilities.
+
+00:22:12.920 --> 00:22:15.680
+We actually got the same universe multiple different ways.
+
+00:22:15.680 --> 00:22:19.440
+So for example, Joanne and Shannon
+
+00:22:19.440 --> 00:22:21.320
+could have been in a group with Richard
+
+00:22:21.320 --> 00:22:24.520
+who's then removed and Jerry gets recruited.
+
+00:22:24.520 --> 00:22:28.920
+Or Joanne and Jerry were in the universe with Richard
+
+00:22:28.920 --> 00:22:33.800
+who gets banished and then Sharon's recruited.
+
+00:22:33.800 --> 00:22:38.240
+And we considered them to be exactly the same universe
+
+00:22:38.240 --> 00:22:41.680
+but their histories are actually different.
+
+00:22:41.680 --> 00:22:45.440
+So what we could have done is instead of collapsing universes
+
+00:22:45.440 --> 00:22:48.120
+together because they had the same members,
+
+00:22:48.120 --> 00:22:49.680
+we could have kept them apart
+
+00:22:49.680 --> 00:22:51.160
+because they have different histories.
+
+00:22:51.160 --> 00:22:53.400
+Now that is very bad in one regard.
+
+00:22:53.400 --> 00:22:55.520
+You get too many universes.
+
+00:22:55.520 --> 00:22:59.080
+So instead of the 964 we get
+
+00:22:59.080 --> 00:23:01.960
+after re-expanding post-Richard banishment,
+
+00:23:01.960 --> 00:23:06.440
+instead we get 2,703.
+
+00:23:06.440 --> 00:23:08.160
+so many more.
+
+00:23:08.160 --> 00:23:10.760
+And at the very end of our entire process,
+
+00:23:10.760 --> 00:23:12.680
+instead of a mere 260,
+
+00:23:12.680 --> 00:23:14.400
+which downed it a lot before,
+
+00:23:14.400 --> 00:23:17.560
+with histories, there's actually 1,702.
+
+00:23:17.560 --> 00:23:19.800
+So why on earth would we keep histories?
+
+00:23:19.800 --> 00:23:24.800
+Well, let's say we take everyone's Bayesian scores
+
+00:23:24.840 --> 00:23:28.400
+and add them together within each of the universes.
+
+00:23:28.400 --> 00:23:32.560
+Every universe gets its accumulative Bayesian score
+
+00:23:32.560 --> 00:23:34.080
+of the sum of its participants.
+
+00:23:34.080 --> 00:23:39.080
+But we still have the Kenny problem where Kenny is a traitor,
+
+00:23:39.440 --> 00:23:41.560
+but their score hasn't had time to move yet.
+
+00:23:41.560 --> 00:23:44.840
+So what we actually should do is keep track
+
+00:23:44.840 --> 00:23:48.440
+of people's Bayesian traitor score
+
+00:23:48.440 --> 00:23:50.720
+only since they became a traitor,
+
+00:23:50.720 --> 00:23:52.240
+but we don't know when they became a traitor.
+
+00:23:52.240 --> 00:23:55.520
+What we do, because we have the entire set
+
+00:23:55.520 --> 00:23:58.160
+of universes with history that track
+
+00:23:58.160 --> 00:24:00.720
+every single conceivable moment
+
+00:24:00.720 --> 00:24:02.680
+someone could have become a traitor.
+
+00:24:02.680 --> 00:24:04.580
+That's what we have to do is take,
+
+00:24:04.580 --> 00:24:05.860
+let's say at the very end,
+
+00:24:05.860 --> 00:24:10.580
+all of those 1,702 history universes
+
+00:24:10.580 --> 00:24:11.980
+and we, for each one,
+
+00:24:11.980 --> 00:24:13.740
+work out when the participants
+
+00:24:13.740 --> 00:24:15.980
+technically became a traitor within that universe
+
+00:24:15.980 --> 00:24:18.340
+and then some of their scores that way,
+
+00:24:18.340 --> 00:24:20.380
+which is a very long way to say
+
+00:24:20.380 --> 00:24:21.700
+there's a longer way to do it.
+
+00:24:21.700 --> 00:24:23.820
+Now, this was not part of the original plan.
+
+00:24:23.820 --> 00:24:25.260
+Hannah did not do this
+
+00:24:25.260 --> 00:24:27.140
+when she was in the traitor's castle.
+
+00:24:27.140 --> 00:24:29.580
+This was an idea we had afterwards
+
+00:24:29.580 --> 00:24:32.260
+but I have retrospectively run the numbers.
+
+00:24:32.260 --> 00:24:35.820
+You had the same issue, the low resolution,
+
+00:24:35.820 --> 00:24:40.820
+Bayesian scores means that lots of universes are tied,
+
+00:24:40.900 --> 00:24:45.700
+but at every single stage, through the entire game,
+
+00:24:45.700 --> 00:24:49.340
+whatever the correct actual universe was,
+
+00:24:49.340 --> 00:24:51.860
+was always tied for first place.
+
+00:24:51.860 --> 00:24:56.300
+So the technique absolutely works.
+
+00:24:56.300 --> 00:24:58.620
+It only stumbles slightly
+
+00:24:58.620 --> 00:25:01.060
+because you need a more nuanced split.
+
+00:25:01.060 --> 00:25:02.660
+And that might have been possible.
+
+00:25:02.660 --> 00:25:04.220
+In fact, while Hannah was in there,
+
+00:25:04.220 --> 00:25:06.380
+she was factoring in, because I spoke to her
+
+00:25:06.380 --> 00:25:07.220
+and we discussed it.
+
+00:25:07.220 --> 00:25:09.380
+I'm allowed to talk to her and repeat it.
+
+00:25:09.380 --> 00:25:13.300
+That's not in violation of her non-compete contract.
+
+00:25:13.300 --> 00:25:15.100
+She's not appearing on a different channel.
+
+00:25:15.100 --> 00:25:17.620
+It's me remembering our conversation.
+
+00:25:17.620 --> 00:25:19.360
+She did factor in other things.
+
+00:25:19.360 --> 00:25:23.460
+So like Richard famously said he was a traitor.
+
+00:25:23.460 --> 00:25:24.460
+You're what?
+
+00:25:24.460 --> 00:25:25.300
+Traitor.
+
+00:25:25.300 --> 00:25:26.140
+He's a traitor.
+
+00:25:26.140 --> 00:25:26.980
+Are you?
+
+00:25:26.980 --> 00:25:28.260
+Yeah.
+
+00:25:28.260 --> 00:25:29.820
+Right.
+
+00:25:29.820 --> 00:25:32.900
+and Hannah had to sit down and go, okay, that happened.
+
+00:25:32.900 --> 00:25:36.420
+How am I gonna assign a Bayesian value to that?
+
+00:25:36.420 --> 00:25:40.460
+And again, it's not if Richard says they're a traitor,
+
+00:25:40.460 --> 00:25:41.780
+what's the probability they are,
+
+00:25:41.780 --> 00:25:44.180
+it's given someone is a traitor,
+
+00:25:44.180 --> 00:25:45.300
+what's the probability they would say
+
+00:25:45.300 --> 00:25:46.580
+something that ridiculous.
+
+00:25:46.580 --> 00:25:49.100
+So Hannah was also altering it on the fly
+
+00:25:49.100 --> 00:25:51.980
+in the castle, but all of that got, you know,
+
+00:25:52.980 --> 00:25:56.180
+washed away when she became a traitor, disappointing.
+
+00:25:56.180 --> 00:26:04.180
+But this combined method, if we had more nuanced Bayesian values,
+
+00:26:04.180 --> 00:26:05.940
+we could have got more splitting.
+
+00:26:05.940 --> 00:26:07.660
+I don't know how accurate that would be.
+
+00:26:07.660 --> 00:26:11.380
+Anyway, that is the current state of the art,
+
+00:26:11.380 --> 00:26:14.100
+how you can use mathematics to cheat.
+
+00:26:14.100 --> 00:26:19.060
+And not to cheat, sorry, to correctly play.
+
+00:26:19.060 --> 00:26:20.980
+And I need to make it very clear,
+
+00:26:20.980 --> 00:26:25.020
+this has not broken the traitors because the next season,
+
+00:26:25.020 --> 00:26:26.060
+they can change any of this.
+
+00:26:26.060 --> 00:26:27.980
+Like if you put all three traders in the same car
+
+00:26:27.980 --> 00:26:31.220
+or same breakfast group early on, you'd throw everyone.
+
+00:26:31.220 --> 00:26:33.800
+And at the very beginning I used the example
+
+00:26:33.800 --> 00:26:36.980
+where all the future traders did all happen to be
+
+00:26:36.980 --> 00:26:39.660
+in the same car, just with our system
+
+00:26:39.660 --> 00:26:42.340
+that was before a recruitment, so it didn't factor in.
+
+00:26:42.340 --> 00:26:44.940
+But if you did that for real, off the scent.
+
+00:26:44.940 --> 00:26:49.820
+So there you are, not cheating, not broken, just maths.
+
+00:26:49.820 --> 00:26:51.180
+Thank you so much for watching this episode
+
+00:26:51.180 --> 00:26:52.500
+about the traders.
+
+00:26:52.500 --> 00:26:54.180
+Thanks to you, the viewers.
+
+00:26:54.180 --> 00:26:55.180
+I can't hold that for too long
+
+00:26:55.180 --> 00:26:59.760
+You'll see what a poor recreation prop. I didn't have a lot of time. All right
+
+00:27:00.460 --> 00:27:05.140
+Thanks for watching the video. Who's thanks to Hannah Fry for going on the show
+
+00:27:05.140 --> 00:27:08.680
+I guess getting me involved doing all this both of us have live shows coming up
+
+00:27:08.680 --> 00:27:11.980
+I got a big and evening of unnecessary detail show
+
+00:27:12.600 --> 00:27:16.180
+We're back at London's Cabrish Theatre on the set of Matilda
+
+00:27:16.180 --> 00:27:22.740
+I'll link to that all the future London and probably New York in January for exciting shows link below and Hannah
+
+00:27:22.740 --> 00:27:29.180
+Hannah's on tour late next year doing some big amazing venues. Come check out. I think it's called come pie with me
+
+00:27:29.180 --> 00:27:32.500
+Is it come come fry with me come fry with me?
+
+00:27:33.000 --> 00:27:34.500
+Check that out
+
+00:27:34.500 --> 00:27:39.980
+Non-zero chance someone else should recognize will be there anyway spoilers and finally
+
+00:27:39.980 --> 00:27:42.580
+I don't know if you noticed this but next to me the entire time
+
+00:27:45.980 --> 00:27:47.980
+Okay, so thanks to the oh
+
+00:27:47.980 --> 00:27:52.260
+So, little, thanks to the dog, thanks to you, thanks to Hannah.
+
+00:27:52.260 --> 00:27:53.100
+Bye.

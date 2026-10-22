@@ -1,0 +1,1093 @@
+WEBVTT
+Kind: captions
+Language: en-US
+
+00:00:00.140 --> 00:00:02.860
+So recently I came across
+this tweet by Andrej Karpathy
+
+00:00:03.120 --> 00:00:06.440
+where he talks about how he uses
+AI to learn anything faster.
+
+00:00:06.780 --> 00:00:09.840
+Specifically, the part that really
+stood out to me was he was using
+
+00:00:09.920 --> 00:00:13.500
+AI to create visual explainers
+for things that he was learning.
+
+00:00:13.600 --> 00:00:16.299
+So I decided to try this out,
+and it's actually pretty insane.
+
+00:00:16.379 --> 00:00:18.420
+If you haven't tried out
+the latest AI models,
+
+00:00:18.580 --> 00:00:22.120
+there's been some pretty major
+advancements just in the past month.
+
+00:00:22.300 --> 00:00:26.600
+So now models are good enough where
+rather than just spitting out a
+
+00:00:26.680 --> 00:00:30.140
+bunch of text and you have to read
+through it to understand something,
+
+00:00:30.320 --> 00:00:33.140
+it can just show you and explain
+it to you with audio and visual.
+
+00:00:33.220 --> 00:00:36.340
+Let me show you a few examples that
+I made The model boils everything
+
+00:00:36.420 --> 00:00:40.860
+down to one list of numbers, a
+score for every word it knows.
+
+00:00:41.140 --> 00:00:44.700
+Then it picks- Loaded ships
+leave in one lane two miles wide.
+
+00:00:44.900 --> 00:00:47.940
+Empty ships come in through another
+with a two-mile buffer between them.
+
+00:00:48.020 --> 00:00:50.920
+The molecule is shaped enough
+like testosterone to slide
+
+00:00:51.000 --> 00:00:54.580
+into the enzyme's pocket,
+but once inside, it jams.
+
+00:00:54.660 --> 00:00:57.640
+It's pretty crazy when you see how
+much progress AI video has come
+
+00:00:57.720 --> 00:01:01.280
+in just the past few months, where
+earlier this year it was still
+
+00:01:01.380 --> 00:01:05.819
+pretty much slop and not really that
+useful or watchable or reliable.
+
+00:01:06.100 --> 00:01:09.780
+But now it can actually create
+very detailed explainers with
+
+00:01:09.880 --> 00:01:12.820
+mathematical concepts, with
+graphs, with really detailed,
+
+00:01:12.900 --> 00:01:15.220
+intricate parts that it
+can show you in a video.
+
+00:01:15.580 --> 00:01:18.920
+And also the audio models now
+are so good that it basically
+
+00:01:19.000 --> 00:01:21.160
+sounds like a real person
+explaining something to you.
+
+00:01:21.240 --> 00:01:23.200
+All right, so in this video
+I'm gonna show you the full
+
+00:01:23.280 --> 00:01:26.520
+workflow that I use to set this
+up, and once you set it up,
+
+00:01:26.600 --> 00:01:29.640
+any AI that you use, whether
+it's Claude or ChatGPT,
+
+00:01:29.860 --> 00:01:33.820
+can create these videos automatically
+and just send it to you in the chat.
+
+00:01:33.900 --> 00:01:35.600
+This video is also
+sponsored by Higgsfield,
+
+00:01:35.680 --> 00:01:40.000
+which is an all-in-one platform for
+creating audio and video with AI.
+
+00:01:40.300 --> 00:01:44.220
+I've personally been a paying user since
+earlier this year, and I think they're
+
+00:01:44.300 --> 00:01:48.640
+really pushing the boundaries of what
+is possible with AI video creation.
+
+00:01:48.720 --> 00:01:52.440
+For example, they've made full-on feature
+length movies using their platform,
+
+00:01:52.680 --> 00:01:55.420
+and they're also hosting competitions
+and sponsoring filmmakers
+
+00:01:55.500 --> 00:01:59.160
+to use their platform and to
+make short films or movies.
+
+00:01:59.240 --> 00:02:03.200
+Some of the results are really quite
+mind-blowing, and if you haven't
+
+00:02:03.280 --> 00:02:06.640
+been paying attention to AI video,
+you probably think it's still slop
+
+00:02:06.720 --> 00:02:11.140
+and you just put in a prompt and
+you get some sort of random output.
+
+00:02:11.240 --> 00:02:13.880
+But if you look at the artists who
+are actually using the platform
+
+00:02:13.960 --> 00:02:17.860
+to make really beautiful, movies,
+it's really quite involved.
+
+00:02:17.940 --> 00:02:20.080
+Like they have storyboards
+that they create.
+
+00:02:20.160 --> 00:02:22.560
+They create multiple versions of a scene.
+
+00:02:22.640 --> 00:02:26.900
+They have character sheets, and it's
+really similar to, how movies are
+
+00:02:26.980 --> 00:02:30.920
+traditionally made, except now more
+people can bring their ideas to life.
+
+00:02:31.000 --> 00:02:33.040
+But even though Higgsfield
+sponsored this video,
+
+00:02:33.120 --> 00:02:36.060
+they didn't have any editorial
+rights, so everything I share in
+
+00:02:36.140 --> 00:02:39.440
+this video and the workflow is
+my own opinion and my own setup.
+
+00:02:39.520 --> 00:02:41.240
+But before I share with you my workflow,
+
+00:02:41.320 --> 00:02:43.080
+I wanna talk about why do
+something like this at all.
+
+00:02:43.160 --> 00:02:46.280
+Like why set up a workflow so
+that your AI can make videos?
+
+00:02:46.360 --> 00:02:49.960
+And if you think about it,
+simultaneous visual and
+
+00:02:50.040 --> 00:02:54.600
+audio input is the best way
+that we absorb information.
+
+00:02:54.680 --> 00:02:57.360
+Like if you think about how we
+learn every topic in school,
+
+00:02:57.440 --> 00:03:01.000
+we had a teacher explain something
+to us while showing something on the
+
+00:03:01.080 --> 00:03:05.500
+whiteboard or on some slides, and that's
+also how we learn from YouTube videos.
+
+00:03:05.580 --> 00:03:07.800
+Like that's why YouTube videos
+are so powerful for learning
+
+00:03:07.880 --> 00:03:11.440
+things because not only are you
+getting information through audio,
+
+00:03:11.520 --> 00:03:15.680
+you're also seeing that information,
+displayed in a different way in real time.
+
+00:03:15.760 --> 00:03:19.740
+So you have more forms of input, and that
+helps your brain understand things better.
+
+00:03:19.820 --> 00:03:23.860
+Like for example, if you were studying
+for a test, you could create a
+
+00:03:24.200 --> 00:03:26.960
+visual explainer that summarizes
+all the different topics so that you
+
+00:03:27.040 --> 00:03:31.680
+could just watch that before a test
+and give you the ultimate refresher.
+
+00:03:31.760 --> 00:03:33.020
+And there's also a lot of topics that's
+
+00:03:33.100 --> 00:03:34.940
+just way better if you
+have a visual medium.
+
+00:03:35.020 --> 00:03:39.100
+Like for example, anything that has
+a bunch of charts or diagrams or
+
+00:03:39.180 --> 00:03:44.040
+math or even music theory and
+biology, these are things that are way
+
+00:03:44.120 --> 00:03:47.900
+easier to understand when you have
+a visual or auditory element to it.
+
+00:03:47.980 --> 00:03:52.040
+And there are already a lot of really
+amazing explainer videos on YouTube,
+
+00:03:52.260 --> 00:03:55.940
+but the problem with that is that they
+are made for a super broad audience,
+
+00:03:56.020 --> 00:03:59.580
+so they're less applicable when you're
+trying to learn something very specific.
+
+00:03:59.660 --> 00:04:02.260
+And also the applications
+of videos made by
+
+00:04:02.340 --> 00:04:07.340
+AI also goes beyond
+just making explainers.
+
+00:04:07.420 --> 00:04:12.140
+You could use it to make daily briefs,
+to make, summaries on different news
+
+00:04:12.220 --> 00:04:15.800
+or topics that you care about, like
+things that are very specific to you.
+
+00:04:15.880 --> 00:04:19.860
+So for example, one workflow I have
+is to have my AI assistant create a
+
+00:04:19.940 --> 00:04:24.560
+daily brief of different news and tweets
+in a 60-second video so I can just
+
+00:04:24.640 --> 00:04:29.580
+watch that and not have to rely on any
+social media feeds The Vatican says
+
+00:04:29.660 --> 00:04:33.600
+surgeons removed part of his right
+lung on Tuesday with no complications.
+
+00:04:33.680 --> 00:04:36.180
+Russia hit all three
+of Kyiv's power plants
+
+00:04:36.260 --> 00:04:38.840
+overnight with 39 ballistic missiles.
+
+00:04:38.920 --> 00:04:41.100
+Grok Voice 3.0 is out.
+
+00:04:41.220 --> 00:04:44.660
+Number one on Artificial
+Analysis' Speech-to-Speech Index.
+
+00:04:44.740 --> 00:04:46.320
+There definitely are
+some limitations to this,
+
+00:04:46.400 --> 00:04:49.540
+which I'll talk about later in the
+video, but even right now this is
+
+00:04:49.620 --> 00:04:53.120
+already really game-changing, so
+that's why I wanted to make this video.
+
+00:04:53.200 --> 00:04:56.460
+After you set up this workflow, all you
+have to do is to tell your AI to explain
+
+00:04:56.540 --> 00:05:00.480
+something to you visually, and it will
+go and make the entire video for you.
+
+00:05:00.580 --> 00:05:02.140
+But yeah, let's get into the setup.
+
+00:05:02.280 --> 00:05:05.320
+All right, so this is the part where
+I'm gonna show you the workflow.
+
+00:05:05.700 --> 00:05:07.840
+And for this setup I'm gonna
+show you how you can do
+
+00:05:07.920 --> 00:05:11.280
+everything in Higgsfield
+directly, because that's the
+
+00:05:11.580 --> 00:05:13.900
+simplest way and you don't
+have to set anything else up.
+
+00:05:13.980 --> 00:05:16.520
+But if you're more technically
+inclined you can also
+
+00:05:16.600 --> 00:05:20.960
+set this up so it's just
+connected to your AI directly.
+
+00:05:21.040 --> 00:05:23.560
+So you can do this directly
+in Claude or Hermes
+
+00:05:23.640 --> 00:05:26.780
+or Muse or Grok Bot or
+any AI that you want.
+
+00:05:27.060 --> 00:05:31.020
+So yeah, this is what the Higgsfield
+website looks like, and we already made an
+
+00:05:31.100 --> 00:05:36.940
+account, so I'm gonna go to one of their
+products that's called Supercomputer.
+
+00:05:37.400 --> 00:05:40.060
+So this one is probably more
+similar to what you're used
+
+00:05:40.140 --> 00:05:44.300
+to with like an AI chat box
+where you can prompt it,
+
+00:05:44.620 --> 00:05:48.080
+and essentially what you get here
+is like you get a computer in the
+
+00:05:48.160 --> 00:05:53.860
+backend in their cloud that you
+can use to build a entire project.
+
+00:05:53.940 --> 00:05:56.640
+So what I'm gonna show you is
+how to make a skill to make these
+
+00:05:56.720 --> 00:06:01.580
+visual explainers so that whenever
+you ask the AI to make a video,
+
+00:06:01.660 --> 00:06:05.700
+it knows exactly the style and format
+that you want the video to be in.
+
+00:06:05.820 --> 00:06:10.260
+And one reason why you might
+use this over ChatGPT or Claude
+
+00:06:10.340 --> 00:06:14.360
+natively is because they have
+access to all the different models.
+
+00:06:14.440 --> 00:06:18.100
+So if you see right here, you
+can use Auto, which is free,
+
+00:06:18.180 --> 00:06:23.580
+or you can use GPT-6 Astra,
+Opus 5.5, Fable, and even open
+
+00:06:23.660 --> 00:06:29.660
+source models that are extremely
+cheap like, Kimi K3 or GLM 5.3.
+
+00:06:30.300 --> 00:06:33.940
+For example, there's like
+extremely cheap ones right here.
+
+00:06:34.020 --> 00:06:37.820
+And with creating these visual
+explainers, basically the model that
+
+00:06:37.900 --> 00:06:40.980
+you select is extremely important
+because that is the model that's
+
+00:06:41.060 --> 00:06:44.660
+going to be writing the script, it's
+going to writing the explanations,
+
+00:06:44.840 --> 00:06:47.440
+and it's going to be the model
+that's putting everything together.
+
+00:06:48.220 --> 00:06:52.160
+And so if you're trying
+to do something like this,
+
+00:06:52.240 --> 00:06:54.400
+I would recommend using a frontier model.
+
+00:06:54.560 --> 00:06:58.940
+The one that I personally use that I
+find to be the best for this is Opus 5.5.
+
+00:06:59.400 --> 00:07:01.420
+You don't technically have
+to use a frontier model,
+
+00:07:01.500 --> 00:07:04.120
+but I found that when you
+don't use a frontier model,
+
+00:07:04.200 --> 00:07:08.980
+it tends to hallucinate, it tends
+to say things wrong or drift.
+
+00:07:09.220 --> 00:07:11.420
+So I think it's really
+worth using a frontier
+
+00:07:11.500 --> 00:07:13.780
+model when it comes to
+something like this.
+
+00:07:13.860 --> 00:07:16.820
+So after you select the model, I
+actually made a prompt that you
+
+00:07:16.900 --> 00:07:22.840
+can just drag in, and then that
+will help you set up the skill.
+
+00:07:22.920 --> 00:07:25.240
+And so the first thing
+it asks is which model
+
+00:07:25.320 --> 00:07:26.620
+do I wanna use it to generate the videos?
+
+00:07:26.700 --> 00:07:29.440
+I just select this one, GPT 2.5,
+
+00:07:30.840 --> 00:07:35.580
+and then the voice engine
+to narrate the videos.
+
+00:07:35.920 --> 00:07:39.920
+So this is the second thing I wanna
+talk about, which is the audio.
+
+00:07:40.220 --> 00:07:44.660
+And choo- I feel like choosing
+a voice that you like is really
+
+00:07:44.740 --> 00:07:47.360
+quite important for watching
+these videos and actually making
+
+00:07:47.440 --> 00:07:51.840
+it watchable because when it is
+a kind of crappy audio model,
+
+00:07:51.920 --> 00:07:56.160
+it's kind of hard to watch, and
+it just feels like a AI slop.
+
+00:07:56.440 --> 00:07:58.760
+But right now, I think ElevenLabs
+
+00:07:58.840 --> 00:08:02.860
+V4 is the best model for audio.
+
+00:08:02.940 --> 00:08:06.240
+Like, it genuinely sounds like
+a human being talking to you,
+
+00:08:06.420 --> 00:08:08.460
+which is kind of amazing
+and scary at the same time.
+
+00:08:08.600 --> 00:08:09.780
+But yeah, that, that's the one I use and
+
+00:08:09.860 --> 00:08:12.320
+that's the one I showed
+in the example earlier.
+
+00:08:12.540 --> 00:08:15.960
+Seven scale shapes with
+seven strange Greek names.
+
+00:08:16.040 --> 00:08:19.580
+Seven scale shapes with
+seven strange Greek names.
+
+00:08:19.780 --> 00:08:22.940
+Every Bitcoin is locked
+by a single maths problem.
+
+00:08:23.080 --> 00:08:26.120
+Every Bitcoin is locked
+by a single maths problem.
+
+00:08:26.200 --> 00:08:29.640
+I'm gonna select this, ElevenLabs V4.
+
+00:08:29.860 --> 00:08:32.740
+They have, they do have a
+website, right here called,
+
+00:08:34.740 --> 00:08:36.640
+AI Voice Cloning, which is just part...
+
+00:08:36.720 --> 00:08:37.940
+One of the things that they have here.
+
+00:08:38.020 --> 00:08:41.660
+So you can clone your own voice with V4,
+
+00:08:42.580 --> 00:08:46.880
+and it will just be you
+narrating the voice.
+
+00:08:46.960 --> 00:08:49.720
+And I did try that, but it
+was kind of weird to have my,
+
+00:08:49.800 --> 00:08:54.340
+my own voice explain to me a concept,
+so I prefer to use one, from elsewhere.
+
+00:08:54.420 --> 00:08:56.920
+There's also this other page,
+AI Text to Speech, where,
+
+00:08:57.420 --> 00:08:59.860
+you can try out the different
+models if you want to use
+
+00:09:00.360 --> 00:09:04.180
+a different voice model,
+which may be cheaper or free.
+
+00:09:04.260 --> 00:09:09.540
+So you can see within the prompt, I made
+it so that it will ask you for which
+
+00:09:09.620 --> 00:09:13.080
+voice you want, and you can just click
+play to hear the different voices.
+
+00:09:13.160 --> 00:09:15.360
+Pull up a chair and tell your story.
+
+00:09:15.440 --> 00:09:18.020
+Our little team finally
+crossed the finish line.
+
+00:09:18.100 --> 00:09:19.580
+Hello, I'm Arthur.
+
+00:09:19.660 --> 00:09:21.160
+Yeah, okay, I'm gonna choose Arthur.
+
+00:09:21.240 --> 00:09:23.540
+So for the visuals and style,
+that's really up to you.
+
+00:09:23.620 --> 00:09:28.100
+For example, with Andrej Karpathy, the
+one that he added in his prompt was to
+
+00:09:28.180 --> 00:09:32.900
+make it look like a 3V1B explainer video,
+so that has, like, a specific style.
+
+00:09:33.140 --> 00:09:35.040
+So if there's a specific
+style that you want,
+
+00:09:35.120 --> 00:09:37.900
+you can also select that, or
+you can just select default.
+
+00:09:38.340 --> 00:09:42.140
+And as you use this skill,
+like whether you use it here or
+
+00:09:42.340 --> 00:09:46.880
+directly in the AI that you
+already use, you could change it
+
+00:09:46.960 --> 00:09:50.720
+over time so that it's more refined
+to be exactly what you want.
+
+00:09:50.860 --> 00:09:53.140
+And even the explanations,
+you can refine over time so
+
+00:09:53.220 --> 00:09:56.380
+that it's closer to exactly
+the way that you want it.
+
+00:09:56.460 --> 00:09:59.940
+And in terms of what's going on
+underneath for creating the visuals,
+
+00:10:00.140 --> 00:10:02.500
+it's using a variety of different tools.
+
+00:10:02.580 --> 00:10:05.700
+So one of them is GPT 2.5 images,
+and that basically generate
+
+00:10:05.780 --> 00:10:09.620
+the different images that are
+required in the explanations.
+
+00:10:09.900 --> 00:10:14.940
+And another one that it uses is this
+actually open source program called Manim,
+
+00:10:15.280 --> 00:10:18.980
+and it basically is able to
+create mathematical explanations,
+
+00:10:19.060 --> 00:10:22.279
+like graphs and different
+points and arrows,
+
+00:10:22.520 --> 00:10:26.280
+and it does all this programmatically,
+so it doesn't even cost any,
+
+00:10:26.760 --> 00:10:29.940
+generation credits in terms
+of, like, image generation.
+
+00:10:30.020 --> 00:10:32.320
+All right, so after I do that,
+it just spent a few minutes,
+
+00:10:32.400 --> 00:10:36.180
+and then it fully made the skill,
+which is the explainer video skill.
+
+00:10:36.640 --> 00:10:40.480
+So to test it out, I'll just
+tell it to make a 30-second,
+
+00:10:41.000 --> 00:10:46.960
+make, make a 30-second video
+explaining how bonds work,
+
+00:10:47.100 --> 00:10:48.960
+and then I will click enter.
+
+00:10:49.240 --> 00:10:51.000
+Two minutes later.
+
+00:10:51.160 --> 00:10:53.720
+A bond is a loan you can trade.
+
+00:10:54.080 --> 00:10:59.480
+You lend a government $1,000 and
+it promises to pay you $50 a year,
+
+00:10:59.680 --> 00:11:01.880
+then return the thousand at the end.
+
+00:11:02.340 --> 00:11:06.280
+That $50 is the coupon,
+and it never changes.
+
+00:11:07.320 --> 00:11:10.560
+But new bonds are issued
+at today's interest rates.
+
+00:11:10.920 --> 00:11:15.300
+If rates rise to 10%,
+your 5% bond looks worse,
+
+00:11:15.460 --> 00:11:19.080
+so its price falls until its
+yield matches the market.
+
+00:11:19.420 --> 00:11:22.160
+Prices and yields move like a seesaw.
+
+00:11:22.960 --> 00:11:24.600
+So yeah, that's pretty much the
+skill, and you can just tell
+
+00:11:24.680 --> 00:11:27.740
+your AI to use the skill whenever
+it needs to make a video.
+
+00:11:27.860 --> 00:11:29.480
+And whenever you wanna
+use it, you can just say,
+
+00:11:29.560 --> 00:11:34.060
+"Make a explainer or summary of
+this," and you can just drag in a
+
+00:11:34.140 --> 00:11:37.520
+file or a document, and it will
+just do everything automatically.
+
+00:11:37.600 --> 00:11:40.160
+They also have built-in templates
+for explainer videos, so you can go
+
+00:11:40.240 --> 00:11:44.620
+to this tab, Explainer videos, and
+if you like any of these styles,
+
+00:11:44.700 --> 00:11:48.580
+you can also just recreate them, and
+then you can make that into a new skill.
+
+00:11:48.740 --> 00:11:51.480
+All right, so my workflow
+and what I use it for.
+
+00:11:51.844 --> 00:11:55.524
+So in terms of how I mostly use
+this workflow, I just created a
+
+00:11:55.604 --> 00:11:59.824
+skill that I have in Claude Code
+and in my Hermes AI Assistant setup,
+
+00:12:00.024 --> 00:12:02.804
+so that they can just automatically
+create video explainers
+
+00:12:02.884 --> 00:12:05.284
+for me whenever I need
+something explained visually.
+
+00:12:05.364 --> 00:12:08.884
+And all you have to do is to basically
+get the API keys from Haxfield
+
+00:12:08.964 --> 00:12:12.624
+and any other services, and just
+create the skill directly in there.
+
+00:12:12.704 --> 00:12:14.324
+Personally, this has been
+extremely game-changing.
+
+00:12:14.404 --> 00:12:19.844
+Like, along with the daily briefs for
+different news and headlines, it's also
+
+00:12:19.924 --> 00:12:24.724
+really nice to have it analyze different
+things that I'm working on, like having
+
+00:12:24.804 --> 00:12:28.924
+it analyze the breakdown of my channel
+and the performance from month to month.
+
+00:12:29.004 --> 00:12:32.384
+And in the back end, it just automatically
+aggregates all the information,
+
+00:12:32.504 --> 00:12:35.524
+does the analysis, and it
+honestly saves me a lot of time.
+
+00:12:35.604 --> 00:12:40.204
+This was basically not possible a few
+months ago, and genuinely at this point,
+
+00:12:40.284 --> 00:12:42.144
+I feel like the models don't
+even need to get any better.
+
+00:12:42.224 --> 00:12:46.084
+Like, just at this point right
+now, it is extremely useful.
+
+00:12:46.504 --> 00:12:50.024
+I've also found visual explainers to
+be great for reviewing books and things
+
+00:12:50.104 --> 00:12:52.884
+that I've learned about in the past,
+because I can just create a summary,
+
+00:12:52.964 --> 00:12:56.764
+and I can review it from time to time,
+almost like a space repetition system.
+
+00:12:56.844 --> 00:13:00.404
+But also with learning languages, it's
+been super helpful because I can create
+
+00:13:00.484 --> 00:13:04.124
+basically custom immersion for
+hyper-specific things like maybe something
+
+00:13:04.204 --> 00:13:09.204
+like repairing a bicycle or even just
+retell stories from my life in a very
+
+00:13:09.284 --> 00:13:13.464
+natural way that can help me understand
+the best way to say that in the future.
+
+00:13:13.544 --> 00:13:16.164
+I think the possibilities are really
+quite endless, and there's still a
+
+00:13:16.244 --> 00:13:19.704
+lot of things that I want to try,
+like creating mnemonics for memorizing
+
+00:13:19.784 --> 00:13:23.844
+things or even recreating dreams or
+memories from my journal entries.
+
+00:13:24.044 --> 00:13:27.124
+If you guys try this out and have
+some interesting applications,
+
+00:13:27.204 --> 00:13:28.984
+I would definitely be
+interested in hearing about it.
+
+00:13:29.064 --> 00:13:32.164
+But with all that being said, if
+you are considering trying this out,
+
+00:13:32.244 --> 00:13:35.204
+there are three main limitations
+at this current point in time.
+
+00:13:35.284 --> 00:13:38.704
+Probably the biggest limitation
+right now is the cost.
+
+00:13:38.904 --> 00:13:43.444
+So each part of the stack has a different
+cost associated with it, like the audio,
+
+00:13:43.524 --> 00:13:46.604
+the visuals, the reasoning, like
+the model that you're using.
+
+00:13:47.044 --> 00:13:51.984
+And it could come out to maybe a
+dollar for a video or maybe less than
+
+00:13:52.064 --> 00:13:55.484
+a dollar for a video, and so that
+may or may not be worth it for you.
+
+00:13:55.564 --> 00:13:57.484
+There are a lot of ways that
+you could reduce the cost,
+
+00:13:57.564 --> 00:14:02.744
+so for example, if you already have
+a Claude or OpenAI subscription,
+
+00:14:02.924 --> 00:14:05.184
+you could just have it
+be part of your usage.
+
+00:14:05.264 --> 00:14:08.804
+All the diagrams could be generated,
+programmatically on your computer,
+
+00:14:08.884 --> 00:14:11.744
+and maybe even the visuals could
+be part of the subscription.
+
+00:14:11.824 --> 00:14:15.424
+At least with Haxfield, like creating an
+image or creating a few images for each
+
+00:14:15.504 --> 00:14:19.564
+generation, it doesn't really cost that
+much, considering what you're getting.
+
+00:14:19.644 --> 00:14:22.104
+But I do think that the cost
+is really only temporary,
+
+00:14:22.184 --> 00:14:25.324
+and over time they will go down and
+become cheaper and cheaper to the
+
+00:14:25.404 --> 00:14:27.924
+point where we can just run them
+locally on our phones or computers.
+
+00:14:28.004 --> 00:14:32.484
+But yeah, besides the cost, the second
+limitation I would say is the time.
+
+00:14:32.564 --> 00:14:36.364
+Right now, each generation could still
+take maybe five to ten minutes to
+
+00:14:36.444 --> 00:14:40.904
+generate, depending on how complex it
+is that the visual explainer it is.
+
+00:14:41.324 --> 00:14:44.244
+So it really makes the most
+sense for something that
+
+00:14:44.324 --> 00:14:47.604
+it can do in the background
+or do on a schedule.
+
+00:14:47.684 --> 00:14:52.144
+So for me, it works really
+well with the daily brief or
+
+00:14:52.324 --> 00:14:55.664
+the weekly or monthly analysis
+videos I have it make.
+
+00:14:55.744 --> 00:14:59.204
+I'm really looking forward to
+in the near future where it can
+
+00:14:59.284 --> 00:15:03.084
+generate these videos almost
+instantaneously in real time,
+
+00:15:03.164 --> 00:15:06.404
+so instead of a voice
+call with your AI agent,
+
+00:15:06.484 --> 00:15:09.884
+it's like a video call where you can
+just see different things moving around.
+
+00:15:10.424 --> 00:15:13.784
+I think that will really
+be quite fun and exciting.
+
+00:15:13.864 --> 00:15:16.224
+The last limitation I
+wanna share is that this
+
+00:15:16.304 --> 00:15:19.464
+is really not a replacement
+for true learning.
+
+00:15:19.704 --> 00:15:24.464
+And, this could be more of a reminder
+than it is a limitation, but it's
+
+00:15:24.544 --> 00:15:28.804
+important to remember that with true
+learning, you need to have active recall,
+
+00:15:28.884 --> 00:15:33.244
+and you need to have actual application
+of the things that you're learning.
+
+00:15:33.324 --> 00:15:36.204
+I think it's important to just remember
+to not fall down the rabbit hole of just
+
+00:15:36.284 --> 00:15:39.804
+consuming more information or generating
+more information for you to learn
+
+00:15:39.884 --> 00:15:44.164
+instead of actually using that information
+and applying it in your own life.
+
+00:15:44.244 --> 00:15:47.444
+Obviously, this is less applicable if
+you're just telling your AI to create
+
+00:15:47.524 --> 00:15:52.084
+analysis videos or summary videos, but
+I think it's still worth remembering.
+
+00:15:52.184 --> 00:15:54.244
+If you wanna try it out for
+yourself, you can check out the link
+
+00:15:54.324 --> 00:15:57.744
+in the description to try out using
+Haxfield, and I've only really
+
+00:15:57.824 --> 00:16:00.044
+scratched the surface with what
+is possible on their platform.
+
+00:16:00.124 --> 00:16:02.864
+They have a whole suite
+of tools for making
+
+00:16:02.944 --> 00:16:05.504
+cinematic videos, even games, and more.
+
+00:16:05.744 --> 00:16:09.443
+So yeah, you can try it out and let
+me know your experience with using it.
+
+00:16:09.684 --> 00:16:11.184
+But yeah, that's pretty
+much it for this video.
+
+00:16:11.264 --> 00:16:16.064
+If you wanna see further how I set up
+my AI assistant to send me daily video
+
+00:16:16.144 --> 00:16:19.444
+briefs, you can check out the video
+right here, and I'll see you over there.
+
+00:16:19.524 --> 00:16:20.524
+Let's get it.
+
