@@ -1,0 +1,73 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:00.000 --> 00:00:01.700
+It's time for a new puzzle of the month.
+
+00:00:02.050 --> 00:00:04.649
+Suppose you have two spheres, each of radius 1,
+
+00:00:04.949 --> 00:00:06.550
+positioned randomly in space,
+
+00:00:06.800 --> 00:00:08.100
+but you know that they intersect.
+
+00:00:08.550 --> 00:00:11.300
+What is the expected volume of that intersection?
+
+00:00:11.950 --> 00:00:13.050
+Or phrased another way,
+
+00:00:13.350 --> 00:00:14.448
+you could say one sphere is
+
+00:00:14.448 --> 00:00:15.350
+centered at the origin,
+
+00:00:15.800 --> 00:00:17.632
+and you choose a random point within
+
+00:00:17.632 --> 00:00:19.266
+a distance 2 of the origin to be
+
+00:00:19.266 --> 00:00:20.900
+the center of that second sphere.
+
+00:00:21.250 --> 00:00:23.500
+This guarantees that the two spheres intersect,
+
+00:00:23.750 --> 00:00:25.193
+although where they intersect is
+
+00:00:25.193 --> 00:00:26.550
+some hard to think about shape.
+
+00:00:26.550 --> 00:00:28.842
+Depending on where that second sphere ended up.
+
+00:00:28.842 --> 00:00:30.234
+And again, the question is,
+
+00:00:30.534 --> 00:00:33.084
+what is the expected volume of that shape?
+
+00:00:33.634 --> 00:00:35.659
+By the way, I've been saving up solutions to
+
+00:00:35.659 --> 00:00:37.639
+several of these monthly puzzles to package
+
+00:00:37.639 --> 00:00:39.709
+together into fuller videos that I'll publish
+
+00:00:39.709 --> 00:00:41.734
+near the end of the year during the holidays.
+
+00:00:41.884 --> 00:00:44.013
+In the meantime, a few previews are available
+
+00:00:44.013 --> 00:00:44.984
+to Patreon supporters.
+
