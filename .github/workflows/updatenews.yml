@@ -3,7 +3,7 @@ name: Update News
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 5-23/8 * * *"
+    - cron: "0 4-23/8 * * *"
 
 # Both workflows write data/archive.json: one queue, never cancelled midway.
 concurrency:
