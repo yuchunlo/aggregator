@@ -1,0 +1,654 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:00.240 --> 00:00:06.400
+You've probably seen the headlines. OpenAI&nbsp;
+launched ChatGPT Atlas, the AI browser. Sam&nbsp;&nbsp;
+
+00:00:06.400 --> 00:00:12.960
+Altman called it a "once-a-decade opportunity.”&nbsp;
+And 292 days later… they shut it down. Yeah.
+
+00:00:12.960 --> 00:00:17.120
+But that's just the start. AI&nbsp;
+browsers popped up everywhere,&nbsp;&nbsp;
+
+00:00:17.120 --> 00:00:22.160
+and most of them are dying. Microsoft's&nbsp;
+Copilot Mode in Edge was retired after&nbsp;&nbsp;
+
+00:00:22.160 --> 00:00:29.600
+289 days. None of them seem to hold a candle to&nbsp;
+regular browsers. No one is using AI browsers.&nbsp;&nbsp;
+
+00:00:29.600 --> 00:00:43.600
+Why? Why can't anyone, not&nbsp;
+even OpenAI, get you to switch?
+
+00:00:43.600 --> 00:00:49.440
+Between May and October 2025, five companies&nbsp;
+launched or announced AI browsers within just&nbsp;&nbsp;
+
+00:00:49.440 --> 00:00:53.600
+six months, each pitching an agent&nbsp;
+that would browse the web for you.
+
+00:00:53.600 --> 00:00:58.960
+One of which is Dia by The Browser Company. If&nbsp;
+you're into productivity, you've probably heard&nbsp;&nbsp;
+
+00:00:58.960 --> 00:01:04.480
+of them, they made another popular browser: Arc.&nbsp;
+It even drew investors like LinkedIn's Jeff Weiner&nbsp;&nbsp;
+
+00:01:04.480 --> 00:01:12.080
+and Figma's Dylan Field, and raised $128 million.&nbsp;
+By March 2024, it was valued at $550 million.
+
+00:01:12.080 --> 00:01:16.960
+So, what’s this Dia browser? Its&nbsp;
+search bar is also a chatbot,&nbsp;&nbsp;
+
+00:01:16.960 --> 00:01:21.440
+it has a sidebar assistant that can read&nbsp;
+every open tab, and has “skills,” which are&nbsp;&nbsp;
+
+00:01:21.440 --> 00:01:26.880
+saved prompts which function like automation.&nbsp;
+That last function is honestly kinda cool!
+
+00:01:26.880 --> 00:01:31.360
+And soon, everyone seemed to be jumping&nbsp;
+on the same trend. Opera launched Neon,&nbsp;&nbsp;
+
+00:01:31.360 --> 00:01:36.480
+a $19.99-a-month browser with an agent "Neon&nbsp;
+Do" which fills in forms, compares products,&nbsp;&nbsp;
+
+00:01:36.480 --> 00:01:39.600
+orders groceries, that sort of thing. Like Dia,&nbsp;&nbsp;
+
+00:01:39.600 --> 00:01:44.720
+it also has "Cards" which are reusable prompts&nbsp;
+you can stack, plus some other features.
+
+00:01:44.720 --> 00:01:48.640
+Then Perplexity, the AI search&nbsp;
+engine research tool, launched Comet,&nbsp;&nbsp;
+
+00:01:48.640 --> 00:01:52.560
+and Microsoft started turning Edge&nbsp;
+into a Copilot-powered assistant.
+
+00:01:52.560 --> 00:01:58.320
+“Edge doesn't just wait idly for you to click&nbsp;
+but anticipates what you might want to do next."
+
+00:01:58.320 --> 00:02:03.920
+Interesting, and you know who else jumped&nbsp;
+on this? Google. But I’m not talking about&nbsp;&nbsp;
+
+00:02:03.920 --> 00:02:09.200
+Gemini. Google's browser agent, Project&nbsp;
+Mariner, was shown onstage at I/O 2025,&nbsp;&nbsp;
+
+00:02:09.200 --> 00:02:15.760
+on a $250-a-month AI Ultra plan. An AI agent,&nbsp;
+but built for using browsers specifically.
+
+00:02:15.760 --> 00:02:21.760
+A few months later, OpenAI joined the race with&nbsp;
+ChatGPT Atlas. It had ChatGPT built into every&nbsp;&nbsp;
+
+00:02:21.760 --> 00:02:26.080
+page, could remember the sites you visited, and&nbsp;
+could even carry out tasks for you through its&nbsp;&nbsp;
+
+00:02:26.080 --> 00:02:32.640
+agent mode. At launch, it was only available on&nbsp;
+Mac. To Sam Altman, that was the time for chatbots&nbsp;&nbsp;
+
+00:02:32.640 --> 00:02:39.040
+to replace URL bars. And on Atlas's launch day,&nbsp;
+Alphabet, Google's parent company, fell 2%.
+
+00:02:39.040 --> 00:02:43.440
+But there’s still a question.&nbsp;
+Browsers adding AI features I get,&nbsp;&nbsp;
+
+00:02:43.440 --> 00:02:47.440
+but why are AI companies obsessed with browsers?
+
+00:02:47.440 --> 00:02:52.080
+Well, think about it. The browser is&nbsp;
+where people spend hours every day.&nbsp;&nbsp;
+
+00:02:52.080 --> 00:02:56.640
+Habits go pretty deep. If you can capture&nbsp;
+a layer where users naturally congregate,&nbsp;&nbsp;
+
+00:02:56.640 --> 00:03:02.640
+it can be very lucrative. For advertising, for&nbsp;
+subscriptions, and for something else. Data.
+
+00:03:02.640 --> 00:03:08.800
+In April 2025, Perplexity's CEO explained that&nbsp;
+"We want to get data even outside the app to&nbsp;&nbsp;
+
+00:03:08.800 --> 00:03:13.520
+better understand you. We plan to use all the&nbsp;
+context to build a better user profile and,&nbsp;&nbsp;
+
+00:03:13.520 --> 00:03:18.080
+maybe, you know, through our Discover&nbsp;
+feed we could show some ads there."
+
+00:03:18.080 --> 00:03:23.520
+Browsers are a goldmine of data. Preferences,&nbsp;
+habits, behavioral information, purchasing&nbsp;&nbsp;
+
+00:03:23.520 --> 00:03:29.040
+information. Imagine what your AI might&nbsp;
+know about you, just by watching you browse?
+
+00:03:29.040 --> 00:03:33.200
+So, the recent shift in the direction of the&nbsp;
+internet has given many companies a chance&nbsp;&nbsp;
+
+00:03:33.200 --> 00:03:38.480
+to get into the game. With, at least on the&nbsp;
+surface, a compelling unique selling point.
+
+00:03:38.480 --> 00:03:40.960
+This was a "rare, once-a-decade opportunity&nbsp;&nbsp;
+
+00:03:40.960 --> 00:03:44.080
+to rethink what a browser can&nbsp;
+be about and how to use one."
+
+00:03:44.080 --> 00:03:47.200
+There’s something hugely ironic&nbsp;
+about all this, which we’ll get&nbsp;&nbsp;
+
+00:03:47.200 --> 00:04:02.080
+to later. But first… what happened to all&nbsp;
+of these AI browsers? Where did they go?
+
+00:04:02.080 --> 00:04:06.720
+By May 2026, Microsoft had retired&nbsp;
+Copilot Mode in Edge, leaving its&nbsp;&nbsp;
+
+00:04:06.720 --> 00:04:12.880
+browsing agent available in a more limited form&nbsp;
+to Microsoft 365 Premium subscribers in the US.&nbsp;&nbsp;
+
+00:04:12.880 --> 00:04:17.280
+But even Microsoft's own executives&nbsp;
+were questioning where Copilot belonged.
+
+00:04:17.280 --> 00:04:22.080
+“It’s critical that we remove Copilot from&nbsp;
+places where it doesn’t live up to its promise.”
+
+00:04:22.080 --> 00:04:25.760
+Google's attempt didn't fare much&nbsp;
+better. Project Mariner was slow,&nbsp;&nbsp;
+
+00:04:25.760 --> 00:04:30.960
+expensive, and prone to mistakes. By&nbsp;
+May 2026, Google had shut it down,&nbsp;&nbsp;
+
+00:04:30.960 --> 00:04:36.000
+moving its technology into other products.&nbsp;
+The most telling, though, was Atlas.
+
+00:04:36.000 --> 00:04:41.760
+By March 2026, OpenAI was already warning its&nbsp;
+staff not to get distracted by side quests,&nbsp;&nbsp;
+
+00:04:41.760 --> 00:04:46.880
+calling Anthropic's lead in enterprise AI&nbsp;
+a wake-up call. And Atlas was one of those&nbsp;&nbsp;
+
+00:04:46.880 --> 00:04:52.000
+side quests. In July, OpenAI announced that&nbsp;
+the browser would stop working on August 9,&nbsp;&nbsp;
+
+00:04:52.000 --> 00:04:57.760
+2026, less than a year after its launch.&nbsp;
+Atlas had never even made it beyond Mac.
+
+00:04:57.760 --> 00:05:01.600
+And now, instead of competing&nbsp;
+with Chrome, OpenAI is folding&nbsp;&nbsp;
+
+00:05:01.600 --> 00:05:06.800
+Atlas features into existing products from&nbsp;
+browsing inside the ChatGPT desktop app to&nbsp;&nbsp;
+
+00:05:06.800 --> 00:05:12.880
+cloud browsing for its workplace agents.&nbsp;
+Ironically, it is now a Chrome extension.
+
+00:05:12.880 --> 00:05:18.240
+But, did you know Atlas wasn’t even OpenAI’s&nbsp;
+first try at this? That was Operator,&nbsp;&nbsp;
+
+00:05:18.240 --> 00:05:23.200
+launched in January 2025. It could click through&nbsp;
+websites to fill out forms, order groceries,&nbsp;&nbsp;
+
+00:05:23.200 --> 00:05:29.840
+and book appointments. But just seven months&nbsp;
+later, it ended up like Atlas as a ChatGPT agent.
+
+00:05:29.840 --> 00:05:32.640
+What’s also funny is that in May 2026,&nbsp;&nbsp;
+
+00:05:32.640 --> 00:05:38.560
+AI-visibility firm presenc.ai called Atlas&nbsp;
+"the breakout winner" of the AI browser race,&nbsp;&nbsp;
+
+00:05:38.560 --> 00:05:44.400
+with an estimated 10–15 million monthly users.&nbsp;
+Only for it to shut down a few months later.
+
+00:05:44.400 --> 00:05:49.680
+There were a couple of winners though. Or&nbsp;
+maybe “survivors” is the better term. Opera&nbsp;&nbsp;
+
+00:05:49.680 --> 00:05:54.640
+Neon is still around, but, Opera hasn’t&nbsp;
+mentioned it in a while. Even in their&nbsp;&nbsp;
+
+00:05:54.640 --> 00:06:00.080
+full earnings call, which included AI use in&nbsp;
+their existing browsers… No mention of Neon.
+
+00:06:00.080 --> 00:06:06.240
+Dia is still around, but is changing focus.&nbsp;
+And this is a weird one. After introducing Dia,&nbsp;&nbsp;
+
+00:06:06.240 --> 00:06:08.560
+The Browser Company also tried to bring all&nbsp;&nbsp;
+
+00:06:08.560 --> 00:06:13.520
+kinds of AI features into Arc as&nbsp;
+well. But that became a problem.
+
+00:06:13.520 --> 00:06:16.400
+"For most people, Arc was simply too different,&nbsp;&nbsp;
+
+00:06:16.400 --> 00:06:19.600
+with too many new things to&nbsp;
+learn, for too little reward."
+
+00:06:19.600 --> 00:06:25.440
+He also admitted that Arc "lacked cohesion,&nbsp;
+in both its core features and core value."
+
+00:06:25.440 --> 00:06:29.040
+I don’t think people agree,&nbsp;
+as a lot of people loved Arc,&nbsp;&nbsp;
+
+00:06:29.040 --> 00:06:34.720
+but it definitely lacked cohesion after a&nbsp;
+bunch of AI features were added. Eventually,&nbsp;&nbsp;
+
+00:06:34.720 --> 00:06:40.000
+the company began pushing users toward&nbsp;
+Dia, and ended development on Arc.
+
+00:06:40.000 --> 00:06:45.440
+Then Atlassian bought The Browser Company for&nbsp;
+$610 million, hoping to turn Dia browser into&nbsp;&nbsp;
+
+00:06:45.440 --> 00:06:49.840
+a tool that could do more than just&nbsp;
+browse the web. In September 2026,&nbsp;&nbsp;
+
+00:06:49.840 --> 00:06:52.400
+Atlassian CEO Mike Cannon-Brookes said:
+
+00:06:52.400 --> 00:06:55.520
+"We're building a doer, not a browser."
+
+00:06:55.520 --> 00:06:58.640
+Dia still hadn't released its Windows version.
+
+00:06:58.640 --> 00:07:03.680
+Meanwhile, Comet kept going.&nbsp;
+After its launch in July 2025,&nbsp;&nbsp;
+
+00:07:03.680 --> 00:07:08.320
+it went free by October, arrived on iOS&nbsp;
+in March 2026, and was still receiving&nbsp;&nbsp;
+
+00:07:08.320 --> 00:07:14.080
+updates in September. In August, it&nbsp;
+also won its appeal against Amazon.
+
+00:07:14.080 --> 00:07:18.880
+So why did Perplexity keep pushing&nbsp;
+while OpenAI pulled back? Perplexity&nbsp;&nbsp;
+
+00:07:18.880 --> 00:07:22.960
+tried to get its AI assistant onto&nbsp;
+phones as the default, but Google's&nbsp;&nbsp;
+
+00:07:22.960 --> 00:07:27.920
+existing agreements stood in the way. So,&nbsp;
+building a browser offered another route.
+
+00:07:27.920 --> 00:07:32.960
+Unlike Atlas, Comet is built around Perplexity's&nbsp;
+own AI search engine. That means people who&nbsp;&nbsp;
+
+00:07:32.960 --> 00:07:38.720
+already use Perplexity have a reason to switch.&nbsp;
+Ironically, Comet defaults to Google for search&nbsp;&nbsp;
+
+00:07:38.720 --> 00:07:44.880
+on iOS. Even Perplexity's CEO admits that Google&nbsp;
+handles navigational searches better than anyone.
+
+00:07:44.880 --> 00:07:49.440
+Perplexity Comet has 10 million monthly&nbsp;
+active users. That sounds like a lot.&nbsp;&nbsp;
+
+00:07:49.440 --> 00:07:54.880
+Does that prove that AI browsers are a&nbsp;
+success? Well, let’s take a step back.
+
+00:07:54.880 --> 00:08:00.560
+Firefox, the fourth-largest browser, with&nbsp;
+just 2.8% of the market, had 198 million&nbsp;&nbsp;
+
+00:08:00.560 --> 00:08:06.560
+monthly active users. Almost 20 times&nbsp;
+that of Comet. And Chrome even bigger.
+
+00:08:06.560 --> 00:08:12.240
+But you know what’s stranger? Perplexity&nbsp;
+tried to buy Chrome from Google. For $34.5&nbsp;&nbsp;
+
+00:08:12.240 --> 00:08:17.360
+billion. All cash too. Yeah. Double&nbsp;
+Perplexity’s valuation, by the way.
+
+00:08:17.360 --> 00:08:22.480
+It turns out this is actually an important piece&nbsp;
+of this story, and related to a bigger question:&nbsp;&nbsp;
+
+00:08:22.480 --> 00:08:27.600
+Why does nobody seem to use AI browsers? It&nbsp;
+seems they even die, or get reworked into&nbsp;&nbsp;
+
+00:08:27.600 --> 00:08:35.440
+something other than a dedicated browser. Why have&nbsp;
+so many shut down or failed to get user adoption?
+
+00:08:42.320 --> 00:08:45.200
+If you’ve watched this far, consider subscribing!&nbsp;&nbsp;
+
+00:08:45.200 --> 00:08:48.960
+It helps the channel and means&nbsp;
+you won’t miss future videos.
+
+00:08:48.960 --> 00:08:52.160
+There are a few reasons. First, the reality is,&nbsp;&nbsp;
+
+00:08:52.160 --> 00:08:55.680
+most people stick with whatever&nbsp;
+comes on their phone or computer.
+
+00:08:55.680 --> 00:09:01.680
+Chrome controls about 69% of the global&nbsp;
+browser market, while Safari has nearly 16%.&nbsp;&nbsp;
+
+00:09:01.680 --> 00:09:04.640
+Even OpenAI, with 800 million weekly users,&nbsp;&nbsp;
+
+00:09:04.640 --> 00:09:09.600
+struggled to convert a fraction of its users&nbsp;
+to Atlas. In fact, according to reports,&nbsp;&nbsp;
+
+00:09:09.600 --> 00:09:13.920
+AI browsers combined account for less than 1%&nbsp;
+of the global market. Less than 1%, combined.
+
+00:09:13.920 --> 00:09:18.080
+Most people just use what’s already&nbsp;
+there. Installing a new, unfamiliar&nbsp;&nbsp;
+
+00:09:18.080 --> 00:09:22.400
+browser with lots of new functions&nbsp;
+is a big ask for a lot of people.
+
+00:09:22.400 --> 00:09:27.440
+But that's just the beginning. The few&nbsp;
+users they manage to pull are put at risk.
+
+00:09:27.440 --> 00:09:31.280
+AI browser agents can read websites,&nbsp;
+click buttons, fill out forms,&nbsp;&nbsp;
+
+00:09:31.280 --> 00:09:37.040
+and take actions for you. That also makes them&nbsp;
+vulnerable to a trick called prompt injection,&nbsp;&nbsp;
+
+00:09:37.040 --> 00:09:40.720
+where hidden instructions on a webpage&nbsp;
+can manipulate what an AI does.
+
+00:09:40.720 --> 00:09:44.960
+They might be the same color as the page&nbsp;
+background, for example. You can’t see them,&nbsp;&nbsp;
+
+00:09:44.960 --> 00:09:50.960
+but the AI can. People can use this to trick&nbsp;
+your LLM into sharing your private details,&nbsp;&nbsp;
+
+00:09:50.960 --> 00:09:55.840
+sending you malware, or even connecting&nbsp;
+to remote plugins that run malicious code.
+
+00:09:55.840 --> 00:09:57.920
+Security researchers demonstrated the problem on&nbsp;&nbsp;
+
+00:09:57.920 --> 00:10:03.600
+Atlas using just a few hidden words in&nbsp;
+a Google Doc. Even OpenAI admits that:
+
+00:10:03.600 --> 00:10:06.960
+"Prompt injection, much like scams&nbsp;
+and social engineering on the web,&nbsp;&nbsp;
+
+00:10:06.960 --> 00:10:09.760
+is unlikely to ever be fully 'solved.'"
+
+00:10:09.760 --> 00:10:14.720
+Gartner even advised companies to block AI&nbsp;
+browsers until safer versions were ready.
+
+00:10:14.720 --> 00:10:18.800
+Major websites also wanted them&nbsp;
+out, too. In November 2025,&nbsp;&nbsp;
+
+00:10:18.800 --> 00:10:24.080
+Amazon sued Perplexity over Comet's shopping&nbsp;
+agent, alleging that it disguised itself as a&nbsp;&nbsp;
+
+00:10:24.080 --> 00:10:28.960
+regular browser while shopping through users'&nbsp;
+accounts. A judge temporarily ruled against&nbsp;&nbsp;
+
+00:10:28.960 --> 00:10:34.320
+Comet in March 2026. But in August, an&nbsp;
+appeals court overturned that order,&nbsp;&nbsp;
+
+00:10:34.320 --> 00:10:38.560
+finding that the user, rather than&nbsp;
+Perplexity, was the one accessing Amazon.
+
+00:10:38.560 --> 00:10:40.400
+The legal fight isn't over,&nbsp;&nbsp;
+
+00:10:40.400 --> 00:10:45.040
+but perhaps the biggest reason is that…&nbsp;
+AI didn't really need a new browser.
+
+00:10:45.040 --> 00:10:51.040
+These AI functions are likely very helpful for&nbsp;
+some people. But, for most people, even AI users,&nbsp;&nbsp;
+
+00:10:51.040 --> 00:10:57.600
+just unnecessary. If you ask ChatGPT or Claude&nbsp;
+to “search for you”… it just does it. How is&nbsp;&nbsp;
+
+00:10:57.600 --> 00:11:02.560
+putting it in a browser any better? Maybe for&nbsp;
+niche uses, like the Perplexity search engine,&nbsp;&nbsp;
+
+00:11:02.560 --> 00:11:06.880
+but for the vast, vast majority of&nbsp;
+people, that’s more than enough.
+
+00:11:06.880 --> 00:11:11.760
+Microsoft moved Copilot's browsing features&nbsp;
+into Edge. OpenAI started moving Atlas's&nbsp;&nbsp;
+
+00:11:11.760 --> 00:11:17.280
+features into ChatGPT and a Chrome extension.&nbsp;
+The extra value of using a separate AI browser,&nbsp;&nbsp;
+
+00:11:17.280 --> 00:11:21.840
+instead of using AI in a browser you&nbsp;
+already have, just wasn't that high.
+
+00:11:21.840 --> 00:11:24.640
+There's one big AI browser that I intentionally&nbsp;&nbsp;
+
+00:11:24.640 --> 00:11:29.040
+left out of this. The one that&nbsp;
+did succeed was… Google Chrome.
+
+00:11:29.040 --> 00:11:34.080
+Google started adding Gemini to Chrome, then&nbsp;
+launched Auto Browse in January 2026. It&nbsp;&nbsp;
+
+00:11:34.080 --> 00:11:38.560
+could click, scroll, and fill out forms for you,&nbsp;
+although you still had to confirm certain actions,&nbsp;&nbsp;
+
+00:11:38.560 --> 00:11:43.680
+like purchases and posts. Google also&nbsp;
+expanded Gemini in Chrome to US Android&nbsp;&nbsp;
+
+00:11:43.680 --> 00:11:48.160
+users and introduced agents that could&nbsp;
+operate Chrome using your saved passwords.
+
+00:11:48.160 --> 00:11:53.920
+There’s also the Google AI Overviews, but those&nbsp;
+are present on every browser, not just Chrome.
+
+00:11:53.920 --> 00:12:00.400
+But Chrome won this race… because it’s where&nbsp;
+users already are. So it wins mostly, by default.
+
+00:12:00.400 --> 00:12:04.240
+This reminds me of the 9x effect, from&nbsp;
+Harvard Business School professor John&nbsp;&nbsp;
+
+00:12:04.240 --> 00:12:10.240
+Gourville’s 2006 article “Eager Sellers and&nbsp;
+Stony Buyers”. He proposes users overvalue&nbsp;&nbsp;
+
+00:12:10.240 --> 00:12:15.600
+what they already have by roughly 3x.&nbsp;
+Companies, however, also overvalue their&nbsp;&nbsp;
+
+00:12:15.600 --> 00:12:22.800
+new product by 3x. So a new product has to&nbsp;
+be about 9x better before people will switch.
+
+00:12:22.800 --> 00:12:28.880
+AI browsers can’t win, by being just a little&nbsp;
+better. They have to be a way better experience.
+
+00:12:28.880 --> 00:12:34.720
+But, do you remember how Perplexity wanted to buy&nbsp;
+Chrome? Isn’t that weird? Well, it’s related to a&nbsp;&nbsp;
+
+00:12:34.720 --> 00:12:40.080
+long legal battle and a judge’s ruling that Google&nbsp;
+had illegally maintained its search monopoly.
+
+00:12:40.080 --> 00:12:43.920
+This is what I meant by people using&nbsp;
+what’s default on the device. Google&nbsp;&nbsp;
+
+00:12:43.920 --> 00:12:46.800
+has been paying tens of billions&nbsp;
+a year, to multiple browsers,&nbsp;&nbsp;
+
+00:12:46.800 --> 00:12:51.040
+to have Google as the default.&nbsp;
+Including Safari and Firefox.
+
+00:12:51.040 --> 00:12:54.000
+Courts were actually looking to&nbsp;
+force Google to sell Chrome at&nbsp;&nbsp;
+
+00:12:54.000 --> 00:12:58.560
+one point… but they didn’t. And,&nbsp;
+you’ll never guess the reason.
+
+00:12:58.560 --> 00:13:00.320
+In an unexpected turn,&nbsp;&nbsp;
+
+00:13:00.320 --> 00:13:04.480
+the rise of AI browsers became one reason&nbsp;
+the judge allowed Google to keep Chrome.
+
+00:13:04.480 --> 00:13:09.280
+Judge Amit Mehta let Google keep Chrome&nbsp;
+in September 2025 because generative AI&nbsp;&nbsp;
+
+00:13:09.280 --> 00:13:14.000
+had "changed the course of this case" and AI&nbsp;
+companies looked newly able to compete. He&nbsp;&nbsp;
+
+00:13:14.000 --> 00:13:18.320
+admitted he was being asked to "gaze into&nbsp;
+a crystal ball and look to the future."
+
+00:13:18.320 --> 00:13:25.120
+But within a year of that ruling… Atlas was gone&nbsp;
+and Chrome was the AI browser. In the end, the&nbsp;&nbsp;
+
+00:13:25.120 --> 00:13:31.440
+companies that set out to take on Chrome may have&nbsp;
+helped Google become even harder to beat. Ironic.
+
+00:13:31.440 --> 00:13:36.720
+But one of the most baffling of&nbsp;
+all these examples is Copilot. And,&nbsp;&nbsp;
+
+00:13:36.720 --> 00:13:41.920
+things aren’t going well for their non-browser&nbsp;
+side either. Microsoft pushed this thing into&nbsp;&nbsp;
+
+00:13:41.920 --> 00:13:48.800
+basically every part of Windows they could, and&nbsp;
+it backfired. Not only did users find it annoying,&nbsp;&nbsp;
+
+00:13:48.800 --> 00:13:53.520
+but it couldn’t even do the most basic&nbsp;
+tasks, and would just tell you to do them.
+
+00:13:53.520 --> 00:13:55.760
+To learn more, watch this video next.
+
