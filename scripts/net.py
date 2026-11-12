@@ -325,7 +325,14 @@ def get(url: str, timeout, *, impersonate=False, lang: str | None = None, header
 
 DOWNLOAD_TRIES = 8          # attempts in a row that brought no new bytes
 DOWNLOAD_STALL = 45         # seconds without data before a connection is dropped and resumed; libcurl adds a few
-_CONTENT_RANGE = re.compile(r"bytes (\d+)-\d+/(\d+|\*)")
+# After a transfer breaks or stalls, the rest is asked for in bounded ranges
+# of half what that connection delivered (within these bounds), halved again
+# if those break too: some CDNs send about 1 MiB per connection and then
+# nothing, and only requests that end before that point complete.
+DOWNLOAD_MIN_CHUNK, DOWNLOAD_MAX_CHUNK = 64 * 1024, 8 * 1024 * 1024
+_CHUNKS: dict = {}          # host -> chunk size learned in this process (the next file starts with it)
+_CONTENT_RANGE = re.compile(r"bytes (\d+)-(\d+)/(\d+|\*)")
+_UNSATISFIED = re.compile(r"bytes \*/(\d+)")
 _CURLE_FILESIZE_EXCEEDED = 63
 
 
@@ -336,9 +343,10 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
     A large file from a distant CDN rarely fails outright: the connection
     drops or stalls part-way. So a broken transfer is resumed from the bytes
     already on disk (Range; a server that answers 200 instead starts the file
-    over), every attempt begins at the original url (a signed redirect target
-    may have expired) and re-checks every hop, and an attempt that made
-    progress does not count against DOWNLOAD_TRIES. `seconds` is the deadline
+    over), in bounded ranges sized from what the broken connection delivered
+    (DOWNLOAD_MIN_CHUNK); every attempt begins at the original url (a signed
+    redirect target may have expired) and re-checks every hop, and an attempt
+    that made progress does not count against DOWNLOAD_TRIES. `seconds` is the deadline
     for the whole download, `max_bytes` the cap for the file. A status that
     means "this client is refused" is tried once more with the browser
     fingerprint."""
@@ -346,6 +354,8 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
     start = time.monotonic()
     deadline = start + seconds
     have, impersonate, idle, last = 0, False, 0, "no response"
+    host = (urlparse(url).hostname or "").lower()
+    chunk, pause = _CHUNKS.get(host, 0), False      # chunk 0: one open-ended request
 
     def failed(why: str) -> str:
         dest.unlink(missing_ok=True)
@@ -356,11 +366,12 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
         return failed(f"cannot write {dest.name}: {e}")
     with f:
         while idle < DOWNLOAD_TRIES and time.monotonic() < deadline:
-            if idle or have:
+            if pause:                           # after a failed attempt, not between chunks
                 wait = min(0.8 * 2 ** idle, 15.0)
                 if time.monotonic() + wait >= deadline:
                     break
                 time.sleep(wait)
+            pause = True
             before, cur, kept = have, url, None     # kept: did this response's body go to the file
 
             def on_status(status):
@@ -386,8 +397,8 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
                                       else "refused: redirect to a non-public address")
                     h = {} if impersonate else {"User-Agent": UA}
                     h["Accept-Encoding"] = "identity"       # byte offsets must be offsets in the file
-                    if have:
-                        h["Range"] = f"bytes={have}-"
+                    if have or chunk:
+                        h["Range"] = f"bytes={have}-{have + chunk - 1 if chunk else ''}"
                     kept = None
                     status, hdrs, loc = _once("GET", cur, ips, deadline, sink, max_bytes - have, headers=h,
                                               impersonate=impersonate, data=None, on_status=on_status,
@@ -407,13 +418,23 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
             f.flush()
             if kept:
                 have = f.tell()
-            if status in (200, 206):
-                m = _CONTENT_RANGE.match({k.lower(): v for k, v in hdrs.items()}.get("content-range", ""))
-                if status == 200 or not m or (int(m[1]) == before and m[2] in ("*", str(have))):
-                    return ""
-                have, last = 0, f"resumed at {before}, server sent {m[0]}"     # not our file: start over
-            elif status == 416:                 # our offset is not in the server's file: start over
-                have, last = 0, "HTTP 416"
+            got = have - before
+            crange = {k.lower(): v for k, v in hdrs.items()}.get("content-range", "")
+            if status == 200:
+                return ""
+            if status == 206:
+                m = _CONTENT_RANGE.match(crange)
+                if m and int(m[1]) != before:   # not the bytes we asked for: start over
+                    have, last = 0, f"asked for bytes from {before}, server sent {m[0]}"
+                elif have >= int(m[3]) if m and m[3] != "*" else (not chunk or got < chunk):
+                    return ""                   # the last byte of the file is on disk
+                else:
+                    pause = False               # a whole chunk: straight on to the next
+            elif status == 416:
+                m = _UNSATISFIED.match(crange)
+                if m and have and int(m[1]) == have:
+                    return ""                   # the file ended exactly at a chunk boundary
+                have, last = 0, "HTTP 416"      # our offset is not in the server's file: start over
             elif status in BLOCK_STATUS and not impersonate:
                 impersonate, last = True, f"HTTP {status}"
                 continue                        # one more look, with the browser fingerprint
@@ -421,6 +442,9 @@ def save(url: str, dest, seconds: float, max_bytes: int) -> str:
                 return failed(f"HTTP {status}")
             else:
                 last = f"HTTP {status}" if status is not None else error
+            if status is None and got > 0:      # broke after `got` bytes: ask for less than that at a time
+                size = max(DOWNLOAD_MIN_CHUNK, min(got // 2, DOWNLOAD_MAX_CHUNK))
+                chunk = _CHUNKS[host] = min(chunk, size) if chunk else size
             idle = 0 if have > before else idle + 1
     got = f"{have / (1024 * 1024):.1f} MB in {time.monotonic() - start:.0f}s; last: {last}"
     if idle < DOWNLOAD_TRIES:

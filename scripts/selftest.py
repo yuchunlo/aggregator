@@ -1298,9 +1298,11 @@ def check_download_resume():
     """net.save against a local server that breaks transfers the way a far
     CDN does: the connection drops part-way (resumed with Range, the file is
     whole), the server ignores Range (the file starts over, never doubled),
-    it stalls (dropped after DOWNLOAD_STALL, resumed), or it refuses a plain
-    client (one more attempt with the browser fingerprint). A download that
-    cannot finish says why and leaves no file."""
+    it sends a fixed amount per connection and then nothing (the stall is cut,
+    the rest fetched in ranges that end before that point, and the next file
+    from that host starts that way), or it refuses a plain client (one more
+    attempt with the browser fingerprint). A download that cannot finish says
+    why and leaves no file."""
     import http.server, threading
     body = bytes(range(256)) * 1200             # 307200 bytes, every offset distinguishable
     seen = []
@@ -1313,32 +1315,37 @@ def check_download_resume():
             with contextlib.suppress(OSError):
                 super().handle()
 
+        def empty(self, code, headers=()):
+            self.send_response(code)
+            for k, v in headers:
+                self.send_header(k, v)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
         def do_GET(self):
             rng = self.headers.get("Range")
             seen.append((self.path, rng, self.headers.get("User-Agent")))
-            start = int(rng[6:-1]) if rng and self.path != "/norange" else 0
+            start, _, end = rng[6:].partition("-") if rng and self.path != "/norange" else ("0", "", "")
+            start, end = int(start), min(int(end) + 1 if end else len(body), len(body))
             if self.path == "/blocked" and self.headers.get("User-Agent") == net.UA:
-                self.send_response(403)
-                self.send_header("Content-Length", "0")
-                self.end_headers()
-                return
+                return self.empty(403)
             if self.path == "/gone":
-                self.send_response(410)
-                self.send_header("Content-Length", "0")
-                self.end_headers()
-                return
-            self.send_response(206 if start else 200)
-            self.send_header("Content-Length", str(len(body) - start))
-            if start:
-                self.send_header("Content-Range", f"bytes {start}-{len(body) - 1}/{len(body)}")
+                return self.empty(410)
+            if start >= len(body):
+                return self.empty(416, [("Content-Range", f"bytes */{len(body)}")])
+            partial = bool(rng) and self.path != "/norange"
+            self.send_response(206 if partial else 200)
+            self.send_header("Content-Length", str(end - start))
+            if partial:
+                self.send_header("Content-Range", f"bytes {start}-{end - 1}/{len(body)}")
             self.end_headers()
             n = sum(1 for path, *_ in seen if path == self.path)
-            if self.path in ("/drop", "/norange") and n <= 2:      # two broken transfers, then a whole one
+            if self.path in ("/drop", "/norange") and n <= 2:      # two broken transfers, then whole ones
                 self.wfile.write(body[start:start + 100_000])
                 self.wfile.flush()
                 self.connection.shutdown(2)
-            elif self.path == "/stall" and n == 1:
-                self.wfile.write(body[:50_000])
+            elif self.path.startswith("/meter") and end - start > 100_000:   # 100000 bytes per connection, then silence
+                self.wfile.write(body[start:start + 100_000])
                 self.wfile.flush()
                 time.sleep(15)
             elif self.path == "/never":
@@ -1346,28 +1353,44 @@ def check_download_resume():
                 self.wfile.flush()
                 self.connection.shutdown(2)
             else:
-                self.wfile.write(body[start:])
+                self.wfile.write(body[start:end])
 
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     base = f"http://t.test:{srv.server_address[1]}"
-    real, real_stall, real_sleep = net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep
-    net.public_addrs = lambda h, p: ["127.0.0.1"] if h == "t.test" else real(h, p)
-    net.DOWNLOAD_STALL = 1
+    ranges = lambda path: [r for p_, r, _ in seen if p_ == path]
+    real = (net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep, net.DOWNLOAD_MIN_CHUNK, net.DOWNLOAD_TRIES)
+    net.public_addrs = lambda h, p: ["127.0.0.1"] if h == "t.test" else real[0](h, p)
+    net.DOWNLOAD_STALL, net.DOWNLOAD_MIN_CHUNK = 1, 10_000
     try:
         with tempfile.TemporaryDirectory() as d:
             dest = Path(d) / "a.m4a"
+            net._CHUNKS.clear()
             eq((net.save(base + "/drop", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
                "dropped connections are resumed into a whole file")
-            eq([r for path, r, _ in seen if path == "/drop"], [None, "bytes=100000-", "bytes=200000-"],
-               "each resume asks for the bytes after those on disk")
+            eq(ranges("/drop")[:3], [None, "bytes=100000-149999", "bytes=150000-199999"],
+               "each resume asks for the bytes after those on disk, in ranges of half what the broken one delivered")
+            net._CHUNKS.clear()
             eq((net.save(base + "/norange", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
                "a server that ignores Range: the file starts over, not appended to")
+            net._CHUNKS.clear()
             t0 = time.monotonic()
-            eq((net.save(base + "/stall", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
-               "a stalled connection is dropped and resumed")
+            eq((net.save(base + "/meter", dest, 60, 10**6), dest.read_bytes() == body), ("", True),
+               "100000 bytes per connection, then silence: the whole file arrives")
             took = time.monotonic() - t0
-            eq(took < 12, True, f"the stall is cut before the server wakes up: {took:.1f}s")
+            eq(took < 13, True, f"one stall is waited out, not one per connection: {took:.1f}s")
+            eq(ranges("/meter"), [None, "bytes=100000-149999", "bytes=150000-199999", "bytes=200000-249999",
+                                  "bytes=250000-299999", "bytes=300000-349999"],
+               "after the stall: ranges that end before the point where the server goes silent")
+            t0 = time.monotonic()
+            eq((net.save(base + "/meter2", dest, 60, 10**6), dest.read_bytes() == body), ("", True),
+               "the next file from that host")
+            eq((ranges("/meter2")[0], time.monotonic() - t0 < 4), ("bytes=0-49999", True),
+               "starts in ranges at once, no stall to wait out")
+            net._CHUNKS[f"t.test"] = len(body) // 3        # the file ends exactly at a chunk boundary
+            eq((net.save(base + "/exact", dest, 30, 10**6), dest.read_bytes() == body, len(ranges("/exact"))),
+               ("", True, 3), "the last chunk ends the download (Content-Range total)")
+            net._CHUNKS.clear()
             eq((net.save(base + "/blocked", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
                "refused as a plain client: fetched with the browser fingerprint")
             eq((net.save(base + "/gone", dest, 30, 10**6), dest.exists()), ("HTTP 410", False),
@@ -1376,16 +1399,13 @@ def check_download_resume():
             eq((why.startswith("timed out after 3s (0.0 MB in "), dest.exists()), (True, False),
                f"out of time says so, with the progress made: {why}")
             net.time.sleep = lambda s: None
-            n0 = len(seen)
-            net.DOWNLOAD_TRIES, tries = 3, net.DOWNLOAD_TRIES
-            try:
-                why = net.save(f"http://t.test:1/closed", dest, 30, 10**6)
-            finally:
-                net.DOWNLOAD_TRIES = tries
+            n0, net.DOWNLOAD_TRIES = len(seen), 3
+            why = net.save("http://t.test:1/closed", dest, 30, 10**6)
             eq((why.startswith("gave up after 3 attempts without progress"), dest.exists(), len(seen) - n0),
                (True, False, 0), f"no progress at all gives up, not until the deadline: {why}")
     finally:
-        net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep = real, real_stall, real_sleep
+        net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep, net.DOWNLOAD_MIN_CHUNK, net.DOWNLOAD_TRIES = real
+        net._CHUNKS.clear()
         srv.shutdown()
 
 
@@ -1404,9 +1424,10 @@ def check_audio_ladder():
        "ladder: the first way leaves the player clients to yt-dlp")
     real = ds.run_cmd
 
-    def run(replies):
+    def run(replies, worked=()):
         """Play `replies` (rc, stderr, writes a file?) in order; return (result or exception, commands)."""
         cmds = []
+        ds._audio_worked[:] = worked
 
         def fake(cmd, timeout):
             rc, err, writes = replies[len(cmds)]
@@ -1425,13 +1446,20 @@ def check_audio_ladder():
         finally:
             ds.run_cmd = real
         return got, cmds
+    way = lambda cmd: next(n for n, args in ds.AUDIO_LADDER
+                           if cmd[:cmd.index("-o")] == ds.ytdlp(Path("/c.txt"), url, *args)[:-2])
 
     got, cmds = run([(1, e403, False), (0, "", True)])
     eq(got, ("audio.m4a", b"audio", ["audio.m4a"]), "ladder: the second way's file, the first way's leftovers removed")
     eq([("player_client=web_safari" in " ".join(c), "--user-agent" in c, c[-2:]) for c in cmds],
        [(False, False, ["--", url]), (True, False, ["--", url])],
        "ladder: 403 on the default clients -> HLS; no user agent override; url after --")
+    eq((ds._audio_worked, [way(c) for c in cmds]), (["hls"], ["default", "hls"]), "ladder: the way that worked is remembered")
+    got, cmds = run([(1, e403, False), (0, "", True)], worked=["premerged"])
+    eq([way(c) for c in cmds], ["premerged", "default"],
+       "ladder: the remembered way goes first for the next video, the rest keep their order")
     got, cmds = run([(1, e403, False)] * len(ds.AUDIO_LADDER))
+    eq([way(c) for c in cmds], [n for n, _ in ds.AUDIO_LADDER], "ladder: nothing remembered -> the table's order")
     eq((type(got), len(cmds), str(got).count("HTTP Error 403"), "WARNING" in str(got)),
        (RuntimeError, len(ds.AUDIO_LADDER), len(ds.AUDIO_LADDER), False),
        "ladder: every way tried once; the error lists each attempt's ERROR line")
@@ -2242,12 +2270,18 @@ MUTATIONS = (
     ("C36", "check_audio_ladder", "media.py",
      '("not available in the runner\'s country",',
      '("not available in the runner\'s country" * 0,'),
+    ("C36", "check_audio_ladder", "media.py",
+     '_audio_worked[:] = [name]',
+     '_audio_worked[:] = []'),
     ("C37", "check_download_resume", "net.py",
      'have = have if status == 206 else 0',
      'have = have'),
     ("C37", "check_download_resume", "net.py",
-     'h["Range"] = f"bytes={have}-"',
+     'h["Range"] = f"bytes={have}-{have + chunk - 1 if chunk else \'\'}"',
      'h["X-Range"] = f"bytes={have}-"'),
+    ("C37", "check_download_resume", "net.py",
+     'chunk = _CHUNKS[host] = min(chunk, size) if chunk else size',
+     'pass'),
     ("C37", "check_audio_ladder", "media.py",
      'return f"run time limit reached ({limit / 60:.0f} min)", False',
      'return None'),
@@ -2415,12 +2449,12 @@ CONTRACTS = (
      'a ?list= url makes the probe walk the whole playlist until it times out, every day; one video shows up several times under different share parameters',
      ('check_youtube_video_url', 'check_security',)),
     ('C36',
-     "a YouTube audio download that fails is tried again by the next way in AUDIO_LADDER (yt-dlp's own client choice first, no user agent override), within one timeout; only a closed video (members only, geo-blocked), refused cookies or a timeout end it early; failures name each attempt's ERROR line",
+     "a YouTube audio download that fails is tried again by the next way in AUDIO_LADDER (yt-dlp's own client choice first, no user agent override), within one timeout, and the way that worked goes first for the rest of the run; only a closed video (members only, geo-blocked), refused cookies or a timeout end it early; failures name each attempt's ERROR line",
      'one refused player client (HTTP 403) leaves every video without captions pending for good, and upgrading yt-dlp changes nothing because its client choice is overridden; the log shows a country list instead of the reason',
      ('check_audio_ladder',)),
     ('C37',
-     'podcast audio downloads resume a broken or stalled transfer from the bytes on disk (a server ignoring Range starts the file over), retry a refused plain client once with the browser fingerprint, and report why they failed; past the run time limit no further ASR job starts',
-     'a long episode on a slow CDN never arrives in one piece and stays pending for good, with a log line that fits every cause; slow downloads run the job into its timeout and nothing is committed',
+     'podcast audio downloads resume a broken or stalled transfer from the bytes on disk (a server ignoring Range starts the file over), in bounded ranges of half what the broken connection delivered, remembered per host, retry a refused plain client once with the browser fingerprint, and report why they failed; past the run time limit no further ASR job starts',
+     'a long episode never arrives in one piece, or crawls at one stall per MiB on a CDN that goes silent after a fixed amount per connection, and stays pending for good, with a log line that fits every cause; slow downloads run the job into its timeout and nothing is committed',
      ('check_download_resume', 'check_audio_ladder',)),
 )
 

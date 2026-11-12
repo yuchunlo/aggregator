@@ -71,6 +71,7 @@ AUDIO_LADDER = (
             "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]),
 )
 AUDIO_MIN_ATTEMPT = 45       # seconds: less than this left of the timeout starts no further attempt
+_audio_worked: list = []     # the way that downloaded the last video: tried first for the next (this process only)
 # live_status values whose video has no finished recording yet (a scheduled
 # stream or premiere, or one still on air): nothing to fetch -- no captions,
 # and the audio download fails ("Premieres in 31 hours") -- until it ends.
@@ -450,10 +451,12 @@ def youtube_audio(cookies: Path, url: str):
     """The audio by the first way in AUDIO_LADDER that downloads. `timeout`
     covers all attempts together. The ladder stops early for what no other
     way can change: the video is closed to us (Restricted), the cookies were
-    refused, or the time is up."""
+    refused, or the time is up. What refuses one video refuses the next, so
+    the way that worked goes first for the rest of the run: the failing ways
+    cost their requests and their share of the timeout once, not per video."""
     def fetch(d: Path, timeout: float) -> Path:
         deadline, tried = time.monotonic() + timeout, []
-        for name, args in AUDIO_LADDER:
+        for name, args in sorted(AUDIO_LADDER, key=lambda way: way[0] not in _audio_worked):
             left = deadline - time.monotonic()
             if tried and left < AUDIO_MIN_ATTEMPT:
                 break
@@ -466,6 +469,7 @@ def youtube_audio(cookies: Path, url: str):
             if rc == 0 and files:
                 if tried:
                     print(f"[AUDIO] {name} worked after: {'; '.join(tried)}")
+                _audio_worked[:] = [name]
                 return files[0]
             if rc is None:
                 tried.append(f"{name}: timed out")
