@@ -29,6 +29,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
@@ -44,16 +45,42 @@ from store import (youtube_watch_url, BLANK_SUMMARY, UTC, choose_track, prune_su
 
 # The JS challenge solver comes from the pinned yt-dlp-ejs package (yt-dlp[default]);
 # `--remote-components ejs:github` would run unpinned code fetched at runtime.
-BASE_ARGS = ["--user-agent", net.UA, "--no-progress", "--socket-timeout", "30"]
-SUB_ARGS = ["--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
-AUDIO_ARGS = ["--extractor-args", "youtube:player_client=tv,web_safari,default",
-              "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]
+BASE_ARGS = ["--no-progress", "--socket-timeout", "30"]
+SUB_ARGS = ["--user-agent", net.UA, "--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
+# Ways to get a video's audio, tried in order until one downloads (youtube_audio).
+# A stream url that extracts fine can still be refused when fetched (HTTP 403),
+# and which player client and protocol YouTube refuses changes every few
+# months; yt-dlp never falls back to another format after a failed download.
+# So each row asks for a different source of the audio:
+#   default    yt-dlp's own client choice for a logged-in session (the part of
+#              yt-dlp that is updated when YouTube changes; naming clients
+#              here would freeze it at whatever worked when this was written)
+#   hls        the m3u8 playlists of the Safari web client: fetched from other
+#              urls, with other access checks, than the https formats
+#   premerged  format 18 (360p video+audio in one https file), the one https
+#              format served without a PO token; larger, still small enough
+#   tv         the TV client, which YouTube has served without a PO token
+# No --user-agent here: every client sends its own, and the stream is fetched
+# with yt-dlp's current browser one.
+AUDIO_LADDER = (
+    ("default", ["-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]),
+    ("hls", ["--extractor-args", "youtube:player_client=web_safari",
+             "-f", "bestaudio[protocol^=m3u8]/worst[protocol^=m3u8]"]),
+    ("premerged", ["-f", "18/worst[acodec!=none][vcodec!=none]"]),
+    ("tv", ["--extractor-args", "youtube:player_client=tv",
+            "-f", "bestaudio[abr<=64]/bestaudio/bestaudio*/best"]),
+)
+AUDIO_MIN_ATTEMPT = 45       # seconds: less than this left of the timeout starts no further attempt
 # live_status values whose video has no finished recording yet (a scheduled
 # stream or premiere, or one still on air): nothing to fetch -- no captions,
 # and the audio download fails ("Premieres in 31 hours") -- until it ends.
 NOT_YET_AVAILABLE = {"is_upcoming": "not yet premiered", "is_live": "still live"}
 EXHAUSTED_UNDER = 10 * 60    # remaining ASR budget too small for any real video
 PODCAST_MAX_BYTES = 512 * 1024 * 1024
+# Podcast CDNs can be slow from the runner: twice the time a YouTube download
+# of that length gets, at least 10 and at most 30 minutes (net.save resumes
+# broken transfers within it).
+PODCAST_PATIENCE, PODCAST_MIN_TIMEOUT, PODCAST_MAX_TIMEOUT = 2, 600, 1800
 
 
 @dataclass
@@ -67,6 +94,10 @@ class Limits:
     probe_timeout: float = 90
     download_timeout: float = 240
     audio_timeout: float = 300
+    # Wall clock after which no further ASR job starts (the rest stay
+    # pending): the job is killed at timeout-minutes (340) and a killed job
+    # commits nothing, so slow or failing downloads must not run it out.
+    max_run: float = 270 * 60
     whisper_model: str = store.Config.whisper_model
     whisper_compute_type: str = store.Config.whisper_compute_type
     no_transcribe: bool = False
@@ -162,6 +193,10 @@ COOKIES_REJECTED = re.compile(r"cookies (?:are|is) no longer valid|cookies? (?:h
 RESTRICTED = (
     ("members only", re.compile(r"^ERROR: \[youtube\] [\w-]+: (?:This video is available to this channel's members"
                                 r"|Join this channel to get access to members-only content)", re.M)),
+    # The runner's country is not ours to choose (GitHub-hosted), so for this
+    # project a geo-block is as final as a membership wall.
+    ("not available in the runner's country",
+     re.compile(r"^ERROR: \[youtube\] [\w-]+: The uploader has not made this video available in your country", re.M)),
 )
 
 
@@ -178,6 +213,15 @@ def cookies_rejected(stderr: str) -> bool:
     """Only yt-dlp's own diagnostics: stdout carries remote metadata, and a
     video titled "cookies are no longer valid" must not end the run."""
     return bool(COOKIES_REJECTED.search(stderr or ""))
+
+
+def why_failed(stderr: str, limit: int = 300) -> str:
+    """yt-dlp's reason in one short line: its ERROR lines (the first words of
+    each; a geo-block error goes on to list every country), else the end of
+    stderr. Only stderr, as for cookies_rejected."""
+    lines = [l.strip() for l in (stderr or "").splitlines() if l.strip()]
+    errors = [l for l in lines if l.startswith("ERROR:")] or lines[-2:]
+    return " / ".join(l if len(l) <= limit else l[:limit] + "..." for l in errors) or "no output"
 
 
 def discard(out_dir: Path, item_id: str) -> list[str]:
@@ -233,7 +277,7 @@ def to_vtt(segments) -> str:
 #
 # Only the episode page and the feed it names are fetched. The audio url is
 # remote data: resolve_episode requires public addresses, and the audio is
-# fetched through net.download, which re-checks every hop.
+# fetched through net.save, which re-checks every hop.
 AUDIO_EXT = (".mp3", ".m4a", ".aac")
 OG_AUDIO_KEYS = ("og:audio", "og:audio:url", "og:audio:secure_url")
 _TOKEN_SPLIT = re.compile(r"""[\s"'<>\\]+""")
@@ -403,27 +447,46 @@ def transcribe(fetch, out_dir: Path, item_id, orig, a, duration) -> tuple[Path, 
 
 
 def youtube_audio(cookies: Path, url: str):
+    """The audio by the first way in AUDIO_LADDER that downloads. `timeout`
+    covers all attempts together. The ladder stops early for what no other
+    way can change: the video is closed to us (Restricted), the cookies were
+    refused, or the time is up."""
     def fetch(d: Path, timeout: float) -> Path:
-        rc, out, err = run_cmd(ytdlp(cookies, url, *AUDIO_ARGS, "-o", f"{d}/audio.%(ext)s"), timeout)
-        if why := restricted(err):
-            raise Restricted(why)
-        files = sorted(p for p in d.glob("audio.*") if p.suffix != ".part")
-        if rc is None:
-            raise RuntimeError(f"audio download timed out after {timeout:.0f}s")
-        if rc != 0 or not files:
-            raise RuntimeError(f"audio download failed: {(out + err).strip()[-1500:]}")
-        return files[0]
+        deadline, tried = time.monotonic() + timeout, []
+        for name, args in AUDIO_LADDER:
+            left = deadline - time.monotonic()
+            if tried and left < AUDIO_MIN_ATTEMPT:
+                break
+            for p in d.glob("audio.*"):          # what a failed attempt left behind
+                p.unlink(missing_ok=True)
+            rc, out, err = run_cmd(ytdlp(cookies, url, *args, "-o", f"{d}/audio.%(ext)s"), left)
+            if why := restricted(err):
+                raise Restricted(why)
+            files = sorted(p for p in d.glob("audio.*") if p.suffix not in (".part", ".ytdl"))
+            if rc == 0 and files:
+                if tried:
+                    print(f"[AUDIO] {name} worked after: {'; '.join(tried)}")
+                return files[0]
+            if rc is None:
+                tried.append(f"{name}: timed out")
+                break
+            tried.append(f"{name}: {why_failed(err)}")
+            if cookies_rejected(err):
+                break
+        raise RuntimeError("audio download failed: " + "; ".join(tried))
     return fetch
 
 
 def direct_audio(url: str):
-    """A podcast file, through net.download: every redirect hop and every
-    connection is held to public addresses, unlike a yt-dlp download."""
+    """A podcast file, through net.save: every redirect hop and every
+    connection is held to public addresses, unlike a yt-dlp download; a
+    broken transfer is resumed, and a failure says why."""
     def fetch(d: Path, timeout: float) -> Path:
         ext = Path(url.split("?", 1)[0]).suffix.lower()
         dest = d / ("audio" + (ext if ext in (".mp3", ".m4a", ".aac") else ".bin"))
-        if not net.download(url, dest, timeout, PODCAST_MAX_BYTES):
-            raise RuntimeError("audio download failed, timed out or too large")
+        timeout = min(max(timeout * PODCAST_PATIENCE, PODCAST_MIN_TIMEOUT), PODCAST_MAX_TIMEOUT)
+        if why := net.save(url, dest, timeout, PODCAST_MAX_BYTES):
+            raise RuntimeError(f"audio download failed: {why}")
         return dest
     return fetch
 
@@ -431,6 +494,7 @@ def direct_audio(url: str):
 class Budget:
     def __init__(self, a):
         self.a, self.count, self.spent, self.hit_wall = a, 0, 0.0, False
+        self.started = time.monotonic()
 
     def left(self) -> float:
         return self.a.max_asr_total - self.spent if self.a.max_asr_total else float("inf")
@@ -449,6 +513,8 @@ class Budget:
             return "faster-whisper not installed", False
         if a.max_transcribe and self.count >= a.max_transcribe:
             return "per-run item cap reached", False
+        if (limit := getattr(a, "max_run", 0)) and time.monotonic() - self.started > limit:
+            return f"run time limit reached ({limit / 60:.0f} min)", False
         if a.max_asr_duration and duration > a.max_asr_duration:
             return f"{duration / 60:.0f} min > {a.max_asr_duration / 60:.0f} min cap", True
         if a.max_asr_total and duration > self.left():
@@ -612,7 +678,7 @@ def main(argv=None, limits: Limits | None = None) -> int:
                 dirty = True
                 continue
             n["failed"] += 1
-            print(f"[FAILED] {item_id}: probe failed (exit {rc}): {err.strip()[-1500:]}")
+            print(f"[FAILED] {item_id}: probe failed (exit {rc}): {why_failed(err)}")
             continue
         # Before anything else: an upcoming or live video has no recording
         # to caption or transcribe, and its duration is not the video's yet.
@@ -665,7 +731,7 @@ def main(argv=None, limits: Limits | None = None) -> int:
             dirty = True
         else:
             n["failed"] += 1
-            print(f"[FAILED] {item_id} (exit {rc}): {(out + err)[-1500:]}")
+            print(f"[FAILED] {item_id} (exit {rc}): {why_failed(err)}")
 
     # No YouTube video was probed (podcasts use no cookies): leave the flag alone.
     if cookies_expired or n["probed"]:

@@ -15,7 +15,7 @@ from pathlib import Path
 from urllib.parse import urlencode, urljoin, urlparse
 
 import charset_normalizer
-from curl_cffi import CurlOpt
+from curl_cffi import CurlInfo, CurlOpt
 from curl_cffi import requests as curl_requests
 
 # ---- HTTP -------------------------------------------------------------------
@@ -194,9 +194,13 @@ class _TooLarge(Exception):
     pass
 
 
-def _once(method, url, ips, deadline, sink, limit, *, headers, impersonate, data):
+def _once(method, url, ips, deadline, sink, limit, *, headers, impersonate, data, on_status=None, stall=None):
     """One request to `url`, connected only to `ips`. Returns (status, headers,
-    location); the body goes to `sink`. Raises on transport errors."""
+    location); the body goes to `sink`. Raises on transport errors.
+    `on_status(status)` is called once, before the first body byte reaches
+    `sink` (a resumed download must know whether the server honoured the
+    Range before it writes anything). `stall` = seconds without data after
+    which the transfer is aborted (default: only the deadline ends it)."""
     host, port = _target(url)
     left = deadline - time.monotonic()
     if left <= 0:
@@ -204,21 +208,30 @@ def _once(method, url, ips, deadline, sink, limit, *, headers, impersonate, data
     pin = f"{host}:{port}:" + ",".join(f"[{i}]" if ":" in i else i for i in ips)
     received = 0
 
+    told = on_status is None
+
     def take(chunk):
-        nonlocal received
+        nonlocal received, told
         received += len(chunk)
         if received > limit or time.monotonic() > deadline:
             raise _TooLarge()                   # aborts the transfer (CURL_WRITEFUNC_ERROR)
+        if not told:
+            told = True
+            on_status(int(s.curl.getinfo(CurlInfo.RESPONSE_CODE)))
         sink(chunk)
     opts = {CurlOpt.RESOLVE: [pin], CurlOpt.PROXY: "", CurlOpt.NOPROXY: "*",
             CurlOpt.PROTOCOLS_STR: "http,https", CurlOpt.REDIR_PROTOCOLS_STR: "http,https",
             CurlOpt.MAXFILESIZE_LARGE: limit}
+    if stall:                                   # under 1 byte/s for `stall` seconds: give up this connection
+        opts |= {CurlOpt.LOW_SPEED_LIMIT: 1, CurlOpt.LOW_SPEED_TIME: int(stall)}
     with curl_requests.Session(curl_options=opts, trust_env=False, use_thread_local_curl=False) as s:
         r = s.request(method, url, headers=headers, data=data, allow_redirects=False,
                       timeout=(min(CONNECT_TIMEOUT, left), max(left - min(CONNECT_TIMEOUT, left), 0.001)),
                       impersonate=IMPERSONATE if impersonate else None,
                       default_headers=bool(impersonate), content_callback=take)
         hdrs = {k: v for k, v in r.headers.items()}
+        if not told:                            # no body at all
+            on_status(r.status_code)
         return r.status_code, hdrs, hdrs.get("location") or hdrs.get("Location")
 
 
@@ -310,24 +323,111 @@ def get(url: str, timeout, *, impersonate=False, lang: str | None = None, header
                    retries=retries, retry_status=retry_status)
 
 
-def download(url: str, dest, seconds: float, max_bytes: int) -> bool:
-    """Stream a 200 response into `dest` under the same checks as get();
-    False (and no file) on any failure, over `max_bytes`, or past `seconds`."""
+DOWNLOAD_TRIES = 8          # attempts in a row that brought no new bytes
+DOWNLOAD_STALL = 45         # seconds without data before a connection is dropped and resumed; libcurl adds a few
+_CONTENT_RANGE = re.compile(r"bytes (\d+)-\d+/(\d+|\*)")
+_CURLE_FILESIZE_EXCEEDED = 63
+
+
+def save(url: str, dest, seconds: float, max_bytes: int) -> str:
+    """Stream `url` into `dest` under the same checks as get(). Returns ""
+    when the whole file arrived, else the reason (and leaves no file).
+
+    A large file from a distant CDN rarely fails outright: the connection
+    drops or stalls part-way. So a broken transfer is resumed from the bytes
+    already on disk (Range; a server that answers 200 instead starts the file
+    over), every attempt begins at the original url (a signed redirect target
+    may have expired) and re-checks every hop, and an attempt that made
+    progress does not count against DOWNLOAD_TRIES. `seconds` is the deadline
+    for the whole download, `max_bytes` the cap for the file. A status that
+    means "this client is refused" is tried once more with the browser
+    fingerprint."""
     dest = Path(dest)
-    try:
-        with open(dest, "wb") as f:
-            def sink(chunk):
-                if chunk is None:
-                    f.seek(0)
-                    f.truncate()
-                else:
-                    f.write(chunk)
-            got = _fetch("GET", url, seconds, sink, max_bytes, headers={"User-Agent": UA}, retries=1)
-    except OSError:
-        got = None
-    if not got or got[0] != 200:
+    start = time.monotonic()
+    deadline = start + seconds
+    have, impersonate, idle, last = 0, False, 0, "no response"
+
+    def failed(why: str) -> str:
         dest.unlink(missing_ok=True)
-        return False
-    return True
+        return why
+    try:
+        f = open(dest, "wb")
+    except OSError as e:
+        return failed(f"cannot write {dest.name}: {e}")
+    with f:
+        while idle < DOWNLOAD_TRIES and time.monotonic() < deadline:
+            if idle or have:
+                wait = min(0.8 * 2 ** idle, 15.0)
+                if time.monotonic() + wait >= deadline:
+                    break
+                time.sleep(wait)
+            before, cur, kept = have, url, None     # kept: did this response's body go to the file
+
+            def on_status(status):
+                """Where this response's body goes, decided before any of it is
+                written: appended (206), a fresh copy (200), or dropped."""
+                nonlocal have, kept
+                kept = status in (200, 206)
+                if kept:
+                    have = have if status == 206 else 0
+                    f.seek(have)
+                    f.truncate()
+
+            def sink(chunk):
+                if chunk is not None and kept:
+                    f.write(chunk)
+            status, hdrs, error = None, {}, ""
+            try:
+                for _ in range(MAX_REDIRECTS + 1):
+                    t = _target(cur)
+                    ips = public_addrs(*t) if t else []
+                    if not ips:                 # refused before any connection: never retried
+                        return failed("refused: not an http(s) url to public addresses" if cur == url
+                                      else "refused: redirect to a non-public address")
+                    h = {} if impersonate else {"User-Agent": UA}
+                    h["Accept-Encoding"] = "identity"       # byte offsets must be offsets in the file
+                    if have:
+                        h["Range"] = f"bytes={have}-"
+                    kept = None
+                    status, hdrs, loc = _once("GET", cur, ips, deadline, sink, max_bytes - have, headers=h,
+                                              impersonate=impersonate, data=None, on_status=on_status,
+                                              stall=DOWNLOAD_STALL)
+                    if status in REDIRECT and loc:
+                        cur, status = urljoin(cur, loc), None
+                        continue
+                    break
+                else:
+                    return failed(f"more than {MAX_REDIRECTS} redirects")
+            except Exception as e:              # the transfer broke; what is on disk may be resumed
+                declared = getattr(e, "code", None) == _CURLE_FILESIZE_EXCEEDED
+                cut = _TooLarge in {type(x) for x in (e, e.__cause__, e.__context__)}
+                if declared or (cut and time.monotonic() <= deadline):
+                    return failed(f"larger than {max_bytes // (1024 * 1024)} MB")
+                error = type(e).__name__ + (f": {str(e)[:200]}" if str(e) else "")
+            f.flush()
+            if kept:
+                have = f.tell()
+            if status in (200, 206):
+                m = _CONTENT_RANGE.match({k.lower(): v for k, v in hdrs.items()}.get("content-range", ""))
+                if status == 200 or not m or (int(m[1]) == before and m[2] in ("*", str(have))):
+                    return ""
+                have, last = 0, f"resumed at {before}, server sent {m[0]}"     # not our file: start over
+            elif status == 416:                 # our offset is not in the server's file: start over
+                have, last = 0, "HTTP 416"
+            elif status in BLOCK_STATUS and not impersonate:
+                impersonate, last = True, f"HTTP {status}"
+                continue                        # one more look, with the browser fingerprint
+            elif status is not None and status not in RETRY_STATUS:
+                return failed(f"HTTP {status}")
+            else:
+                last = f"HTTP {status}" if status is not None else error
+            idle = 0 if have > before else idle + 1
+    got = f"{have / (1024 * 1024):.1f} MB in {time.monotonic() - start:.0f}s; last: {last}"
+    if idle < DOWNLOAD_TRIES:
+        return failed(f"timed out after {seconds:.0f}s ({got})")
+    return failed(f"gave up after {DOWNLOAD_TRIES} attempts without progress ({got})")
 
 
+def download(url: str, dest, seconds: float, max_bytes: int) -> bool:
+    """save() as a yes/no: True when the file is complete at `dest`."""
+    return not save(url, dest, seconds, max_bytes)

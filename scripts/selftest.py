@@ -1261,6 +1261,7 @@ def check_download_guard():
 
         def fake_once(method, url, ips, deadline, sink, limit, **kw):
             status, chunks, headers = replies.pop(0)
+            kw["on_status"](status)
             total = 0
             for c in chunks:
                 total += len(c)
@@ -1282,8 +1283,205 @@ def check_download_guard():
             replies = [(302, [b"moved"], {"location": "https://1.1.1.1/b.mp3"}), (200, [b"ab", b"cd"], {})]
             eq((net.download("https://1.1.1.1/a.mp3", dest, 5, 1000), dest.read_bytes()), (True, b"abcd"),
                "download: body of the final hop only")
+            replies = [(302, [], {"location": "http://10.0.0.1/x.mp3"})]
+            eq(net.save("https://1.1.1.1/a.mp3", dest, 5, 1000), "refused: redirect to a non-public address",
+               "save: says why")
+            replies = [(404, [b"nope"], {})]
+            eq(net.save("https://1.1.1.1/a.mp3", dest, 5, 1000), "HTTP 404", "save: the status is the reason")
+            replies = [(200, [b"x" * 600, b"x" * 600], {})]
+            eq(net.save("https://1.1.1.1/a.mp3", dest, 5, 1000), "larger than 0 MB", "save: over the cap")
         finally:
             net._once = real
+
+
+def check_download_resume():
+    """net.save against a local server that breaks transfers the way a far
+    CDN does: the connection drops part-way (resumed with Range, the file is
+    whole), the server ignores Range (the file starts over, never doubled),
+    it stalls (dropped after DOWNLOAD_STALL, resumed), or it refuses a plain
+    client (one more attempt with the browser fingerprint). A download that
+    cannot finish says why and leaves no file."""
+    import http.server, threading
+    body = bytes(range(256)) * 1200             # 307200 bytes, every offset distinguishable
+    seen = []
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def handle(self):
+            with contextlib.suppress(OSError):
+                super().handle()
+
+        def do_GET(self):
+            rng = self.headers.get("Range")
+            seen.append((self.path, rng, self.headers.get("User-Agent")))
+            start = int(rng[6:-1]) if rng and self.path != "/norange" else 0
+            if self.path == "/blocked" and self.headers.get("User-Agent") == net.UA:
+                self.send_response(403)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            if self.path == "/gone":
+                self.send_response(410)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            self.send_response(206 if start else 200)
+            self.send_header("Content-Length", str(len(body) - start))
+            if start:
+                self.send_header("Content-Range", f"bytes {start}-{len(body) - 1}/{len(body)}")
+            self.end_headers()
+            n = sum(1 for path, *_ in seen if path == self.path)
+            if self.path in ("/drop", "/norange") and n <= 2:      # two broken transfers, then a whole one
+                self.wfile.write(body[start:start + 100_000])
+                self.wfile.flush()
+                self.connection.shutdown(2)
+            elif self.path == "/stall" and n == 1:
+                self.wfile.write(body[:50_000])
+                self.wfile.flush()
+                time.sleep(15)
+            elif self.path == "/never":
+                self.wfile.write(body[start:start + 10])
+                self.wfile.flush()
+                self.connection.shutdown(2)
+            else:
+                self.wfile.write(body[start:])
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    base = f"http://t.test:{srv.server_address[1]}"
+    real, real_stall, real_sleep = net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep
+    net.public_addrs = lambda h, p: ["127.0.0.1"] if h == "t.test" else real(h, p)
+    net.DOWNLOAD_STALL = 1
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            dest = Path(d) / "a.m4a"
+            eq((net.save(base + "/drop", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
+               "dropped connections are resumed into a whole file")
+            eq([r for path, r, _ in seen if path == "/drop"], [None, "bytes=100000-", "bytes=200000-"],
+               "each resume asks for the bytes after those on disk")
+            eq((net.save(base + "/norange", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
+               "a server that ignores Range: the file starts over, not appended to")
+            t0 = time.monotonic()
+            eq((net.save(base + "/stall", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
+               "a stalled connection is dropped and resumed")
+            took = time.monotonic() - t0
+            eq(took < 12, True, f"the stall is cut before the server wakes up: {took:.1f}s")
+            eq((net.save(base + "/blocked", dest, 30, 10**6), dest.read_bytes() == body), ("", True),
+               "refused as a plain client: fetched with the browser fingerprint")
+            eq((net.save(base + "/gone", dest, 30, 10**6), dest.exists()), ("HTTP 410", False),
+               "a final status is the reason, no file left")
+            why = net.save(base + "/never", dest, 3, 10**6)
+            eq((why.startswith("timed out after 3s (0.0 MB in "), dest.exists()), (True, False),
+               f"out of time says so, with the progress made: {why}")
+            net.time.sleep = lambda s: None
+            n0 = len(seen)
+            net.DOWNLOAD_TRIES, tries = 3, net.DOWNLOAD_TRIES
+            try:
+                why = net.save(f"http://t.test:1/closed", dest, 30, 10**6)
+            finally:
+                net.DOWNLOAD_TRIES = tries
+            eq((why.startswith("gave up after 3 attempts without progress"), dest.exists(), len(seen) - n0),
+               (True, False, 0), f"no progress at all gives up, not until the deadline: {why}")
+    finally:
+        net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep = real, real_stall, real_sleep
+        srv.shutdown()
+
+
+def check_audio_ladder():
+    """youtube_audio tries each way in AUDIO_LADDER until one downloads: a
+    refused stream (HTTP 403) moves on to the next way, within one shared
+    timeout. It stops early only for what no other way changes: a video closed
+    to us (members only, geo-blocked -> Restricted), refused cookies, a
+    timeout. The failure names every attempt in a short line."""
+    e403 = "WARNING: x\nERROR: unable to download video data: HTTP Error 403: Forbidden\n"
+    geo = ("ERROR: [youtube] T1mE658hnfQ: The uploader has not made this video available in your country\n"
+           "This video is available in " + ", ".join(["Zambia"] * 400) + ".\n")
+    url = "https://www.youtube.com/watch?v=T1mE658hnfQ"
+    eq([n for n, _ in ds.AUDIO_LADDER][:2], ["default", "hls"], "ladder: yt-dlp's own clients first, then HLS")
+    eq(any("player_client" in a for a in ds.AUDIO_LADDER[0][1]), False,
+       "ladder: the first way leaves the player clients to yt-dlp")
+    real = ds.run_cmd
+
+    def run(replies):
+        """Play `replies` (rc, stderr, writes a file?) in order; return (result or exception, commands)."""
+        cmds = []
+
+        def fake(cmd, timeout):
+            rc, err, writes = replies[len(cmds)]
+            cmds.append(cmd)
+            out = Path(cmd[cmd.index("-o") + 1]).parent
+            (out / ("audio.m4a" if writes else "audio.webm.part")).write_bytes(b"audio" if writes else b"half")
+            return rc, "", err
+        ds.run_cmd = fake
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                try:
+                    got = ds.youtube_audio(Path("/c.txt"), url)(Path(d), 300)
+                    got = (got.name, got.read_bytes(), sorted(p.name for p in Path(d).iterdir()))
+                except Exception as e:
+                    got = e
+        finally:
+            ds.run_cmd = real
+        return got, cmds
+
+    got, cmds = run([(1, e403, False), (0, "", True)])
+    eq(got, ("audio.m4a", b"audio", ["audio.m4a"]), "ladder: the second way's file, the first way's leftovers removed")
+    eq([("player_client=web_safari" in " ".join(c), "--user-agent" in c, c[-2:]) for c in cmds],
+       [(False, False, ["--", url]), (True, False, ["--", url])],
+       "ladder: 403 on the default clients -> HLS; no user agent override; url after --")
+    got, cmds = run([(1, e403, False)] * len(ds.AUDIO_LADDER))
+    eq((type(got), len(cmds), str(got).count("HTTP Error 403"), "WARNING" in str(got)),
+       (RuntimeError, len(ds.AUDIO_LADDER), len(ds.AUDIO_LADDER), False),
+       "ladder: every way tried once; the error lists each attempt's ERROR line")
+    eq(str(got).startswith("audio download failed: default: ERROR: unable to download"), True, f"ladder message: {got}")
+    got, cmds = run([(1, geo, False)])
+    eq((type(got), str(got), len(cmds)), (ds.Restricted, "not available in the runner's country", 1),
+       "ladder: a geo-block ends it at once (blanked by asr)")
+    got, cmds = run([(None, "", False)])
+    eq((type(got), len(cmds), "timed out" in str(got)), (RuntimeError, 1, True), "ladder: a timeout is not retried")
+    got, cmds = run([(1, "ERROR: [youtube] x: Sign in to confirm you're not a bot\n", False)])
+    eq((type(got), len(cmds)), (RuntimeError, 1), "ladder: refused cookies end it (kept pending)")
+    real_min, ds.AUDIO_MIN_ATTEMPT = ds.AUDIO_MIN_ATTEMPT, 10**6
+    try:
+        got, cmds = run([(1, e403, False)] * 2)
+    finally:
+        ds.AUDIO_MIN_ATTEMPT = real_min
+    eq(len(cmds), 1, "ladder: no further attempt without time for it")
+
+    eq(len(ds.why_failed(geo)) < 400, True, "why_failed: the country list is cut")
+    eq(ds.why_failed("[youtube] a\nWARNING: b\nERROR: c\nERROR: d\n"), "ERROR: c / ERROR: d", "why_failed: ERROR lines")
+    eq(ds.why_failed("x\ny\nz\n"), "y / z", "why_failed: else the end of stderr")
+    eq(ds.restricted("WARNING: [youtube] x: The uploader has not made this video available in your country"), None,
+       "geo-block: only an ERROR line (the probe reports it as a warning and still lists subtitles)")
+
+    # A podcast download failure carries net.save's reason.
+    real_save, net.save = net.save, lambda url, dest, seconds, cap: seen.append(seconds) or "HTTP 403"
+    seen = []
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            try:
+                ds.direct_audio("https://cdn.example/a.m4a")(Path(d), 705)
+                got = None
+            except RuntimeError as e:
+                got = str(e)
+    finally:
+        net.save = real_save
+    eq((got, seen), ("audio download failed: HTTP 403", [1410]), "podcast: the reason, and twice the time")
+
+    # Past the run's wall-clock limit nothing new starts, and nothing is blanked.
+    import types
+    a = types.SimpleNamespace(no_transcribe=False, max_transcribe=0, max_asr_duration=0, max_asr_total=0, max_run=60)
+    real_spec = ds.importlib.util.find_spec
+    ds.importlib.util.find_spec = lambda name: object()
+    try:
+        b = ds.Budget(a)
+        eq(b.refuse(60), None, "run limit: not reached")
+        b.started -= 61
+        eq(b.refuse(60), ("run time limit reached (1 min)", False), "run limit: reached -> refused, not permanent")
+    finally:
+        ds.importlib.util.find_spec = real_spec
 
 
 def check_archive_rekey_collision():
@@ -2038,6 +2236,21 @@ MUTATIONS = (
     ("C25", "check_security", "media.py",
      '*(["--", youtube_watch_url(url)] if url else [])',
      "*([youtube_watch_url(url)] if url else [])"),
+    ("C36", "check_audio_ladder", "media.py",
+     'tried.append(f"{name}: {why_failed(err)}")\n            if cookies_rejected(err):',
+     'tried.append(f"{name}: {why_failed(err)}")\n            if True:'),
+    ("C36", "check_audio_ladder", "media.py",
+     '("not available in the runner\'s country",',
+     '("not available in the runner\'s country" * 0,'),
+    ("C37", "check_download_resume", "net.py",
+     'have = have if status == 206 else 0',
+     'have = have'),
+    ("C37", "check_download_resume", "net.py",
+     'h["Range"] = f"bytes={have}-"',
+     'h["X-Range"] = f"bytes={have}-"'),
+    ("C37", "check_audio_ladder", "media.py",
+     'return f"run time limit reached ({limit / 60:.0f} min)", False',
+     'return None'),
     ("C35", "check_youtube_video_url", "media.py",
      '*(["--", youtube_watch_url(url)] if url else [])',
      '*(["--", url] if url else [])'),
@@ -2201,6 +2414,14 @@ CONTRACTS = (
      'only YouTube *videos* (a valid 11-character id from store.youtube_video_id) reach media and the youtube route; the url yt-dlp gets is always rebuilt from the id (youtube_watch_url) and names that one video; stored video urls carry no list, index, si or t parameters',
      'a ?list= url makes the probe walk the whole playlist until it times out, every day; one video shows up several times under different share parameters',
      ('check_youtube_video_url', 'check_security',)),
+    ('C36',
+     "a YouTube audio download that fails is tried again by the next way in AUDIO_LADDER (yt-dlp's own client choice first, no user agent override), within one timeout; only a closed video (members only, geo-blocked), refused cookies or a timeout end it early; failures name each attempt's ERROR line",
+     'one refused player client (HTTP 403) leaves every video without captions pending for good, and upgrading yt-dlp changes nothing because its client choice is overridden; the log shows a country list instead of the reason',
+     ('check_audio_ladder',)),
+    ('C37',
+     'podcast audio downloads resume a broken or stalled transfer from the bytes on disk (a server ignoring Range starts the file over), retry a refused plain client once with the browser fingerprint, and report why they failed; past the run time limit no further ASR job starts',
+     'a long episode on a slow CDN never arrives in one piece and stays pending for good, with a log line that fits every cause; slow downloads run the job into its timeout and nothing is committed',
+     ('check_download_resume', 'check_audio_ladder',)),
 )
 
 
