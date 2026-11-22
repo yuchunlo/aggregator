@@ -1,0 +1,1336 @@
+WEBVTT
+Kind: captions
+
+00:00:00.000 --> 00:00:05.520 position:63%
+Imagine building a machine the size of a
+small mountain and then burying it deep
+
+00:00:05.520 --> 00:00:11.920 position:63%
+under the ice in Antarctica. That's what he
+really did. That's Dr. Francis Halzen. And
+
+00:00:11.920 --> 00:00:18.960 position:63%
+he just won the Nobel Prize in Physics. Because
+with that machine, we're now uncovering one of
+
+00:00:18.960 --> 00:00:25.840 position:63%
+the greatest mysteries in our universe. It's
+an eye that looks at the sky. I want people
+
+00:00:25.840 --> 00:00:32.029 position:63%
+to understand how crazy this is. That's why you
+need the biggest detector ever built. Let's go.
+
+00:00:36.720 --> 00:00:40.870 position:63%
+This episode was made possible by Grand
+Theft Auto VI from Rockstar Games.
+
+00:00:41.454 --> 00:00:46.320 position:63%
+We really cheering for you on the day. Our team
+was sending messages back and forth. We were
+
+00:00:46.320 --> 00:00:51.520 position:63%
+screaming. We were very excited. Well, do you
+know this is not my favorite day of the year,
+
+00:00:51.520 --> 00:00:59.360 position:63%
+is. No? I was working. I had totally forgotten
+about it when the call came. I was surprised.
+
+00:00:59.360 --> 00:01:04.560 position:63%
+I wouldn't have been surprised, but now I was
+because I wasn't thinking about it. And you just
+
+00:01:04.560 --> 00:01:09.520 position:63%
+forgotten that you were one of the most eligible
+people for the Nobel Prize this year? Well,
+
+00:01:09.520 --> 00:01:18.240 position:63%
+I don't know. There are about 20 people, some
+of whom I think it's amazing that I got this
+
+00:01:18.240 --> 00:01:24.000 position:63%
+prize because they are waiting
+much longer. And the Nobel is an outreach
+
+00:01:24.000 --> 00:01:31.600 position:63%
+project for science as well, right? And so this
+fits. Yeah. Congratulations. Thank you. So our
+
+00:01:31.600 --> 00:01:37.840 position:63%
+goal in this conversation is to both explain the
+discovery that you just won the Nobel Prize for,
+
+00:01:37.840 --> 00:01:43.120 position:63%
+but also to look ahead and think about how does it
+help us understand the universe from here? What's
+
+00:01:43.120 --> 00:01:48.800 position:63%
+happened since? What might be coming? And I am
+not a physicist like you. I am not an engineer.
+
+00:01:48.800 --> 00:01:55.360 position:63%
+I think of myself as one of our audience and
+those people that watch this show are really
+
+00:01:55.360 --> 00:02:00.720 position:63%
+curious. They're really smart, but they don't
+know anything about the complex science that
+
+00:02:00.720 --> 00:02:05.520 position:63%
+we're about to talk about. And I found that
+the best way for me to understand complex
+
+00:02:05.520 --> 00:02:12.640 position:63%
+science is to understand first the physical
+things that humans built. Why did we build
+
+00:02:12.640 --> 00:02:19.120 position:63%
+that thing with our hands? What is it teaching
+us? And then what might we do with it next? So,
+
+00:02:19.120 --> 00:02:25.212 position:63%
+I want to start with the actual machine that you
+built under the ice in Antarctica. And to do that,
+
+00:02:29.600 --> 00:02:39.680 position:63%
+Ta-da! Wow. This is a model that our team built
+ourself. Wow. Based on the specs of IceCube. Oh,
+
+00:02:39.680 --> 00:02:46.560 position:63%
+this is beautiful. You like it? Many of these
+have been built, but this ranks near the top. Yes!
+
+00:02:46.560 --> 00:02:55.120 position:63%
+It has, you know, it has an artistic
+side to it as as well. Yeah. Beautiful. So
+
+00:02:55.120 --> 00:03:03.120 position:63%
+imagine we are here, we fly into Antarctica, we're
+on the surface. What do we see on the surface? And
+
+00:03:03.120 --> 00:03:08.720 position:63%
+then if we had X-ray vision and we look down,
+just the physical parts, what do we literally
+
+00:03:08.720 --> 00:03:16.480 position:63%
+see? Yeah. So the South Pole is a desert. So all
+the pictures you see with penguins in Antarctica,
+
+00:03:16.480 --> 00:03:21.840 position:63%
+that has nothing to do with the South Pole.
+You're at the center of the continent and it
+
+00:03:21.840 --> 00:03:31.120 position:63%
+just compacted snow that fell on Antarctica for a
+long time. What you put on top of the detector
+
+00:03:31.120 --> 00:03:40.240 position:63%
+is not the detector. It's our computing
+center that collects the data. As your model
+
+00:03:40.240 --> 00:03:48.160 position:63%
+nicely shows, the detector is in the ice. And
+so what's special about the South Pole is that
+
+00:03:48.160 --> 00:03:57.280 position:63%
+you stand on 3 kilometers of ice. And so this ice
+is actually a glacier that moves 10 meters every year,
+
+00:03:57.280 --> 00:04:05.040 position:63%
+somewhat more than 10 meters, but it float. So you are
+not aware of it. It doesn't modify. It doesn't
+
+00:04:05.040 --> 00:04:11.120 position:63%
+deform. It doesn't do anything. The detector just
+floats. So if we look at this, my understanding
+
+00:04:11.120 --> 00:04:16.240 position:63%
+is there's the facility on top that does the
+computing and it's taking information from
+
+00:04:16.240 --> 00:04:23.600 position:63%
+86 boreholes that are deep under the ice. And in
+each borehole, there's a cable, each carrying 60
+
+00:04:23.600 --> 00:04:31.840 position:63%
+detectors. So that's 5,160 sensors, all buried
+in Antarctic ice. And you had to get them down
+
+00:04:31.840 --> 00:04:36.160 position:63%
+there with this special hot water drill. And this
+is just an incredible piece of engineering. We're
+
+00:04:36.160 --> 00:04:41.680 position:63%
+going to get into more of these details, but
+what does this machine actually do? It's an
+
+00:04:41.680 --> 00:04:49.600 position:63%
+eye that looks at the sky, but it sees neutrinos
+instead of light. And that's all. And a neutrino
+
+00:04:49.600 --> 00:04:56.640 position:63%
+is a special kind of particle. It's a particle
+and it's just like the particles of light,
+
+00:04:56.640 --> 00:05:03.920 position:63%
+but we cannot see them with our eyes. You are
+looking actually at more than 5,000 light sensors
+
+00:05:03.920 --> 00:05:11.900 position:63%
+which are deployed in a kilometer cube of ice 1.5 kilometers below the geographic South Pole. What
+
+00:05:11.900 --> 00:05:20.800 position:63%
+we do is collect signals made by neutrinos whenthey crash into an atom, actually a nucleus in the
+
+00:05:20.800 --> 00:05:28.080 position:63%
+ice. Neutrinos you cannot see. They have barely any
+reality. They have no electric charge. They stream
+
+00:05:28.080 --> 00:05:36.400 position:63%
+through the ice and you know a million do. For one
+that occasionally will crash into a nucleus and
+
+00:05:36.400 --> 00:05:44.240 position:63%
+then it disappear and transforms itself in charged
+particles, electrically charged particles and they
+
+00:05:44.240 --> 00:05:53.120 position:63%
+emit light and make a glow in the detector and we
+map this glow of light and from its shape and its
+
+00:05:53.120 --> 00:06:01.200 position:63%
+properties we can reconstruct that we detected a
+neutrino but we can also detect where it comes
+
+00:06:01.200 --> 00:06:09.440 position:63%
+from. So it points back in the sky. So if you
+detect enough of them, it's like making a digital
+
+00:06:09.440 --> 00:06:16.080 position:63%
+map of the universe. You get dots and the more
+dots we get, the more we see. And that's what
+
+00:06:16.080 --> 00:06:23.338 position:63%
+we are doing now. Let me see if I can repeat some of this back to
+you to see if I understand it correctly. Yeah.
+
+00:06:23.338 --> 00:06:28.480 position:63%
+You come up with
+the idea that you can build a machine like this
+
+00:06:28.480 --> 00:06:36.960 position:63%
+in Antarctic ice. And this machine involves the
+computing station on the surface, but then 86
+
+00:06:36.960 --> 00:06:43.440 position:63%
+of these, what do we call them? Strands? Beads.
+Beads? String-beads down into the ice. Beads on a string, yeah.
+
+00:06:43.440 --> 00:06:51.760 position:63%
+Each bead is a light sensor. Mhm. And all
+of these light sensors are detecting um bursts of
+
+00:06:51.760 --> 00:07:00.240 position:63%
+light through the ice that themselves are caused
+by a neutrino coming through the earth or through
+
+00:07:00.240 --> 00:07:07.360 position:63%
+stars or wherever it came from and colliding with
+an atom of ice in the water. Exactly. And the
+
+00:07:07.360 --> 00:07:14.633 position:63%
+reason that we want to do this is because neutrinos
+help us study the universe in a new way.
+
+00:07:14.633 --> 00:07:20.847 position:63%
+I think that that way is basically, please tell me if I'm
+wrong, we've been looking up at the universe for a
+
+00:07:20.847 --> 00:07:27.040 position:63%
+long time and we detect all kinds of signals
+coming our way, right? The electromagnetic
+
+00:07:27.040 --> 00:07:33.440 position:63%
+spectrum being the big one, but also cosmic rays,
+gravitational waves now. But all of those ways of
+
+00:07:33.440 --> 00:07:39.680 position:63%
+looking at the universe have a problem, which
+is they can get blocked or bent or disturbed
+
+00:07:39.680 --> 00:07:45.280 position:63%
+in some way. So light obviously gets blocked but
+cosmic rays have charge so they get warped for a
+
+00:07:45.280 --> 00:07:50.480 position:63%
+long time until you, we didn't know where they came
+from. And then gravitational waves you know that
+
+00:07:50.480 --> 00:07:55.200 position:63%
+something is there but not exactly what. But
+neutrinos are special because as you said they
+
+00:07:55.200 --> 00:08:00.960 position:63%
+have basically no mass and no charge. So they go
+through basically everything. And they go through
+
+00:08:00.960 --> 00:08:06.400 position:63%
+stars and and all kinds of things including
+us all the time. So, we collect them from the beginning of
+
+00:08:06.400 --> 00:08:14.320 position:63%
+time and the edge of the universe without any
+deflection, without any absorption. They just
+
+00:08:14.320 --> 00:08:22.960 position:63%
+come from anywhere directly to us. And so if we
+can detect them, what does that do for us? Well,
+
+00:08:22.960 --> 00:08:31.280 position:63%
+neutrinos as they can reach us from the universe
+from space and time from since whenever it
+
+00:08:31.280 --> 00:08:39.760 position:63%
+existed. They hopefully give us a very transparent
+view. The fact that they interact means that they
+
+00:08:39.760 --> 00:08:46.800 position:63%
+can escape from places in the universe where light
+doesn't get out. Mhm. For instance, the sun. The
+
+00:08:46.800 --> 00:08:54.000 position:63%
+sun is a nuclear reactor and it produces light
+and it produces neutrinos. Neutrinos are present
+
+00:08:54.000 --> 00:09:01.360 position:63%
+wherever there is some nuclear stuff happening.
+But the neutrinos they have been detected by other
+
+00:09:01.360 --> 00:09:07.920 position:63%
+experiments in the past. They come directly at
+us and tell us exactly what this reactor can
+
+00:09:07.920 --> 00:09:15.680 position:63%
+do. Whereas the light takes 8 minutes to get
+here and then it has to get out of the sun.
+
+00:09:15.680 --> 00:09:20.640 position:63%
+So, if you're a photon and you're born in the
+center of the sun, you'll bounce around in there
+
+00:09:20.640 --> 00:09:26.880 position:63%
+for actually tens of thousands of years before
+reaching the surface, it's incredibly hard for
+
+00:09:26.880 --> 00:09:31.840 position:63%
+light to get out. But neutrinos, on the other
+hand, don't have that problem. They escape the
+
+00:09:31.840 --> 00:09:37.360 position:63%
+center right away. And that makes them incredibly
+effective messengers, not just from the inside of
+
+00:09:37.360 --> 00:09:43.760 position:63%
+the sun, but also from the inside of other stuff
+way out there. So, I understand now why neutrinos
+
+00:09:43.760 --> 00:09:50.240 position:63%
+would help us analyze big cosmic events in the
+universe and why we want to study them. But the
+
+00:09:50.240 --> 00:09:54.080 position:63%
+reason why that works is because neutrinos go
+through basically everything, right? There are
+
+00:09:54.080 --> 00:09:58.320 position:63%
+billions of them going through us right now,
+which makes them also hard to detect, right?
+
+00:09:58.320 --> 00:10:03.760 position:63%
+Yes. This is my question. That's why you need
+the biggest detector ever built. You're sitting
+
+00:10:03.760 --> 00:10:09.840 position:63%
+there and you're thinking decades ago, how do you
+catch these things that are by definition nearly
+
+00:10:09.840 --> 00:10:16.960 position:63%
+impossible to detect and you come up with this
+idea? Where did this idea come from? Well, I had
+
+00:10:16.960 --> 00:10:25.120 position:63%
+ice on my brains for a long time. I was a particle,
+I still am a particle theorist and I was
+
+00:10:25.120 --> 00:10:34.560 position:63%
+fascinated by a problem which went back to 1963.
+An Armenian physicist, Askaryan suggested to do
+
+00:10:34.560 --> 00:10:43.360 position:63%
+exactly what we are discussing. But his idea was
+when the neutrino changes into charged particles
+
+00:10:43.360 --> 00:10:51.520 position:63%
+and it emits a radio signal and he wanted to do
+what we are doing but instead of putting light
+
+00:10:51.520 --> 00:11:00.800 position:63%
+sensors in the ice he want to put radio antennas
+in the ice. And the problem with his idea was he
+
+00:11:00.800 --> 00:11:08.080 position:63%
+didn't know and nobody knew what the power in that
+signal was. So whether it was detectable. So I was
+
+00:11:08.080 --> 00:11:14.560 position:63%
+thinking about ice for many years. And suddenly
+they were building an experiment like this of
+
+00:11:14.560 --> 00:11:20.400 position:63%
+the coast of Hawaii. Friends of mine. In the water.
+Instead of ice and using water. That experiment
+
+00:11:20.400 --> 00:11:28.640 position:63%
+was very challenging. They began to understand the
+problems of doing this in ocean water. And we in
+
+00:11:28.640 --> 00:11:38.320 position:63%
+at Wisconsin started to develop the idea that this
+was actually much easier in ice
+
+00:11:38.320 --> 00:11:46.800 position:63%
+than in water. If you succeeded at overcoming some
+hurdles, there are mostly three three obstacles.
+
+00:11:46.800 --> 00:11:54.160 position:63%
+The first one is we had no idea what the optical
+properties of the ice are. The clearer the ice,
+
+00:11:54.160 --> 00:12:00.640 position:63%
+the less sensors you need to map these flashes
+of light that we want to to measure. That
+
+00:12:00.640 --> 00:12:07.440 position:63%
+was the first hurdle. The second one was to
+deploy them. Glaciologists that developed the
+
+00:12:07.440 --> 00:12:14.960 position:63%
+hot water technique, the drilling technique
+in glaciers, but they made holes, you know,
+
+00:12:14.960 --> 00:12:24.560 position:63%
+the size of a coffee cup, and then a few hundred
+meters deep, I guess. And so we had to scale this up
+
+00:12:24.560 --> 00:12:32.480 position:63%
+to the size of a basketball, actually bigger.
+And so, was this possible? That was number two.
+
+00:12:32.480 --> 00:12:40.000 position:63%
+Number three is that the atmosphere produces
+neutrinos. And so it's like there are clouds
+
+00:12:40.000 --> 00:12:46.960 position:63%
+in the sky and they never go away. And so we
+didn't know that at the depth we wanted to do
+
+00:12:46.960 --> 00:12:54.880 position:63%
+this originally want to do it at 1 kilometer. That
+didn't work. So if we overcame these three things,
+
+00:12:54.880 --> 00:13:00.880 position:63%
+then we didn't actually know whether we are ever
+going to see something. But that didn't matter.
+
+00:13:00.880 --> 00:13:07.920 position:63%
+We were all particle physicists. So we wanted to
+build this detector. And our idea was that if you
+
+00:13:07.920 --> 00:13:14.480 position:63%
+build something this unusual, you will be doing
+something interesting. Our joke was God forbid
+
+00:13:14.480 --> 00:13:23.360 position:63%
+we have to do astronomy.
+We're digging in the ice instead. Yeah. So you
+
+00:13:23.360 --> 00:13:28.640 position:63%
+so you have to figure out if you can solve these
+three things. And to do that you start by building
+
+00:13:28.640 --> 00:13:35.520 position:63%
+a smaller detector. Yeah. Can you tell me about
+AMANDA? Yeah, AMANDA was the version. It had a
+
+00:13:35.520 --> 00:13:44.080 position:63%
+detection capability of about between 1% and 10% of
+the ultimate detector. But the goal was to figure
+
+00:13:44.080 --> 00:13:51.600 position:63%
+out the transparency of the ice. And of course,
+while we were building this, we started developing
+
+00:13:51.600 --> 00:13:59.280 position:63%
+the hot water drilling technique. So AMANDA made
+the critical discovery that the ice, the light,
+
+00:13:59.280 --> 00:14:08.960 position:63%
+the blue light emitted by the flash made by
+neutrinos just travels for 100 meters and more. And you
+
+00:14:08.960 --> 00:14:18.240 position:63%
+can actually not find a solid that clear even if
+you try to build it in the lab. I want people to
+
+00:14:18.240 --> 00:14:24.720 position:63%
+understand how crazy this is. Yeah, this is crazy.
+Nobody anticipated this, right? This just came
+
+00:14:24.720 --> 00:14:31.520 position:63%
+out of the blue. It's like this incredible gift in Antarctica.
+Like if I went into a lab and I had all the best
+
+00:14:31.520 --> 00:14:37.360 position:63%
+technology here on the surface to make the purest
+ice, it would be what 8 meters that light would travel
+
+00:14:37.360 --> 00:14:43.920 position:63%
+to. Exactly. This is 300. Yeah. And of course that
+matters for building it because the detectors are
+
+00:14:43.920 --> 00:14:50.160 position:63%
+25 meters apart. So if you used my ice from a lab,
+8 meters wouldn't cover it. It wouldn't be enough.
+
+00:14:50.160 --> 00:14:56.480 position:63%
+So AMANDA is too small to detect the neutrinos
+from deep space, but it does have this massive
+
+00:14:56.480 --> 00:15:01.680 position:63%
+success of saying the ice is incredible. The
+ice is really going to work. That's right. This
+
+00:15:01.680 --> 00:15:09.200 position:63%
+is ancient Antarctic ice. It's snow that fell on
+Antarctica 50,000 years ago. It's ultrapure. Now
+
+00:15:09.200 --> 00:15:16.000 position:63%
+we know why it's so clear, but we had no clue
+when we started this. So in this ice for both
+
+00:15:16.000 --> 00:15:22.187 position:63%
+AMANDA and now IceCube, you have these detectors. Yeah. And
+I want to take a moment to show people what they look like...
+
+00:15:22.854 --> 00:15:32.560 position:63%
+Francis Halzen's team turned a cubic kilometer of Antarctic ice
+into a telescope. I'm just obsessed with projects that ambitious,
+
+00:15:32.560 --> 00:15:39.920 position:63%
+which is why I'm so excited about this one, too.
+The wait is over. GTA VI is finally here. And guys,
+
+00:15:39.920 --> 00:15:45.600 position:63%
+it is so impressive. Rockstar Games has
+been working on GTA VI for over a decade.
+
+00:15:45.600 --> 00:15:52.080 position:63%
+They opened an entire studio to create and write
+and animate the pedestrians of the population that
+
+00:15:52.080 --> 00:15:57.440 position:63%
+make up Leonida. The vehicles were developed
+by real-life race car drivers. They brought in
+
+00:15:57.440 --> 00:16:02.560 position:63%
+more than 50 street artists to design the murals
+and graffiti and other street art. And just look
+
+00:16:02.560 --> 00:16:07.920 position:63%
+at these animations. You can see individual
+strands of Lucia's hair blowing in the wind.
+
+00:16:07.920 --> 00:16:13.760 position:63%
+You can bask in the sunshine on Key Lento and watch
+a tropical storm rain down on the city in the
+
+00:16:13.760 --> 00:16:19.600 position:63%
+distance and then drive to the city and splash
+around in fresh puddles. It is just the most
+
+00:16:19.600 --> 00:16:25.120 position:63%
+incredible technical detail I've ever seen. Grand
+Theft Auto VI from Rockstar Games, the biggest,
+
+00:16:25.120 --> 00:16:30.960 position:63%
+most immersive evolution of the series yet. Out
+now on PlayStation 5 and Xbox Series X|S, rated
+
+00:16:30.960 --> 00:16:36.960 position:63%
+M for Mature. Now, back to that machine under
+the ice. Oh my God, it's heavier than I thought
+
+00:16:36.960 --> 00:16:45.520 position:63%
+it was gonna be. What are we looking at? IceCube is...
+it's simply a block of ice and more than 5,000 of
+
+00:16:45.520 --> 00:16:53.440 position:63%
+these. Wow. Inside the block of ice. What you see
+here on the bottom, it's like a light bulb, right?
+
+00:16:53.440 --> 00:17:00.160 position:63%
+By by the way, it because of the pressure, it's
+it's in a glass pressure vessel. But this
+
+00:17:00.160 --> 00:17:07.440 position:63%
+is uh what physicists call a photomultiplier tube.
+But it's a light bulb. But it does the opposite of
+
+00:17:07.440 --> 00:17:15.600 position:63%
+a light bulb. When light strikes it, it makes
+an electric signal. That electric signal is
+
+00:17:15.600 --> 00:17:25.440 position:63%
+uh formed by this electronics. And then the light,
+the image, the light detected becomes an electric
+
+00:17:25.440 --> 00:17:33.040 position:63%
+signal, an electric pulse, and that's sent to
+the computers that in the house, the two-story
+
+00:17:33.040 --> 00:17:39.120 position:63%
+house we saw before there. Yeah. And so for
+people to understand just how crazy this is,
+
+00:17:39.120 --> 00:17:46.000 position:63%
+this is one of the tiny little silver dots that
+we had in our model. This is one. This is one
+
+00:17:46.000 --> 00:17:54.560 position:63%
+of...yes, exactly. How many are there under the ice
+now? So, we deployed 5,160. When you lower them in
+
+00:17:54.560 --> 00:18:00.880 position:63%
+the liquid holes, right, they're never holes.
+They're like a thermos, a very long
+
+00:18:00.880 --> 00:18:08.560 position:63%
+thermos bottle uh that ice is an insulator that
+contains the water. So, when you deploy them,
+
+00:18:08.560 --> 00:18:18.160 position:63%
+the water refreezes from the top. Mhm. And they
+refreeze under very high pressures. And so we
+
+00:18:18.160 --> 00:18:24.880 position:63%
+we lose about one in a hundred when we deploy
+them and uh we had predicted that and this is
+
+00:18:24.880 --> 00:18:31.200 position:63%
+what happened. There's nothing we can do about
+it. It's like sometimes this may get ripped off,
+
+00:18:31.200 --> 00:18:38.560 position:63%
+right? But the ones that survive, they live
+forever. There are still more than 5,000 right
+
+00:18:38.560 --> 00:18:45.040 position:63%
+in in the ice. It's incredible. Yeah. I also I
+know this is a very practical question for a very
+
+00:18:45.040 --> 00:18:50.480 position:63%
+theoretical physics explainer, but you talked
+about the hot water drilling to get them down
+
+00:18:50.480 --> 00:18:58.000 position:63%
+there. How did you actually make holes that deep
+in Antarctic ice to deploy so many of these? Well,
+
+00:18:58.000 --> 00:19:02.960 position:63%
+that was in the end I mentioned the three
+challenges that were in the end the biggest
+
+00:19:02.960 --> 00:19:10.880 position:63%
+challenge. So what they had to do is so the hot
+water is supplied to a hose which is again about
+
+00:19:10.880 --> 00:19:18.880 position:63%
+uh no it's significantly larger than a a coffee
+cup. It's a big hose. It's like your garden hose
+
+00:19:18.880 --> 00:19:25.920 position:63%
+and it falls by gravity and puts out boiling
+water under pressure and just it falls and two
+
+00:19:25.920 --> 00:19:33.520 position:63%
+days later you have transformed a pipe from
+ice into water. That's amazing. But two days
+
+00:19:33.520 --> 00:19:40.560 position:63%
+for each hole. It takes two days for each hole.
+But we were told very early in the project, look,
+
+00:19:40.560 --> 00:19:50.000 position:63%
+if you hang a a hose that big. Mhm. 2 and 1/2
+kilometers long in boiling water, it will just
+
+00:19:50.000 --> 00:19:57.200 position:63%
+collapse. And so they say we cannot build such
+a hose. And one of our engineers went to Dunlop,
+
+00:19:57.200 --> 00:20:05.360 position:63%
+Canada. They had research labs and he was told the
+same story. And finally he discovered a company in
+
+00:20:05.360 --> 00:20:12.320 position:63%
+Padua near Venice where they said we can build
+anything and they did. For weeks I thought
+
+00:20:12.320 --> 00:20:18.640 position:63%
+this project is finished. You cannot build the
+drill. I love this story because we are talking
+
+00:20:18.640 --> 00:20:25.440 position:63%
+about trying to detect a massless, chargeless
+particle from the universe to understand cosmic
+
+00:20:25.440 --> 00:20:31.120 position:63%
+events and we're like but the hose is just
+really going to kill us. It's an incredibly
+
+00:20:32.000 --> 00:20:38.320 position:63%
+impressive piece of technology. And I want to take
+a second. I'll move this out and then I'll move
+
+00:20:38.320 --> 00:20:42.009 position:63%
+this back and then I'll continue with the rest of
+my questions. This is my workout for the day.
+
+00:20:43.427 --> 00:20:49.600 position:63%
+I'm glad you didn't drop it. I know. Me, too. Before
+we get to the big moment of discovery with this
+
+00:20:49.600 --> 00:20:56.320 position:63%
+machine, I want to zoom back and talk about the
+mystery that started it all, which is a centuries
+
+00:20:56.320 --> 00:21:03.520 position:63%
+old mystery about finding the source of another
+kind of particle, cosmic rays. Could you explain
+
+00:21:03.520 --> 00:21:08.400 position:63%
+why we wanted to find the source of this high-energy
+radiation coming at us from the universe,
+
+00:21:08.400 --> 00:21:15.120 position:63%
+these cosmic rays, and how neutrinos help us
+figure out where cosmic rays are from? Yeah.
+
+00:21:15.120 --> 00:21:22.960 position:63%
+The first question is easy to answer. You already
+mentioned multi-wavelength astronomy, right? So
+
+00:21:22.960 --> 00:21:32.720 position:63%
+you have visible light and then you go to the red
+and to to the blue. To the blue you eventually do
+
+00:21:32.720 --> 00:21:39.440 position:63%
+astronomy with very high-energy photons. These
+high-energy photons at some point don't make it
+
+00:21:39.440 --> 00:21:46.000 position:63%
+through the universe anymore. And so that's where
+neutrinos come in because the neutrinos are not
+
+00:21:46.000 --> 00:21:54.400 position:63%
+stopped. At some point you can only do astronomy
+with neutrinos. But then the question is is there's
+
+00:21:54.400 --> 00:22:01.520 position:63%
+something interesting there. And in fact most of
+the energy that reaches from the universe at these
+
+00:22:01.520 --> 00:22:08.240 position:63%
+ultra high photon energies, those are protons.
+And just to be clear, these high-energy particles
+
+00:22:08.240 --> 00:22:16.080 position:63%
+are cosmic rays. They're just high-energy space
+radiation mysteriously raining down on us. We
+
+00:22:16.080 --> 00:22:24.400 position:63%
+know cosmic rays exist for more than a century. We
+have no idea where they come from or how they are
+
+00:22:24.400 --> 00:22:30.560 position:63%
+accelerated. How can you not be fascinated by
+this, right? And I'm not the only one. I mean,
+
+00:22:30.560 --> 00:22:38.240 position:63%
+solving the cosmic ray problem was the big goal
+of this experiment. Why neutrinos? Because you
+
+00:22:38.240 --> 00:22:44.720 position:63%
+need cosmic rays to produce neutrinos. Got it.
+So to repeat this back to you a little bit,
+
+00:22:44.720 --> 00:22:50.560 position:63%
+there's this super high-energy radiation coming
+at us all the time and we call it cosmic rays
+
+00:22:50.560 --> 00:22:55.760 position:63%
+and we for obvious reasons, why wouldn't you want
+to know where the high-energy radiation is coming
+
+00:22:55.760 --> 00:23:02.640 position:63%
+from? What's creating it? But it's getting all
+messed up by other things with charge. But we
+
+00:23:02.640 --> 00:23:10.720 position:63%
+know that neutrinos and cosmic rays come from the
+same sources. So if we can detect this sibling,
+
+00:23:10.720 --> 00:23:15.840 position:63%
+this neutrino, we can understand where cosmic
+rays come from. That's a good way of saying
+
+00:23:15.840 --> 00:23:20.880 position:63%
+it. Okay. Yeah. I I feel like I understand it now.
+There is also an element of mystery because
+
+00:23:20.880 --> 00:23:26.880 position:63%
+these wavelengths in the sky, these energies,
+we have never seen the universe. You know,
+
+00:23:26.880 --> 00:23:34.080 position:63%
+it's like the dark side of the moon, but hopefully
+a bit more interesting. Given all of that,
+
+00:23:34.080 --> 00:23:42.880 position:63%
+why did IceCube need to be so big? Why is it that
+it needs to be this large? Well, this is where the
+
+00:23:42.880 --> 00:23:49.440 position:63%
+physics of the particles come in. Right? For a
+couple of decades, theorists including myself
+
+00:23:49.440 --> 00:23:56.880 position:63%
+would be imagining things in the sky and ask the
+question, how many neutrinos do they produce? And
+
+00:23:56.880 --> 00:24:03.360 position:63%
+then it's just Standard Model physics to design
+the detector. That's because statistically using
+
+00:24:03.360 --> 00:24:08.080 position:63%
+the Standard Model given our understanding of
+how many of these neutrinos from deep space are
+
+00:24:08.080 --> 00:24:13.600 position:63%
+coming. Yeah, we know exactly then what we have
+to build. We know all the particle physics. We
+
+00:24:13.600 --> 00:24:21.200 position:63%
+know the neutrino physics. I can calculate exactly
+how often a neutrino will interact and which is
+
+00:24:21.200 --> 00:24:28.560 position:63%
+the basic unit that tells you how big the detector
+has to be, right? And so if all of these neutrinos
+
+00:24:28.560 --> 00:24:34.880 position:63%
+are coming through us all the time, we need one to
+actually just happen to hit something in order for
+
+00:24:34.880 --> 00:24:41.760 position:63%
+this to work. And the bigger the more likely it
+to hit. But still, we only catch one in a million
+
+00:24:41.760 --> 00:24:48.240 position:63%
+that stream through the detector. Yeah. Let's jump
+into what you found. So, you actually do build
+
+00:24:48.240 --> 00:24:55.520 position:63%
+IceCube, which is just this incredible feat of both
+particle physics and engineering. And then let's
+
+00:24:55.520 --> 00:25:02.720 position:63%
+jump forward. It's 2013. What happens in 2013
+that's significant to this? Okay, I'll tell you
+
+00:25:02.720 --> 00:25:10.480 position:63%
+the story. We were looking for something which I'm
+not going to explain to you but it's called the
+
+00:25:10.480 --> 00:25:18.080 position:63%
+guaranteed neutrinos. Okay. So there was a source
+we had imagined in our great wisdom as theorists
+
+00:25:18.080 --> 00:25:24.800 position:63%
+that you had to see if you build a kilometer cube
+detector. So easy to see these
+
+00:25:24.800 --> 00:25:32.880 position:63%
+neutrinos. So we started looking for the guaranteed
+neutrinos. We saw absolutely nothing. But it's
+
+00:25:32.880 --> 00:25:39.440 position:63%
+called the guaranteed neutrino. It was called the
+guaranteed neutrinos. But while looking for them,
+
+00:25:39.440 --> 00:25:48.560 position:63%
+we discovered these two spectacular events which
+couldn't be possibly produced in the atmosphere.
+
+00:25:48.560 --> 00:25:56.240 position:63%
+But two events are you going to risk your
+reputation on two events? And very importantly,
+
+00:25:56.240 --> 00:26:03.920 position:63%
+there is no second detector to check us. We
+realized if we ever made a claim that turned out
+
+00:26:03.920 --> 00:26:12.560 position:63%
+not to be true, then nobody would actually ever
+believe anything we did after. So we published
+
+00:26:12.560 --> 00:26:20.240 position:63%
+the two events but didn't claim anything. Then
+what we could do however was we could calculate
+
+00:26:20.240 --> 00:26:27.920 position:63%
+how many more of these events where in our
+two years of data if we actually looked for them
+
+00:26:27.920 --> 00:26:35.280 position:63%
+rather than have them accidentally appear in the
+wrong analysis of the data. And so we went and
+
+00:26:35.280 --> 00:26:42.080 position:63%
+looked through and we found 26 more and that
+was it. And that we published claiming we had
+
+00:26:42.080 --> 00:26:49.680 position:63%
+discovered cosmic neutrinos. And a few weeks later
+we were declared the physics breakthrough of the
+
+00:26:49.680 --> 00:26:57.840 position:63%
+year. And you know we this made us feel very bad
+because I was all the time thinking what do I say
+
+00:26:57.840 --> 00:27:03.600 position:63%
+at the next press conference when we have to admit
+this is a fluke. No. So you have you have this
+
+00:27:03.600 --> 00:27:08.880 position:63%
+enormous discovery that's so significant, it's
+the breakthrough of the year and you're thinking,
+
+00:27:08.880 --> 00:27:14.320 position:63%
+"What if this is some cosmic trick? What if this
+isn't real?" Yes, exactly. Or it's something
+
+00:27:14.320 --> 00:27:20.240 position:63%
+really interesting, but not what we think it
+is. Making discoveries is not fun. And
+
+00:27:20.240 --> 00:27:27.520 position:63%
+that's always true, actually. It's
+no fun to be responsible for discoveries. It's
+
+00:27:27.520 --> 00:27:32.320 position:63%
+so interesting to hear you say that because from
+the outside it seems so fun. Yeah. It seems like
+
+00:27:32.320 --> 00:27:36.720 position:63%
+there must be some big moment of Eureka where
+everyone lifts their finger up in the air and
+
+00:27:36.720 --> 00:27:45.920 position:63%
+then celebrates. No, in fact,
+we to write the paper took God knows 6 months,
+
+00:27:45.920 --> 00:27:53.680 position:63%
+no or more. So it was not easy. Fast forward now
+to 2017, another big moment. What happens then?
+
+00:27:54.240 --> 00:28:01.200 position:63%
+Well, that was much easier and it all went very
+fast and there was no time to think because
+
+00:28:01.200 --> 00:28:10.400 position:63%
+after we found this spectacular glow of neutrinos
+coming from all over the universe for 3 years we
+
+00:28:10.400 --> 00:28:19.440 position:63%
+accumulated data, searched for any evidence of any
+you know, preferred places where neutrinos come from,
+
+00:28:19.440 --> 00:28:27.440 position:63%
+nothing. So then what we did is when a neutrino is
+detected it's first reconstructed as I said there
+
+00:28:27.440 --> 00:28:34.720 position:63%
+then sent to Madison for better reconstruction.
+What we did is the early reconstruction we just
+
+00:28:34.720 --> 00:28:44.800 position:63%
+sent over a Iridium phone to every astronomer in
+the universe. Cool. So then in 2017 you see this
+
+00:28:44.800 --> 00:28:52.160 position:63%
+really high-energy neutrino come through and you
+send this data to astronomers all over the world.
+
+00:28:52.160 --> 00:28:57.520 position:63%
+And we actually didn't know whether any point paid
+attention but you know that event there were more
+
+00:28:57.520 --> 00:29:05.040 position:63%
+than 20 telescopes pointing at the area in
+Orion. And what did they see? Where it was coming
+
+00:29:05.040 --> 00:29:15.200 position:63%
+from and so that's how we saw the first source.
+What was it? It was an active galaxy. What's an
+
+00:29:15.200 --> 00:29:23.200 position:63%
+active galaxy? All galaxies have a a supermassive
+black hole in the center. We have a supermassive
+
+00:29:23.200 --> 00:29:30.080 position:63%
+black hole in our galaxy. Mhm. But it's not doing
+anything. It's not an accelerator. Ah. So we see
+
+00:29:30.080 --> 00:29:35.840 position:63%
+it we see neutrinos from other places more. It has been
+decommissioned as a neutrino source. Fascinating.
+
+00:29:35.840 --> 00:29:44.080 position:63%
+Uh 10 million years ago or more. And so when it's
+active means that it's still absorbing material.
+
+00:29:44.080 --> 00:29:51.440 position:63%
+Anything hydrogen, stars, anything that's in
+the galaxy eventually can fall in and it becomes
+
+00:29:51.440 --> 00:29:58.320 position:63%
+it's spinning. It's a whirlpool that forms and
+particles are falling in and the particles falling
+
+00:29:58.320 --> 00:30:06.400 position:63%
+in are accelerated. And we can actually derive
+that these neutrinos come from right on top of the
+
+00:30:06.400 --> 00:30:12.880 position:63%
+black hole. That's where they come from. And where
+cosmic rays come from. And where cosmic rays come
+
+00:30:12.880 --> 00:30:20.240 position:63%
+from. Just to make sure that people understand how
+significant this is, you came up with the idea to
+
+00:30:20.240 --> 00:30:28.480 position:63%
+build a massive under-ice machine in Antarctica.
+You and your team actually figure out how to build
+
+00:30:28.480 --> 00:30:34.000 position:63%
+this thing from an engineering perspective. Then
+you decide to share all of the data that you get
+
+00:30:34.000 --> 00:30:40.080 position:63%
+from it with other telescopes that themselves can
+look using other forms of signals, electromagnetic
+
+00:30:40.080 --> 00:30:45.520 position:63%
+waves for example, to look at at where the
+neutrinos are coming from that you find. And one
+
+00:30:45.520 --> 00:30:51.040 position:63%
+day you see a signal that you send to all of them
+without knowing if anyone will choose to follow
+
+00:30:51.040 --> 00:30:59.760 position:63%
+up on it. They do. They follow up on it. They
+see this active galaxy. And by combining their
+
+00:30:59.760 --> 00:31:10.640 position:63%
+data with yours, we actually now understand where
+neutrinos and cosmic rays come from. Now, we have to
+
+00:31:10.640 --> 00:31:17.680 position:63%
+introduce some caution here. We have found sources
+of cosmic rays. Whether these are the sources of
+
+00:31:17.680 --> 00:31:24.880 position:63%
+all cosmic rays, we don't know. So now we may find
+more of these sources and the problem is solved.
+
+00:31:24.880 --> 00:31:32.400 position:63%
+Mhm. Or it could be that there are other types of
+accelerators that produce cosmic rays we'll find
+
+00:31:32.400 --> 00:31:39.680 position:63%
+later. Maybe we have to build bigger detectors to
+find them. This is typical. Now more questions are
+
+00:31:39.680 --> 00:31:46.880 position:63%
+raised about this discovery and you you know they
+are harder to solve. This is how science works,
+
+00:31:46.880 --> 00:31:53.280 position:63%
+nothing new there. I think there's a bigger, I mean,
+it's crazy to say a bigger story. There's there's
+
+00:31:53.280 --> 00:31:59.280 position:63%
+an even broader story as well which is
+multi-messenger astronomy itself. The idea that what
+
+00:31:59.280 --> 00:32:08.240 position:63%
+you've done here is both a discovery that has
+won the Nobel Prize and also kicked off a way
+
+00:32:08.240 --> 00:32:14.640 position:63%
+of working together as scientists that seems
+like it could be um even better than anyone
+
+00:32:14.640 --> 00:32:21.440 position:63%
+working alone by a lot. Right? The idea that the
+combination of the neutrinos and the detections
+
+00:32:21.440 --> 00:32:26.560 position:63%
+from other telescopes is what allowed us to have
+this new information. It's very inspiring to think
+
+00:32:26.560 --> 00:32:34.160 position:63%
+about not only is one experiment impressive,
+but the combined effect of humans is even
+
+00:32:34.160 --> 00:32:42.560 position:63%
+better. So if you think of the multi-wavelength
+astronomy from deep red to deep blue, right,
+
+00:32:42.560 --> 00:32:49.600 position:63%
+radio to gamma rays. So on one end we can continue
+with gravitational waves and in the other end with
+
+00:32:49.600 --> 00:32:57.440 position:63%
+neutrinos. Do you imagine that we'll learn even
+more even faster because of this? That's one thing
+
+00:32:57.440 --> 00:33:03.760 position:63%
+making predictions in this business is impossible.
+There's no way to predict what will happen and
+
+00:33:03.760 --> 00:33:12.240 position:63%
+the sky the sky is big. I think for a lot of
+people this would be a very neat conclusion.
+
+00:33:12.240 --> 00:33:19.200 position:63%
+Right? You had this idea. You built this machine.
+You had a Nobel Prize winning discovery. But you
+
+00:33:19.200 --> 00:33:27.360 position:63%
+are not done. You are working now on IceCube
+2. Yeah. What does IceCube 2 have to teach us
+
+00:33:27.360 --> 00:33:35.040 position:63%
+that IceCube can't? IceCube is basically
+discovery experiment. When I give the talk,
+
+00:33:35.040 --> 00:33:40.720 position:63%
+you know, you always end with a slide with a
+list of conclusions. And my first conclusion,
+
+00:33:40.720 --> 00:33:47.840 position:63%
+which is always the most important thing with
+it, is it says neutrino astronomy exists. Yeah.
+
+00:33:47.840 --> 00:33:55.760 position:63%
+What does IceCube 2 physically look like? IceCube
+2 uh is just 10 times bigger. Awesome. So, we built
+
+00:33:55.760 --> 00:34:03.600 position:63%
+uh we build up the ice around IceCube. So, more
+more here. More more here. And you would think,
+
+00:34:03.600 --> 00:34:12.320 position:63%
+you know, instead of 5,000, we need 50,000
+sensors. No, we can make the detector with
+
+00:34:12.320 --> 00:34:20.720 position:63%
+uh 10,000 sensors, 10 times bigger. Because of the
+incredible properties of the ice. And
+
+00:34:20.720 --> 00:34:27.600 position:63%
+the modules have become much more sensitive. In
+fact, the 10 times bigger detector cost the same
+
+00:34:27.600 --> 00:34:34.800 position:63%
+as IceCube if you correct for inflation, which
+is a factor 1.7. Because the technology has gotten
+
+00:34:34.800 --> 00:34:41.120 position:63%
+better. The technology is better and we understand
+the ice better. That's so cool. You know,
+
+00:34:41.120 --> 00:34:46.960 position:63%
+one of the things I've heard you say in other
+interviews that I found very inspiring was that
+
+00:34:46.960 --> 00:34:52.640 position:63%
+the most interesting talk you could give was about
+how many times this project nearly failed. Oh,
+
+00:34:52.640 --> 00:34:59.600 position:63%
+yes. Yes. Well, we discussed one case, right,
+with the hose that couldn't be built. Yeah. And
+
+00:34:59.600 --> 00:35:04.720 position:63%
+Yeah. What were some of the other moments and
+what lessons have you taken from that? Well,
+
+00:35:04.720 --> 00:35:15.600 position:63%
+the first we started deploying AMANDA strings
+at a depth of 1 kilometer, not 1.4
+
+00:35:15.600 --> 00:35:22.240 position:63%
+kilometers. That makes a big difference because
+there were bubbles in the ice, so it doesn't work.
+
+00:35:22.240 --> 00:35:30.640 position:63%
+Mhm. But we also discovered something that hasn't
+been useful yet. My colleagues refer to this
+
+00:35:30.640 --> 00:35:38.400 position:63%
+as if they serve you lemons, you make
+lemonade. So we discovered that we could actually
+
+00:35:38.400 --> 00:35:48.320 position:63%
+use detector at 1 kilometer to detect supernova.
+Woah. It's only sensitive to supernova in our own
+
+00:35:48.320 --> 00:35:56.960 position:63%
+galaxy. You know, the one we really know about,
+the last one was Kepler. Mhm. But they happen all
+
+00:35:56.960 --> 00:36:02.960 position:63%
+the time. It's just that the light doesn't reach
+Earth. But the neutrinos do. But the neutrinos do.
+
+00:36:02.960 --> 00:36:08.080 position:63%
+Since we had that idea, we are looking for
+supernova. I can guarantee you there was
+
+00:36:08.080 --> 00:36:17.520 position:63%
+no supernova in our galaxy since 1994. Because
+we looked continuously without interruptions.
+
+00:36:17.520 --> 00:36:24.400 position:63%
+But now we would know if they happened. But if one happened it
+would be incredible and we would detect a million
+
+00:36:24.400 --> 00:36:32.800 position:63%
+events with a detailed movie of what's happening
+in the star. And so I joked last Friday when we
+
+00:36:32.800 --> 00:36:39.680 position:63%
+were celebrating that Wisconsin get another Nobel
+Prize when a supernova happens. And I don't think
+
+00:36:39.680 --> 00:36:45.040 position:63%
+I'm joking. I don't think you're joking
+either. It would, it would be the astronomical
+
+00:36:45.040 --> 00:36:50.480 position:63%
+event of the century. I hope it happens in my lifetime. I
+hope there just happens to be a supernova. The same for me,
+
+00:36:50.480 --> 00:36:57.040 position:63%
+which is a bit more challenging because it will
+happen eventually. There's no doubt about it. We
+
+00:36:57.040 --> 00:37:04.720 position:63%
+know supernova happens. As you said, the critical
+thing is whether it happens in our lifetime.
+
+00:37:04.720 --> 00:37:08.480 position:63%
+They're definitely going to happen. We're
+definitely not going to be here for too long. Keep your
+
+00:37:08.480 --> 00:37:15.200 position:63%
+fingers crossed. Yeah. This is the question I ask
+everyone at the end of these conversations. When I
+
+00:37:15.200 --> 00:37:20.320 position:63%
+think about not being here for very long, when I
+think about when I'm gonna die and I think about
+
+00:37:20.320 --> 00:37:27.200 position:63%
+what people are going to say about me after I'm
+gone, I hope that after they say, you know, she
+
+00:37:27.200 --> 00:37:33.280 position:63%
+was a really great family member, a really great
+friend, they talk about the mission of what we're
+
+00:37:33.280 --> 00:37:39.920 position:63%
+trying to do on this show, which is to help people
+see incredible people like yourself working on big
+
+00:37:39.920 --> 00:37:45.040 position:63%
+projects, trying to make the world better, trying
+to deepen our understanding of the universe. And
+
+00:37:45.040 --> 00:37:49.760 position:63%
+they understand that we were trying to help people
+participate in that, trying to make the world
+
+00:37:49.760 --> 00:37:55.920 position:63%
+better by showing them what's possible. What would
+you like people to talk about after you're gone?
+
+00:37:55.920 --> 00:38:05.280 position:63%
+What would you like to be remembered for? My real
+wish even before I pass away is that this inspires
+
+00:38:05.280 --> 00:38:13.920 position:63%
+people to keep dreaming. You know, this is the
+time of chips and AI and God knows what else. But
+
+00:38:13.920 --> 00:38:22.720 position:63%
+I hope that in this world, material world that's
+developing very fast, that this inspires people to
+
+00:38:22.720 --> 00:38:29.360 position:63%
+keep following their dreams and to keep dreaming
+and not go to university, you know, to get a
+
+00:38:29.360 --> 00:38:37.120 position:63%
+higher salary. Yeah. That's my wish that this
+project does and I hope it does this now before
+
+00:38:37.760 --> 00:38:44.960 position:63%
+uh, I leave a legacy. You know, I'll keep going.
+Yeah. You had this incredible dream and it has
+
+00:38:44.960 --> 00:38:50.080 position:63%
+already taught us so much. Thank you so so much
+for doing this. I really appreciate it. Thank
+
+00:38:50.080 --> 00:38:56.240 position:63%
+you very much. Awesome. Pleasure. And this, by
+the way, is a gift for you if you would like it.
+
+00:38:56.240 --> 00:39:04.020 position:63%
+That's what I was thinking of all the time. It's
+for you. Okay, you get more chocolates. Thank you.
+
+00:39:10.000 --> 00:39:15.600 position:63%
+I have seen at least 20 of these
+by now of all shapes and forms.
+
+00:39:15.600 --> 00:39:19.280 position:63%
+But this artistically this wins by big. Yeah.
+

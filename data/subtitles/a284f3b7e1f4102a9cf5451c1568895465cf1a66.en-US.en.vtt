@@ -1,0 +1,679 @@
+WEBVTT
+Kind: captions
+
+00:00:00.400 --> 00:00:06.800 position:63%
+Adobe has a problem. For years, they’ve&nbsp;
+made you rent their apps. $105 a month,&nbsp;&nbsp;
+
+00:00:06.800 --> 00:00:13.700 position:63%
+forever. And if you try to cancel early…&nbsp;
+that’ll cost you too. But one developer cloned&nbsp;&nbsp;
+
+00:00:13.700 --> 00:00:20.300 position:63%
+it in under a week. And gave it away for free.
+Then Premiere. Then Lightroom. Then Microsoft&nbsp;&nbsp;
+
+00:00:20.300 --> 00:00:27.800 position:63%
+Word, Excel, PowerPoint. For as long as software&nbsp;
+has existed, the hard part was building it. But&nbsp;&nbsp;
+
+00:00:27.800 --> 00:00:35.000 position:63%
+now, software has changed. And there’s no&nbsp;
+going back. Yet this gets even weirder.&nbsp;
+
+00:00:35.600 --> 00:00:41.300 position:63%
+Most software stocks collapsed, but&nbsp;
+have gradually rebounded… except Adobe.&nbsp;&nbsp;
+
+00:00:41.300 --> 00:00:56.900 position:63%
+Even with record revenue. Can Adobe survive?
+Ok, first, what the heck are these clones things?&nbsp;&nbsp;
+
+00:00:57.500 --> 00:01:03.600 position:63%
+Well, let’s get a bit more context. Photoshop,&nbsp;
+Premiere Pro, Lightroom. These are some of&nbsp;&nbsp;
+
+00:01:03.600 --> 00:01:10.800 position:63%
+Adobe's biggest products, and a single app costs&nbsp;
+around $23 a month, or as high as $105 a month for&nbsp;&nbsp;
+
+00:01:10.800 --> 00:01:16.300 position:63%
+Creative Cloud. This has been one of the most&nbsp;
+lucrative, dominant software empires on earth.&nbsp;
+
+00:01:17.000 --> 00:01:23.100 position:63%
+Together, Adobe's creative and marketing software&nbsp;
+brought in $4.65 billion in just the last three&nbsp;&nbsp;
+
+00:01:23.100 --> 00:01:28.800 position:63%
+months. Which brings us to their clones, and&nbsp;
+developer Brandon Thomas. What motivated him&nbsp;&nbsp;
+
+00:01:28.800 --> 00:01:33.600 position:63%
+to do all of this… is quite ironic.
+Brandon Thomas announced seven free,&nbsp;&nbsp;
+
+00:01:33.600 --> 00:01:38.800 position:63%
+open-source alternatives to Adobe's creative&nbsp;
+software, on GitHub. This came with a promise&nbsp;&nbsp;
+
+00:01:38.800 --> 00:01:44.400 position:63%
+of “100% parity within one month,” which simply&nbsp;
+means to match the originals completely within a&nbsp;&nbsp;
+
+00:01:44.400 --> 00:01:51.800 position:63%
+month. But would he actually achieve this?… More&nbsp;
+on that later. He called the project ArtCraft.&nbsp;
+
+00:01:51.800 --> 00:01:58.400 position:63%
+Photoshop became PhotoCraft, Illustrator became&nbsp;
+VectorCraft, and Premiere Pro became FilmCraft.&nbsp;&nbsp;
+
+00:01:59.000 --> 00:02:02.693 position:63%
+You get the idea. They were designed to&nbsp;
+be functional clones of Adobe's apps,&nbsp;&nbsp;
+
+00:02:02.693 --> 00:02:08.293 position:63%
+with nearly identical features. Thomas believes&nbsp;
+AI can now build software that once took teams&nbsp;&nbsp;
+
+00:02:08.293 --> 00:02:14.993 position:63%
+of engineers months or even years to create.
+Not only that, they’re open source. Anyone&nbsp;&nbsp;
+
+00:02:14.993 --> 00:02:20.493 position:63%
+could copy, modify, and even sell them. And they&nbsp;
+could run on Windows, Mac, Linux, or straight from&nbsp;&nbsp;
+
+00:02:20.493 --> 00:02:28.193 position:63%
+a browser. So, how did this happen, and why now?
+On September 22, Anthropic released Claude Opus&nbsp;&nbsp;
+
+00:02:28.193 --> 00:02:33.793 position:63%
+5.5, the AI model Thomas would use to&nbsp;
+build these clones. Eight days later,&nbsp;&nbsp;
+
+00:02:33.793 --> 00:02:39.493 position:63%
+PhotoCraft's first code appeared on GitHub.&nbsp;
+He used eight AI agents working in parallel&nbsp;&nbsp;
+
+00:02:39.493 --> 00:02:45.193 position:63%
+to write code that recreated how Adobe's software&nbsp;
+worked without copying its original source code,&nbsp;&nbsp;
+
+00:02:45.193 --> 00:02:51.493 position:63%
+something called a clean-room rebuild. By October&nbsp;
+1, it had gone from supporting 224 Photoshop menu&nbsp;&nbsp;
+
+00:02:51.493 --> 00:03:01.193 position:63%
+items to 532 out of 625 in a single day.&nbsp;
+Two days later, it was 625. On October 5,&nbsp;&nbsp;
+
+00:03:01.193 --> 00:03:06.093 position:63%
+Thomas released the first signed version.
+And ArtCraft drew a lot of attention.&nbsp;&nbsp;
+
+00:03:06.593 --> 00:03:14.293 position:63%
+PhotoCraft had 6,691 GitHub stars on October 7,&nbsp;
+essentially bookmarks or likes for GitHub. It&nbsp;&nbsp;
+
+00:03:14.293 --> 00:03:21.593 position:63%
+passed 23,000 the next day, 44,000 by October&nbsp;
+14, and, as of writing, it’s over 74,000.&nbsp;
+
+00:03:21.593 --> 00:03:27.893 position:63%
+… That’s a lot. So, why do this?&nbsp;
+Why go to all this trouble,&nbsp;&nbsp;
+
+00:03:27.893 --> 00:03:33.893 position:63%
+and release it for free? Well, that’s what&nbsp;
+I find extremely ironic, and kinda funny.&nbsp;
+
+00:03:34.493 --> 00:03:39.093 position:63%
+If you’ve watched our past videos, you’d&nbsp;
+know about the dreaded Adobe cancellation&nbsp;&nbsp;
+
+00:03:39.093 --> 00:03:43.893 position:63%
+fee. The reason so many people loathe this&nbsp;
+company, and why the US government sued them,&nbsp;&nbsp;
+
+00:03:43.893 --> 00:03:50.293 position:63%
+and why Adobe had to pay $150 million in fines&nbsp;
+and refunds. Well... Thomas is one of them.&nbsp;
+
+00:03:50.793 --> 00:03:54.493 position:63%
+"They charged me the 'cancellation&nbsp;
+fee' on multiple occasions,&nbsp;&nbsp;
+
+00:03:54.493 --> 00:04:00.493 position:63%
+and I've hated them ever since,"
+In fact, this was one of his selling points:&nbsp;&nbsp;
+
+00:04:00.493 --> 00:04:07.094 position:63%
+"No more subscriptions with cancellation fees."
+But he didn't stop at Adobe. Within the same week,&nbsp;&nbsp;
+
+00:04:07.094 --> 00:04:12.294 position:63%
+three more projects appeared on GitHub:&nbsp;
+WordCraft, GridCraft, and DeckCraft. These&nbsp;&nbsp;
+
+00:04:12.294 --> 00:04:18.894 position:63%
+were free alternatives to Microsoft Word, Excel,&nbsp;
+and PowerPoint. Wordcraft pulled in about 14,700&nbsp;&nbsp;
+
+00:04:18.894 --> 00:04:23.994 position:63%
+GitHub stars within the month of release.
+It is, very funny, that Adobe’s predatory&nbsp;&nbsp;
+
+00:04:23.994 --> 00:04:30.694 position:63%
+cancellation fees caused these clone products to&nbsp;
+appear… but it’s not the only reason. Thomas has&nbsp;&nbsp;
+
+00:04:30.694 --> 00:04:34.994 position:63%
+another motivation for building these.&nbsp;
+And more importantly, ArtCraft is just&nbsp;&nbsp;
+
+00:04:34.994 --> 00:04:40.394 position:63%
+a tiny part of a major shift in software.
+Adobe isn't the only company facing this&nbsp;&nbsp;
+
+00:04:40.394 --> 00:04:45.394 position:63%
+problem. Software has changed, and I&nbsp;
+don't think there's any going back.
+
+00:04:53.794 --> 00:04:59.194 position:63%
+Over time, online businesses and e-commerce have&nbsp;
+become more refined. There's a proven effective&nbsp;&nbsp;
+
+00:04:59.194 --> 00:05:04.294 position:63%
+way of doing things, checkouts, page layouts,&nbsp;
+marketable products. A lot of the problem is&nbsp;&nbsp;
+
+00:05:04.294 --> 00:05:09.594 position:63%
+figuring all of that out and implementing it&nbsp;
+manually. Don't let that be a bottleneck. Jump&nbsp;&nbsp;
+
+00:05:09.594 --> 00:05:14.794 position:63%
+into e-commerce today with Build Your Store. Build&nbsp;
+Your Store is a Shopify store builder that helps&nbsp;&nbsp;
+
+00:05:14.794 --> 00:05:20.094 position:63%
+you get an e-commerce brand up and running fast&nbsp;
+and easily. It guides you every step of the way.&nbsp;&nbsp;
+
+00:05:20.094 --> 00:05:24.494 position:63%
+It helps you find products with strong market&nbsp;
+demand, build a proven professional websites,&nbsp;&nbsp;
+
+00:05:24.494 --> 00:05:28.994 position:63%
+and set up a Shopify store with proven winning&nbsp;
+products along with all of the more technical&nbsp;&nbsp;
+
+00:05:28.994 --> 00:05:33.594 position:63%
+steps. With Build Your Store, you can have&nbsp;
+your own side hustle or personal brand in&nbsp;&nbsp;
+
+00:05:33.594 --> 00:05:40.094 position:63%
+a matter of minutes at no upfront cost. So, how&nbsp;
+does it work? First, click Build My Free Store,&nbsp;&nbsp;
+
+00:05:40.094 --> 00:05:44.094 position:63%
+then register to Shopify, and the AI&nbsp;
+will guide you through every step,&nbsp;&nbsp;
+
+00:05:44.094 --> 00:05:48.294 position:63%
+including the more technical ones. Then, select&nbsp;
+your niche, products you're interested in,&nbsp;&nbsp;
+
+00:05:48.294 --> 00:05:53.794 position:63%
+and where there's market demand. Use the basic&nbsp;
+monthly Shopify plan and follow BYS's easy steps&nbsp;&nbsp;
+
+00:05:53.794 --> 00:05:58.394 position:63%
+to set it up, including connecting your store&nbsp;
+to AutoDS, a tool that imports products into&nbsp;&nbsp;
+
+00:05:58.394 --> 00:06:04.595 position:63%
+your store and manages order fulfillment. Easy.&nbsp;
+And with a click of a button, you have a unique,&nbsp;&nbsp;
+
+00:06:04.596 --> 00:06:09.496 position:63%
+professional e-commerce platform. Then, review&nbsp;
+your professional store design, which is also&nbsp;&nbsp;
+
+00:06:09.496 --> 00:06:14.896 position:63%
+extremely mobile friendly. Build your store today&nbsp;
+with Build Your Store. Join over 1 million happy&nbsp;&nbsp;
+
+00:06:14.896 --> 00:06:19.996 position:63%
+customers and skip the unnecessary barriers to&nbsp;
+running an e-commerce brand. Click the URL below&nbsp;&nbsp;
+
+00:06:19.996 --> 00:06:25.096 position:63%
+to build your own Shopify store for free. Thank&nbsp;
+you to Build Your Store for sponsoring this video.
+
+00:06:25.996 --> 00:06:31.696 position:63%
+I want to talk about Thomas a bit more, and&nbsp;
+I’m not saying he was being untruthful earlier,&nbsp;&nbsp;
+
+00:06:31.696 --> 00:06:38.096 position:63%
+but there’s some extra context we need. His&nbsp;
+Reddit account, u/ai_art_is_art, offers us a&nbsp;&nbsp;
+
+00:06:38.096 --> 00:06:44.496 position:63%
+few clues already. Thomas has around 15 years of&nbsp;
+engineering experience, including time at Square.&nbsp;
+
+00:06:44.496 --> 00:06:51.296 position:63%
+More importantly, he is… or was the CEO of&nbsp;
+Storyteller.ai, the company behind FakeYou,&nbsp;&nbsp;
+
+00:06:51.296 --> 00:06:56.596 position:63%
+a service that could generate realistic imitations&nbsp;
+of celebrity voices. Which is a huge, ongoing&nbsp;&nbsp;
+
+00:06:56.596 --> 00:07:03.396 position:63%
+problem with AI. In October 2022, Italy's privacy&nbsp;
+watchdog opened an inquiry into FakeYou over&nbsp;&nbsp;
+
+00:07:03.396 --> 00:07:10.296 position:63%
+concerns about the potential misuse of people's&nbsp;
+voices. But Storyteller.ai now has a new name:&nbsp;&nbsp;
+
+00:07:10.296 --> 00:07:15.696 position:63%
+ArtCraft. And it turns out these free apps&nbsp;
+seem to be funnels into his other AI business.&nbsp;
+
+00:07:15.696 --> 00:07:21.996 position:63%
+For image and video generation, ArtCraft sells&nbsp;
+credits for $10, $35, or $60 a month. And the&nbsp;&nbsp;
+
+00:07:21.996 --> 00:07:26.396 position:63%
+revenue from this business helps fund the&nbsp;
+development of the free software. In fact,&nbsp;&nbsp;
+
+00:07:26.396 --> 00:07:31.096 position:63%
+you can see how the two businesses connect.&nbsp;
+Inside the free apps, users can buy credits to&nbsp;&nbsp;
+
+00:07:31.096 --> 00:07:37.096 position:63%
+access ArtCraft's own AI models, alongside models&nbsp;
+from other providers. And if you visit any of the&nbsp;&nbsp;
+
+00:07:37.096 --> 00:07:42.696 position:63%
+apps' GitHub pages, you'll find another link&nbsp;
+pointing straight to ArtCraft's paid AI studio.&nbsp;
+
+00:07:42.696 --> 00:07:48.996 position:63%
+But it's not just a funnel, because you don't&nbsp;
+actually have to pay for anything. The editing&nbsp;&nbsp;
+
+00:07:48.996 --> 00:07:54.696 position:63%
+tools remain free, and you can use them without&nbsp;
+buying a single AI credit. Thomas isn’t alone&nbsp;&nbsp;
+
+00:07:54.696 --> 00:08:00.396 position:63%
+or particularly nefarious either. This is how&nbsp;
+many AI companies operate. At the same time,&nbsp;&nbsp;
+
+00:08:00.396 --> 00:08:05.496 position:63%
+the license lets anyone copy the code and&nbsp;
+build their own free apps. They just have&nbsp;&nbsp;
+
+00:08:05.496 --> 00:08:11.597 position:63%
+to remove ArtCraft's branding. In fact,&nbsp;
+there are already around 12,100 copies.&nbsp;
+
+00:08:11.597 --> 00:08:17.297 position:63%
+But a lot of this hinges on one question:&nbsp;
+Do these clone apps actually work? And the&nbsp;&nbsp;
+
+00:08:17.297 --> 00:08:22.197 position:63%
+answer is... kind of. I've tested&nbsp;
+PhotoCraft and some of the others,&nbsp;&nbsp;
+
+00:08:22.197 --> 00:08:26.797 position:63%
+and one thing that stands out is how lightweight&nbsp;
+it feels compared with Photoshop, which takes a&nbsp;&nbsp;
+
+00:08:26.797 --> 00:08:32.097 position:63%
+million years to open. But being lightweight&nbsp;
+doesn't automatically make it a replacement.&nbsp;
+
+00:08:32.697 --> 00:08:38.097 position:63%
+Remember what they said about “100% parity”?&nbsp;
+Well, that promise slowly began to change.&nbsp;
+
+00:08:38.697 --> 00:08:44.597 position:63%
+"99% parity will take a while, but I'm sure&nbsp;
+it'll be measured in months and not years."&nbsp;
+
+00:08:45.297 --> 00:08:51.797 position:63%
+So… not 100% within a month. On October&nbsp;
+5, PhotoCraft rated itself just 25 to&nbsp;&nbsp;
+
+00:08:51.797 --> 00:08:58.597 position:63%
+35% ready for real work. By October 10,&nbsp;
+that figure had risen to around 45%. But,&nbsp;&nbsp;
+
+00:08:58.597 --> 00:09:03.597 position:63%
+the developers acknowledged the limitations.
+"It is not yet a Photoshop replacement&nbsp;&nbsp;
+
+00:09:03.597 --> 00:09:07.497 position:63%
+for daily professional work."
+PDFs, for example, aren’t reliably&nbsp;&nbsp;
+
+00:09:07.497 --> 00:09:12.897 position:63%
+accepted yet. So… not a perfect clone.
+The Office clones have similar problems,&nbsp;&nbsp;
+
+00:09:12.897 --> 00:09:19.397 position:63%
+too. WordCraft rated itself around 60% ready,&nbsp;
+but charts and SmartArt graphics still wouldn't&nbsp;&nbsp;
+
+00:09:19.397 --> 00:09:26.097 position:63%
+survive a save properly. GridCraft was around&nbsp;
+50% ready, while DeckCraft sat at roughly 55%.&nbsp;
+
+00:09:26.697 --> 00:09:32.697 position:63%
+But the bigger question is: what did Adobe do?&nbsp;
+These are very clearly clones of their products.&nbsp;&nbsp;
+
+00:09:33.297 --> 00:09:40.797 position:63%
+Did they sue? Send a DMCA? Well, no. They’ve&nbsp;
+done… nothing? As of writing, there’s no response.&nbsp;
+
+00:09:41.397 --> 00:09:46.497 position:63%
+“I’m just surprised that Adobe hasn’t issued&nbsp;
+a cease and desist yet, although I suspect&nbsp;&nbsp;
+
+00:09:46.497 --> 00:09:50.097 position:63%
+that lawyers for Adobe realise that this&nbsp;
+could end up being a game of whack-a-mole&nbsp;&nbsp;
+
+00:09:50.097 --> 00:09:55.897 position:63%
+if they don’t address the root cause.”
+Granted, lawsuits and responses do take time.&nbsp;&nbsp;
+
+00:09:55.897 --> 00:10:01.597 position:63%
+But there’s a chance they don’t respond at all.
+First of all, copying what software does isn't&nbsp;&nbsp;
+
+00:10:01.597 --> 00:10:08.197 position:63%
+automatically illegal. In the 1995 case Lotus&nbsp;
+v. Borland, a US appeals court ruled that a&nbsp;&nbsp;
+
+00:10:08.197 --> 00:10:12.998 position:63%
+software menu system wasn't protected by&nbsp;
+copyright, comparing it to the buttons on a&nbsp;&nbsp;
+
+00:10:12.998 --> 00:10:19.098 position:63%
+VCR. The code itself is a different story.&nbsp;
+That can be copyrighted. But remember,&nbsp;&nbsp;
+
+00:10:19.098 --> 00:10:25.198 position:63%
+ArtCraft was reverse engineered. The end&nbsp;
+result is the same, but not the way it’s built.&nbsp;
+
+00:10:25.198 --> 00:10:29.798 position:63%
+One potential issue is something called&nbsp;
+trade dress: copying a product's overall&nbsp;&nbsp;
+
+00:10:29.798 --> 00:10:34.698 position:63%
+look closely enough that people might confuse&nbsp;
+it with the original. PhotoCraft's own README&nbsp;&nbsp;
+
+00:10:34.698 --> 00:10:40.298 position:63%
+makes the resemblance pretty clear: "If you&nbsp;
+know Photoshop, you already know PhotoCraft."&nbsp;&nbsp;
+
+00:10:40.298 --> 00:10:45.898 position:63%
+But ironically this brings us to something&nbsp;
+big in Adobe’s favor. At least, for now.&nbsp;
+
+00:10:46.598 --> 00:10:52.198 position:63%
+Take photographers, who use Lightroom. LightCraft&nbsp;
+can import their Lightroom catalogs and presets,&nbsp;&nbsp;
+
+00:10:52.198 --> 00:10:57.498 position:63%
+but their edits won’t look the same.&nbsp;
+Then there’s all their paid LUTs,&nbsp;&nbsp;
+
+00:10:57.498 --> 00:11:03.298 position:63%
+as well as paid plugins for Photoshop, which don’t&nbsp;
+work in PhotoCraft. Adobe has color profiles for&nbsp;&nbsp;
+
+00:11:03.298 --> 00:11:10.298 position:63%
+about 1,500 cameras. LightCraft has four. And some&nbsp;
+Canon and Olympus RAW files won’t open at all.&nbsp;
+
+00:11:10.298 --> 00:11:16.798 position:63%
+Then there's trust. For example, photographer Glyn&nbsp;
+Dewis, who discloses paid work for Adobe, said&nbsp;&nbsp;
+
+00:11:16.798 --> 00:11:22.398 position:63%
+he wouldn't install PhotoCraft, citing its early&nbsp;
+alpha state and Thomas's hostility toward Adobe.&nbsp;&nbsp;
+
+00:11:23.098 --> 00:11:28.098 position:63%
+Jumping to a new, potentially unstable clone…&nbsp;
+for something you use for your livelihood? Which&nbsp;&nbsp;
+
+00:11:28.098 --> 00:11:33.098 position:63%
+you use for professional, high-paying clients? I&nbsp;
+just don’t see a lot of professionals switching.&nbsp;
+
+00:11:33.098 --> 00:11:38.698 position:63%
+Even if Adobe is a big company with dubious&nbsp;
+morals… It's still a big company, which comes&nbsp;&nbsp;
+
+00:11:38.698 --> 00:11:43.598 position:63%
+with trust and stability. I can’t imagine&nbsp;
+any giant companies rushing to replace Adobe&nbsp;&nbsp;
+
+00:11:43.598 --> 00:11:49.098 position:63%
+either. Workers also carry existing knowledge and&nbsp;
+expertise and procedures that include software.&nbsp;&nbsp;
+
+00:11:49.798 --> 00:11:55.398 position:63%
+Breaking that takes a lot of time to fix.
+But… some definitely will. And this is&nbsp;&nbsp;
+
+00:11:55.398 --> 00:11:58.898 position:63%
+the unavoidable problem Adobe&nbsp;
+and many others have to face.&nbsp;
+
+00:11:59.698 --> 00:12:06.398 position:63%
+To many, this isn’t actually a surprise. Some&nbsp;
+saw this coming, but, what is really surprising,&nbsp;&nbsp;
+
+00:12:06.398 --> 00:12:11.698 position:63%
+is that Adobe’s stock is struggling, while other&nbsp;
+SaaS companies have rebounded. Why might Adobe be&nbsp;&nbsp;
+
+00:12:11.698 --> 00:12:26.099 position:63%
+hurt the most by this new era of software cloning?
+If you’ve watched this far, consider subscribing!&nbsp;&nbsp;
+
+00:12:26.600 --> 00:12:29.900 position:63%
+It helps the channel and means&nbsp;
+you won’t miss future videos.&nbsp;
+
+00:12:29.900 --> 00:12:35.300 position:63%
+This is bigger than Adobe. Wall Street&nbsp;
+saw it coming. In February 2026,&nbsp;&nbsp;
+
+00:12:35.300 --> 00:12:40.000 position:63%
+Anthropic released plugins for Claude Cowork,&nbsp;
+and software stocks took a hit. Often called&nbsp;&nbsp;
+
+00:12:40.000 --> 00:12:44.700 position:63%
+the "SaaSpocalypse." Why keep paying for&nbsp;
+software when AI could help companies build&nbsp;&nbsp;
+
+00:12:44.700 --> 00:12:51.100 position:63%
+their own? The S&amp;P 500 software index fell&nbsp;
+more than 26% between late January and April.&nbsp;
+
+00:12:51.100 --> 00:12:55.900 position:63%
+But then, the panic started to fade. By&nbsp;
+October 6, the index had climbed to its&nbsp;&nbsp;
+
+00:12:55.900 --> 00:13:02.300 position:63%
+highest level since November 2025. …Except&nbsp;
+Adobe. Which was still down 31% for the year.&nbsp;
+
+00:13:02.800 --> 00:13:07.200 position:63%
+"The whole SaaSpocalypse didn't happen&nbsp;
+anywhere near as fast as some of the&nbsp;&nbsp;
+
+00:13:07.200 --> 00:13:12.500 position:63%
+people on Wall Street thought it would."
+So why Adobe? In September, the company&nbsp;&nbsp;
+
+00:13:12.500 --> 00:13:19.800 position:63%
+reported a record $6.76 billion in quarterly&nbsp;
+revenue. Well, there’s a big problem. The money&nbsp;&nbsp;
+
+00:13:19.800 --> 00:13:25.100 position:63%
+it added from new subscriptions was down&nbsp;
+about 38% compared with the year before.&nbsp;
+
+00:13:25.100 --> 00:13:31.700 position:63%
+Investors price a company on where growth is&nbsp;
+heading, and that number points down. By October,&nbsp;&nbsp;
+
+00:13:31.700 --> 00:13:37.800 position:63%
+Wells Fargo had downgraded Adobe, cutting&nbsp;
+the price target from $270 to $225,&nbsp;&nbsp;
+
+00:13:37.800 --> 00:13:42.800 position:63%
+warning that "cracks are starting to show." Its&nbsp;
+survey of IT leaders found Adobe was "a clear&nbsp;&nbsp;
+
+00:13:42.800 --> 00:13:49.100 position:63%
+loser of budget share" as companies shifted money&nbsp;
+toward AI. So the amount companies would budget&nbsp;&nbsp;
+
+00:13:49.100 --> 00:13:55.600 position:63%
+for Adobe is shrinking. Meaning the total pool&nbsp;
+of potential revenue or growth is shrinking.&nbsp;
+
+00:13:55.600 --> 00:14:01.500 position:63%
+And right now, companies are already building&nbsp;
+their own software. In a survey of 817 people&nbsp;&nbsp;
+
+00:14:01.500 --> 00:14:07.000 position:63%
+who build or buy software, 35% had already&nbsp;
+replaced at least one paid tool with something&nbsp;&nbsp;
+
+00:14:07.000 --> 00:14:14.300 position:63%
+they built themselves. And 78% expected to build&nbsp;
+even more in 2026. Even Starbucks is getting in&nbsp;&nbsp;
+
+00:14:14.300 --> 00:14:20.501 position:63%
+on it. The company spends around $400 million a&nbsp;
+year on software, but now is building some with&nbsp;&nbsp;
+
+00:14:20.501 --> 00:14:24.201 position:63%
+AI to cut down on that cost.
+"There's clear opportunities&nbsp;&nbsp;
+
+00:14:24.201 --> 00:14:29.001 position:63%
+to reduce the spend in software."
+And PhotoCraft is just one of several AI-built&nbsp;&nbsp;
+
+00:14:29.001 --> 00:14:34.101 position:63%
+alternatives that have appeared. One developer&nbsp;
+behind another clone reportedly spent around&nbsp;&nbsp;
+
+00:14:34.101 --> 00:14:40.701 position:63%
+$2,000 in AI fees to build it. Though, sometimes,&nbsp;
+trying to replace existing tools can backfire.&nbsp;
+
+00:14:40.701 --> 00:14:46.901 position:63%
+Back in August 2024, Klarna's CEO announced that&nbsp;
+the company was dropping Salesforce and Workday,&nbsp;&nbsp;
+
+00:14:46.901 --> 00:14:52.201 position:63%
+crediting AI for helping it do more with less.
+"How is he achieving compliance, governance of&nbsp;&nbsp;
+
+00:14:52.201 --> 00:14:59.701 position:63%
+his company? What is his institutional memory?"
+And… yeah, less than a year later, it fizzled out.&nbsp;
+
+00:14:59.701 --> 00:15:05.001 position:63%
+"We did not replace SaaS with an LLM."
+So, where does this leave Adobe?&nbsp;
+
+00:15:05.001 --> 00:15:10.501 position:63%
+There will always be lock-in a clone can't&nbsp;
+copy. But that only applies to people and&nbsp;&nbsp;
+
+00:15:10.501 --> 00:15:15.901 position:63%
+companies already using Adobe. What about&nbsp;
+someone just starting out? What about new&nbsp;&nbsp;
+
+00:15:15.901 --> 00:15:20.801 position:63%
+businesses? Why would they pay for Photoshop&nbsp;
+if a free alternative could do the job?&nbsp;
+
+00:15:20.801 --> 00:15:27.801 position:63%
+Then again, free alternatives aren't exactly&nbsp;
+new. GIMP has been free since the 1990s. And&nbsp;&nbsp;
+
+00:15:27.801 --> 00:15:32.601 position:63%
+in October 2025, Canva made Affinity,&nbsp;
+another Photoshop competitor, free.&nbsp;
+
+00:15:33.201 --> 00:15:37.701 position:63%
+But history also shows us what can happen&nbsp;
+when a smaller company successfully copies&nbsp;&nbsp;
+
+00:15:37.701 --> 00:15:44.101 position:63%
+a giant. In 1982, everyone wanted IBM’s&nbsp;
+new PC. But it was built mostly from parts&nbsp;&nbsp;
+
+00:15:44.101 --> 00:15:49.501 position:63%
+anyone could buy. The only piece rivals&nbsp;
+couldn’t copy was IBM’s startup software,&nbsp;&nbsp;
+
+00:15:49.501 --> 00:15:54.801 position:63%
+called the BIOS. But Compaq rebuilt it from&nbsp;
+scratch in nine months, for about $1 million.&nbsp;
+
+00:15:54.801 --> 00:16:00.901 position:63%
+And… IBM never sued. Within a few years,&nbsp;
+IBM began falling behind, in the market&nbsp;&nbsp;
+
+00:16:00.901 --> 00:16:06.101 position:63%
+it had entirely controlled just a few years&nbsp;
+earlier. Thomas uses this example himself.&nbsp;
+
+00:16:07.001 --> 00:16:12.501 position:63%
+Some analysts believe the real test for software&nbsp;
+companies could come in the second half of 2027,&nbsp;&nbsp;
+
+00:16:12.501 --> 00:16:18.002 position:63%
+when more powerful AI coding tools become&nbsp;
+available. Till then, we'll have to wait and see.&nbsp;
+
+00:16:18.603 --> 00:16:24.802 position:63%
+Either way, Adobe has reason to worry,&nbsp;
+but it’s not just from AI software.&nbsp;
+
+00:16:24.802 --> 00:16:28.902 position:63%
+On another front, editors and filmmakers&nbsp;
+are fleeing to a rival that’s winning by&nbsp;&nbsp;
+
+00:16:28.903 --> 00:16:34.603 position:63%
+giving customers the one thing Adobe won’t:&nbsp;
+full ownership of their software. Pay once,&nbsp;&nbsp;
+
+00:16:34.603 --> 00:16:42.103 position:63%
+own forever. Watch this video next&nbsp;
+to learn the rest of the story.
+

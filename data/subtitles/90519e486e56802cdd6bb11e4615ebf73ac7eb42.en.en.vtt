@@ -1,0 +1,1731 @@
+WEBVTT
+Kind: captions
+
+00:00:00.000 --> 00:00:04.071 position:63%
+There's a kind of wild paper from 2002 called Language Trees and Zipping,
+
+00:00:04.071 --> 00:00:09.035 position:63%
+which shows how you can find structure between languages just by using very general file
+
+00:00:09.035 --> 00:00:09.760 position:63%
+compression.
+
+00:00:10.460 --> 00:00:14.622 position:63%
+For example, let's say I give you a bunch of text documents in many different languages,
+
+00:00:14.622 --> 00:00:17.460 position:63%
+and your goal is to automatically cluster them by language.
+
+00:00:18.040 --> 00:00:19.860 position:63%
+And actually, you can aim even higher than that.
+
+00:00:20.100 --> 00:00:24.184 position:63%
+Suppose you also want to recover which languages are most closely related to each
+
+00:00:24.184 --> 00:00:28.268 position:63%
+other in a way that lets you rediscover the tree of shared lineage between them,
+
+00:00:28.268 --> 00:00:32.100 position:63%
+and all you can do is write a function that processes the text in each one.
+
+00:00:32.340 --> 00:00:34.260 position:63%
+There's no pre-baked knowledge of linguistics.
+
+00:00:34.920 --> 00:00:37.578 position:63%
+Now keep in mind, this is almost a quarter century ago,
+
+00:00:37.578 --> 00:00:40.140 position:63%
+so nothing like modern language models is available.
+
+00:00:40.640 --> 00:00:44.385 position:63%
+What's crazy is how the authors showed that you can do this just by using gzip,
+
+00:00:44.385 --> 00:00:48.413 position:63%
+basically the same operation that you might use on your computer to make files a bit
+
+00:00:48.413 --> 00:00:48.913 position:63%
+smaller.
+
+00:00:49.440 --> 00:00:50.340 position:63%
+Here's the basic idea.
+
+00:00:50.760 --> 00:00:55.394 position:63%
+Given two documents, A and B, append a small snippet of B to the end of A,
+
+00:00:55.394 --> 00:00:56.960 position:63%
+and compress the result.
+
+00:00:56.960 --> 00:01:02.200 position:63%
+Now compare that file size to what you get just by compressing A on its own.
+
+00:01:03.060 --> 00:01:06.960 position:63%
+One way to think about this difference is it's telling you how well a little
+
+00:01:06.960 --> 00:01:10.860 position:63%
+snippet of B gets compressed when the compressor is mostly optimized for A.
+
+00:01:11.260 --> 00:01:14.904 position:63%
+You'd expect that result to be small when the linguistic patterns of B
+
+00:01:14.904 --> 00:01:18.600 position:63%
+are similar to those in A, but larger when B is more different from A.
+
+00:01:19.300 --> 00:01:23.399 position:63%
+The authors used this general idea to define a specific metric for how far
+
+00:01:23.399 --> 00:01:27.720 position:63%
+away two documents are, based exclusively on how well they compress together.
+
+00:01:28.220 --> 00:01:31.212 position:63%
+And then, evidently, this co-compression-based distance
+
+00:01:31.212 --> 00:01:34.040 position:63%
+was enough to recover the tree of language lineage.
+
+00:01:34.520 --> 00:01:35.380 position:63%
+And it doesn't stop there.
+
+00:01:35.520 --> 00:01:38.553 position:63%
+The same trick can be used for other natural language tasks,
+
+00:01:38.553 --> 00:01:40.980 position:63%
+like identifying who authored a given document.
+
+00:01:42.560 --> 00:01:46.597 position:63%
+What I like about this paper is what a pure example it is of when the theory and
+
+00:01:46.597 --> 00:01:50.482 position:63%
+the engineering behind compression can be surprisingly useful to tasks which
+
+00:01:50.482 --> 00:01:54.620 position:63%
+would seem to fall in the domain of machine learning and artificial intelligence.
+
+00:01:54.620 --> 00:01:58.700 position:63%
+The specific concept underlying this example is something known as cross-entropy.
+
+00:01:59.220 --> 00:02:02.632 position:63%
+And what's interesting is that cross-entropy is also a very core part
+
+00:02:02.632 --> 00:02:05.995 position:63%
+of how modern language models are trained, which gives a whisper of
+
+00:02:05.995 --> 00:02:09.160 position:63%
+an unexpected connection between that training and compression.
+
+00:02:09.800 --> 00:02:12.143 position:63%
+Most of what I want to do with this video is provide
+
+00:02:12.143 --> 00:02:13.900 position:63%
+a lesson that goes back to the basics.
+
+00:02:14.180 --> 00:02:17.914 position:63%
+We're going to spend the first half on the fundamentals of what cross-entropy is,
+
+00:02:17.914 --> 00:02:21.740 position:63%
+how it naturally arises in the study of compression, and how you can visualize it.
+
+00:02:21.740 --> 00:02:24.398 position:63%
+Then after that, we're going to go through the fundamentals
+
+00:02:24.398 --> 00:02:26.560 position:63%
+on pre-training and distilling language models.
+
+00:02:26.940 --> 00:02:29.229 position:63%
+And what's interesting is how, in that second half,
+
+00:02:29.229 --> 00:02:32.460 position:63%
+the way that cross-entropy arises initially looks completely different.
+
+00:02:32.600 --> 00:02:34.220 position:63%
+It seems unrelated to compression.
+
+00:02:34.660 --> 00:02:38.086 position:63%
+But whenever you see the same formula pop up in two separate contexts,
+
+00:02:38.086 --> 00:02:41.560 position:63%
+it's math's way of kind of winking at you and hinting at a connection.
+
+00:02:42.180 --> 00:02:46.052 position:63%
+So at the end, armed with an understanding of where cross-entropy really comes from,
+
+00:02:46.052 --> 00:02:48.264 position:63%
+combined with an understanding of pre-training,
+
+00:02:48.264 --> 00:02:51.583 position:63%
+I want to show you how you can reframe the way you think about training
+
+00:02:51.583 --> 00:02:54.395 position:63%
+large language models to not be about next token prediction,
+
+00:02:54.395 --> 00:02:56.100 position:63%
+but instead to be about compression.
+
+00:03:02.240 --> 00:03:04.766 position:63%
+It's easiest to motivate cross-entropy in the
+
+00:03:04.766 --> 00:03:07.740 position:63%
+context of encoding messages into sequences of bits.
+
+00:03:08.080 --> 00:03:10.467 position:63%
+This is a topic we began discussing in part one,
+
+00:03:10.467 --> 00:03:13.898 position:63%
+where the framing is that we treat messages as sequences of symbols,
+
+00:03:13.898 --> 00:03:18.075 position:63%
+something like characters of text, and if you treat each new symbol like it's being
+
+00:03:18.075 --> 00:03:22.202 position:63%
+sampled from some probability distribution, those probabilities tell you something
+
+00:03:22.202 --> 00:03:24.440 position:63%
+about the fundamental limits on compression.
+
+00:03:25.060 --> 00:03:27.858 position:63%
+Now, the case of natural language is incredibly complicated,
+
+00:03:27.858 --> 00:03:30.516 position:63%
+those distributions would be very difficult to describe,
+
+00:03:30.516 --> 00:03:33.920 position:63%
+so we centered a lot of our discussion on a very simplified toy example.
+
+00:03:34.260 --> 00:03:36.311 position:63%
+And I want to pick up from that thread here, since
+
+00:03:36.311 --> 00:03:38.280 position:63%
+that example also helps motivate cross-entropy.
+
+00:03:38.660 --> 00:03:41.009 position:63%
+The setup was that we're sending sequences of
+
+00:03:41.009 --> 00:03:43.620 position:63%
+four possible instructions to some faraway robot.
+
+00:03:43.620 --> 00:03:48.454 position:63%
+Move up, down, left, or right, and each symbol we send is sampled from a distribution
+
+00:03:48.454 --> 00:03:53.459 position:63%
+that gives a 50% chance to sending the instruction up, a 1 in 4 chance of sending down,
+
+00:03:53.459 --> 00:03:57.440 position:63%
+and a 1 in 8 chance for each of the remaining symbols left and right.
+
+00:03:57.840 --> 00:04:01.100 position:63%
+It's as if we want the robot to do some specific biased random walk.
+
+00:04:01.820 --> 00:04:06.087 position:63%
+One of the conclusions we came to in part one was how the best possible
+
+00:04:06.087 --> 00:04:09.572 position:63%
+encoding here turns the symbol up into just a single bit,
+
+00:04:09.572 --> 00:04:14.680 position:63%
+turns that symbol down into two bits, and turns left and right each into three bits.
+
+00:04:15.080 --> 00:04:18.941 position:63%
+The whole point of this toy example is that it's a concrete illustration
+
+00:04:18.941 --> 00:04:22.373 position:63%
+of a much more general fact, which is that for an optimal code,
+
+00:04:22.373 --> 00:04:25.913 position:63%
+the number of bits that you allocate to a given symbol looks like
+
+00:04:25.913 --> 00:04:29.720 position:63%
+the negative log base 2 of the probability for that symbol showing up.
+
+00:04:30.120 --> 00:04:32.820 position:63%
+This negative log expression takes a little getting used to.
+
+00:04:33.080 --> 00:04:36.754 position:63%
+I mentioned how I kind of wish that history had unfolded in such a way that we
+
+00:04:36.754 --> 00:04:39.015 position:63%
+call it the log base 1 half of the probability,
+
+00:04:39.015 --> 00:04:42.547 position:63%
+since it's really just asking how many times do you chop things in half to
+
+00:04:42.547 --> 00:04:43.960 position:63%
+get down to a certain amount.
+
+00:04:44.740 --> 00:04:49.160 position:63%
+Claude Shannon defined this expression to be the information content of an event.
+
+00:04:49.680 --> 00:04:52.143 position:63%
+Now of course usually the numbers aren't so clean,
+
+00:04:52.143 --> 00:04:55.049 position:63%
+so this information value is typically not a whole number,
+
+00:04:55.049 --> 00:04:58.596 position:63%
+meaning your optimal codes can't look so simple as associating a symbol
+
+00:04:58.596 --> 00:05:00.320 position:63%
+with some specific string of bits.
+
+00:05:00.660 --> 00:05:04.510 position:63%
+The more general way to think about it is that to encode a full message,
+
+00:05:04.510 --> 00:05:08.252 position:63%
+the information content of the full message looks like the sum of the
+
+00:05:08.252 --> 00:05:11.032 position:63%
+information contents of all the individual symbols,
+
+00:05:11.032 --> 00:05:15.203 position:63%
+and the number of bits in an optimal encoding of the message is approximately
+
+00:05:15.203 --> 00:05:16.860 position:63%
+that full information content.
+
+00:05:17.160 --> 00:05:20.320 position:63%
+So fractional information really does have a very real meaning here.
+
+00:05:20.980 --> 00:05:25.078 position:63%
+Now for part 2, imagine your space agency has decided to change the plan,
+
+00:05:25.078 --> 00:05:29.344 position:63%
+effectively rotating things to encourage an overall more rightward journey,
+
+00:05:29.344 --> 00:05:33.217 position:63%
+where from now on the symbols up and down each have a 1 in 8 chance,
+
+00:05:33.217 --> 00:05:37.820 position:63%
+the symbol left has a 1 in 4 chance, and right is sampled fully half of the time.
+
+00:05:38.300 --> 00:05:41.915 position:63%
+Supposing all of your encoding and decoding systems are hard-coded
+
+00:05:41.915 --> 00:05:45.914 position:63%
+to use the previous encoding scheme, optimized for the old distribution,
+
+00:05:45.914 --> 00:05:49.420 position:63%
+this is obviously now inefficient, but how inefficient exactly?
+
+00:05:50.260 --> 00:05:51.960 position:63%
+And this is not that hard to calculate.
+
+00:05:52.560 --> 00:05:57.124 position:63%
+Now the single bit instruction for up comes up only one eighth of the time,
+
+00:05:57.124 --> 00:06:01.018 position:63%
+the two bits for down also come up only one eighth of the time,
+
+00:06:01.018 --> 00:06:04.426 position:63%
+and the other two instructions each require three bits,
+
+00:06:04.426 --> 00:06:06.860 position:63%
+which together happens 75% of the time.
+
+00:06:07.640 --> 00:06:13.180 position:63%
+Adding this up as a weighted sum, you get an average of 2.625 bits per message.
+
+00:06:13.780 --> 00:06:16.881 position:63%
+You would say that this number represents the cross entropy
+
+00:06:16.881 --> 00:06:19.720 position:63%
+of the original distribution relative to the new one.
+
+00:06:20.080 --> 00:06:23.560 position:63%
+If you've optimized a compression scheme around one context,
+
+00:06:23.560 --> 00:06:25.880 position:63%
+how does it perform in another context?
+
+00:06:26.760 --> 00:06:30.434 position:63%
+Even just as I've stated things so far, perhaps this already rings a few bells
+
+00:06:30.434 --> 00:06:33.920 position:63%
+in your mind as you think back to that zipping and language tree example.
+
+00:06:34.400 --> 00:06:37.036 position:63%
+Before spelling that out, it is worth our time to take a few
+
+00:06:37.036 --> 00:06:39.980 position:63%
+minutes generalizing this and packaging it into a couple formulas.
+
+00:06:40.580 --> 00:06:44.532 position:63%
+Let's label all the probabilities from our new distribution with the letter P,
+
+00:06:44.532 --> 00:06:48.180 position:63%
+and then all of those from the original distribution with the letter Q.
+
+00:06:48.620 --> 00:06:51.691 position:63%
+And instead of limiting ourselves to four robot instructions,
+
+00:06:51.691 --> 00:06:55.920 position:63%
+let's consider the general case of messages that look like any sequence of symbols.
+
+00:06:55.920 --> 00:06:58.240 position:63%
+Those symbols could be the four robot instructions,
+
+00:06:58.240 --> 00:07:00.333 position:63%
+they could be the characters of English text,
+
+00:07:00.333 --> 00:07:02.380 position:63%
+or they could be anything else you dream up.
+
+00:07:02.940 --> 00:07:06.378 position:63%
+An encoding optimized for this first distribution, Q,
+
+00:07:06.378 --> 00:07:10.400 position:63%
+allocates negative log base 2 of Q sub i bits to each symbol.
+
+00:07:11.080 --> 00:07:15.220 position:63%
+So the average bits used per instruction looks like this weighted sum.
+
+00:07:15.740 --> 00:07:19.127 position:63%
+Basically, you go through each symbol, and for each one you take the
+
+00:07:19.127 --> 00:07:22.316 position:63%
+proportion of times that it comes up, which is its probability,
+
+00:07:22.316 --> 00:07:26.500 position:63%
+multiplied by the information content, the negative log base 2, of its probability.
+
+00:07:27.360 --> 00:07:30.739 position:63%
+This sum was the other key term we had in the last lesson,
+
+00:07:30.739 --> 00:07:34.700 position:63%
+the entropy of Q, and we visualized it as the area of this diagram.
+
+00:07:35.220 --> 00:07:37.760 position:63%
+Each bar represents one part of the weighted sum.
+
+00:07:38.040 --> 00:07:41.920 position:63%
+Its width is Q, and its height is the negative log base 2 of Q.
+
+00:07:43.320 --> 00:07:47.375 position:63%
+But if the distribution that arises in practice is something else, P,
+
+00:07:47.375 --> 00:07:50.137 position:63%
+and we keep using an encoding optimized for Q,
+
+00:07:50.137 --> 00:07:55.190 position:63%
+then the average number of bits used per instruction would still look like a weighted
+
+00:07:55.190 --> 00:07:58.540 position:63%
+sum, but now the weights are these new probabilities, P.
+
+00:07:59.800 --> 00:08:03.598 position:63%
+So this general expression is, by definition, the cross
+
+00:08:03.598 --> 00:08:07.880 position:63%
+entropy of the distribution Q relative to the distribution P.
+
+00:08:08.700 --> 00:08:12.007 position:63%
+The specific notation that you'll see out in the wild is a little bit of a mess,
+
+00:08:12.007 --> 00:08:13.660 position:63%
+there's a lot of different conventions.
+
+00:08:14.020 --> 00:08:19.349 position:63%
+For you and me, we'll just think about the sum itself, visualized with this diagram,
+
+00:08:19.349 --> 00:08:24.996 position:63%
+where the width of each bar is P sub i, while the height is the negative log base 2 of Q
+
+00:08:24.996 --> 00:08:25.496 position:63%
+sub i.
+
+00:08:26.320 --> 00:08:29.740 position:63%
+With any new formula, it helps to build some intuition with very simple examples.
+
+00:08:30.440 --> 00:08:34.506 position:63%
+So in this case, instead of having distributions with many possible events,
+
+00:08:34.506 --> 00:08:37.000 position:63%
+consider a distribution with only two events.
+
+00:08:37.380 --> 00:08:42.887 position:63%
+And let's say Q is an even distribution that assigns a 50% chance to each event,
+
+00:08:42.887 --> 00:08:47.500 position:63%
+while P is more skewed, assigning 90% to one and 10% to the other.
+
+00:08:47.820 --> 00:08:52.398 position:63%
+This would mean, from Q's perspective, each event has one bit of information,
+
+00:08:52.398 --> 00:08:56.679 position:63%
+and an optimal code for symbols following this distribution would spend
+
+00:08:56.679 --> 00:09:00.960 position:63%
+only one bit on each such symbol, so the total entropy of Q is one bit.
+
+00:09:01.500 --> 00:09:02.520 position:63%
+And what about cross entropy?
+
+00:09:02.940 --> 00:09:06.116 position:63%
+If this code was used when a new distribution of symbols applies,
+
+00:09:06.116 --> 00:09:09.340 position:63%
+what would the average number of bits per symbol be in that case?
+
+00:09:09.340 --> 00:09:14.187 position:63%
+Well, in this example, actually, because each symbol has the same amount of information,
+
+00:09:14.187 --> 00:09:18.427 position:63%
+one bit, the weights in the weighted sum don't actually make any difference,
+
+00:09:18.427 --> 00:09:20.300 position:63%
+so cross entropy is also one bit.
+
+00:09:20.740 --> 00:09:22.220 position:63%
+But now think about flipping this around.
+
+00:09:22.460 --> 00:09:26.333 position:63%
+Suppose that Q was the very skewed distribution with the 90-10 split,
+
+00:09:26.333 --> 00:09:29.420 position:63%
+while P was an even distribution with the 50-50 split.
+
+00:09:29.940 --> 00:09:34.735 position:63%
+Now, from Q's perspective, that one much more likely event has very little information,
+
+00:09:34.735 --> 00:09:37.160 position:63%
+and the other one has a lot of information.
+
+00:09:37.160 --> 00:09:42.068 position:63%
+So as far as Q is concerned, a perfect code for symbols following this distribution
+
+00:09:42.068 --> 00:09:46.325 position:63%
+should spend much less than one bit, again, averaged over all messages,
+
+00:09:46.325 --> 00:09:51.233 position:63%
+for that one common symbol, trading off spending multiple bits on average for that
+
+00:09:51.233 --> 00:09:52.120 position:63%
+second symbol.
+
+00:09:52.680 --> 00:09:56.480 position:63%
+When you calculate it, the total entropy of Q is now smaller than one bit.
+
+00:09:57.180 --> 00:09:58.740 position:63%
+But now what about cross entropy?
+
+00:09:59.100 --> 00:10:02.834 position:63%
+If a code optimized for this skewed distribution was faced against
+
+00:10:02.834 --> 00:10:05.777 position:63%
+a new reality where both events are equally likely,
+
+00:10:05.777 --> 00:10:10.360 position:63%
+now you really do see a disadvantage, and that weighted sum is around 1.74 bits.
+
+00:10:10.780 --> 00:10:13.120 position:63%
+So stepping back, notice how much order matters here.
+
+00:10:13.420 --> 00:10:17.811 position:63%
+When we swapped the roles of P and Q, the value of this cross entropy changed,
+
+00:10:17.811 --> 00:10:18.880 position:63%
+which makes sense.
+
+00:10:19.000 --> 00:10:21.500 position:63%
+In the formula, the roles of P and Q are pretty different.
+
+00:10:22.500 --> 00:10:25.235 position:63%
+While we're here, by the way, just showing simple distributions
+
+00:10:25.235 --> 00:10:27.840 position:63%
+over only two possible outcomes, we can have some more fun.
+
+00:10:28.100 --> 00:10:32.896 position:63%
+Notice how this distribution Q depends on only one free variable, little q sub 1,
+
+00:10:32.896 --> 00:10:37.160 position:63%
+and the complementary value has to be locked at 1 minus little q sub 1.
+
+00:10:37.780 --> 00:10:38.900 position:63%
+And same deal for P.
+
+00:10:39.220 --> 00:10:42.160 position:63%
+It really depends on just one parameter, little p sub 1.
+
+00:10:42.620 --> 00:10:45.761 position:63%
+The reason we can have some fun is that with so few free parameters,
+
+00:10:45.761 --> 00:10:47.978 position:63%
+we can build more intuition by graphing things,
+
+00:10:47.978 --> 00:10:50.380 position:63%
+which lets me highlight one critical property here.
+
+00:10:50.840 --> 00:10:54.164 position:63%
+I want you to imagine fixing P in place and then plotting
+
+00:10:54.164 --> 00:10:57.080 position:63%
+this cross entropy expression as a function of Q.
+
+00:10:57.560 --> 00:11:02.373 position:63%
+What you'll notice is this graph reaches a very clear minimum, and more specifically,
+
+00:11:02.373 --> 00:11:06.960 position:63%
+the value where it achieves that minimum is the one where P and Q are identical.
+
+00:11:07.860 --> 00:11:11.420 position:63%
+And hopefully based on how we motivated it, this should make abundant sense.
+
+00:11:11.800 --> 00:11:14.060 position:63%
+Always remember that question cross entropy is asking.
+
+00:11:14.500 --> 00:11:19.420 position:63%
+How well does a code optimized for one setting, Q, perform in a different setting, P?
+
+00:11:20.180 --> 00:11:24.160 position:63%
+That compression efficiency will obviously be at its best when both settings align.
+
+00:11:24.800 --> 00:11:28.240 position:63%
+There's something very fun we can do with this plot that helps to highlight a key point.
+
+00:11:28.240 --> 00:11:30.866 position:63%
+What I'm going to do is move around that value P,
+
+00:11:30.866 --> 00:11:33.974 position:63%
+which changes the entire shape of the graph, and as I do,
+
+00:11:33.974 --> 00:11:37.940 position:63%
+you'll notice I'm tracing out where that minimum value of the graph goes.
+
+00:11:38.420 --> 00:11:41.181 position:63%
+That traced out shape is a new curve that I'm drawing in green,
+
+00:11:41.181 --> 00:11:44.380 position:63%
+and let me take a moment to ask you, what does this new curve represent?
+
+00:11:45.720 --> 00:11:49.142 position:63%
+Well, that minimum value for cross entropy is the most efficient
+
+00:11:49.142 --> 00:11:52.457 position:63%
+possible compression when reality follows the distribution P,
+
+00:11:52.457 --> 00:11:56.040 position:63%
+and that's exactly what the entropy of P is supposed to represent.
+
+00:11:56.040 --> 00:11:59.575 position:63%
+And indeed, in this very simplified setting where we're dealing with
+
+00:11:59.575 --> 00:12:02.070 position:63%
+a distribution over only two possible outcomes,
+
+00:12:02.070 --> 00:12:05.812 position:63%
+this green curve is what the entropy of P would look like as a function
+
+00:12:05.812 --> 00:12:06.800 position:63%
+of little p sub 1.
+
+00:12:08.720 --> 00:12:12.743 position:63%
+This graph emphasizes the one key point about cross entropy that I want
+
+00:12:12.743 --> 00:12:16.937 position:63%
+you to remember from this video, which is that if you think of P as fixed
+
+00:12:16.937 --> 00:12:21.753 position:63%
+and Q as the variable, it takes on its smallest possible value when Q is equal to P,
+
+00:12:21.753 --> 00:12:25.380 position:63%
+and more specifically, that smallest value is the entropy of P.
+
+00:12:25.380 --> 00:12:28.667 position:63%
+It's a little harder to visualize in general, because usually these
+
+00:12:28.667 --> 00:12:31.904 position:63%
+are distributions over many more than just two possible outcomes,
+
+00:12:31.904 --> 00:12:35.240 position:63%
+but here's one way that you might hold that same fact in your head.
+
+00:12:35.940 --> 00:12:39.303 position:63%
+We'll take that core diagram that we built up, I'm going to keep P,
+
+00:12:39.303 --> 00:12:43.420 position:63%
+the width of all the bars, fixed, and the distribution Q is going to be variable.
+
+00:12:43.860 --> 00:12:46.809 position:63%
+Remember, Q is what determines the height of all of these bars,
+
+00:12:46.809 --> 00:12:48.400 position:63%
+those negative log base 2 values.
+
+00:12:48.780 --> 00:12:53.118 position:63%
+And again, that key fact is that this value is bound by a certain minimum,
+
+00:12:53.118 --> 00:12:56.166 position:63%
+that it achieves that minimum when Q is equal to P,
+
+00:12:56.166 --> 00:12:58.980 position:63%
+and that the minimal value is the entropy of P.
+
+00:12:59.760 --> 00:13:04.384 position:63%
+Before explaining why this key property makes cross entropy such a good fit for training
+
+00:13:04.384 --> 00:13:08.746 position:63%
+large language models, I want you to take a moment to think about how that opening
+
+00:13:08.746 --> 00:13:13.160 position:63%
+example of zipping and language trees is basically an application of cross entropy.
+
+00:13:13.860 --> 00:13:17.363 position:63%
+Remember what the key idea there was, where if you want to measure how
+
+00:13:17.363 --> 00:13:20.816 position:63%
+different two different text documents are, we'll call them A and B,
+
+00:13:20.816 --> 00:13:24.720 position:63%
+you take a little snippet of B, tack it onto A, and then compress the result.
+
+00:13:25.320 --> 00:13:27.901 position:63%
+You then compare the size of that compressed file to
+
+00:13:27.901 --> 00:13:30.680 position:63%
+the size of what you get just compressing A on its own.
+
+00:13:31.220 --> 00:13:34.139 position:63%
+Again, because the zipping in that first context is mostly
+
+00:13:34.139 --> 00:13:37.007 position:63%
+optimized for the patterns of document A, computing this
+
+00:13:37.007 --> 00:13:40.480 position:63%
+difference is basically asking the same question cross entropy does.
+
+00:13:40.820 --> 00:13:43.472 position:63%
+How well does a compression scheme optimized for
+
+00:13:43.472 --> 00:13:46.400 position:63%
+one context perform when faced with another context?
+
+00:13:46.400 --> 00:13:49.746 position:63%
+I am glossing over a couple details where the specific distance metric
+
+00:13:49.746 --> 00:13:52.901 position:63%
+that the authors defined was a little more complicated than this,
+
+00:13:52.901 --> 00:13:56.200 position:63%
+but the core of it really is this difference that I've been showing.
+
+00:13:56.700 --> 00:13:59.760 position:63%
+Now this is not exactly cross entropy for a number of reasons.
+
+00:14:00.060 --> 00:14:03.100 position:63%
+One, it's not comparing two different probability distributions.
+
+00:14:03.540 --> 00:14:06.676 position:63%
+Instead, it's kind of like retreating a text document from one
+
+00:14:06.676 --> 00:14:09.711 position:63%
+language as a sample from some distribution, and hence this
+
+00:14:09.711 --> 00:14:13.100 position:63%
+difference is kind of like an empirical estimate of cross entropy.
+
+00:14:13.660 --> 00:14:16.670 position:63%
+And even then, it can't be a very good estimate because gzip
+
+00:14:16.670 --> 00:14:19.480 position:63%
+is not perfect compression achieving the Shannon limit.
+
+00:14:19.860 --> 00:14:20.580 position:63%
+Very far from it.
+
+00:14:20.760 --> 00:14:25.214 position:63%
+The algorithm underlying it is a much more straightforward way to find repetitions of
+
+00:14:25.214 --> 00:14:29.720 position:63%
+a given text sequence and replace later instances with pointers to earlier instances.
+
+00:14:30.240 --> 00:14:34.189 position:63%
+But the author's idea was that, insofar as this approximates cross entropy,
+
+00:14:34.189 --> 00:14:37.453 position:63%
+you can still get a useful distance measure, letting you do a
+
+00:14:37.453 --> 00:14:40.560 position:63%
+legitimately interesting natural language processing task.
+
+00:14:41.000 --> 00:14:44.520 position:63%
+This is a common theme for how cross entropy gets used in practice.
+
+00:14:44.520 --> 00:14:48.147 position:63%
+It comes up whenever you have a feeling of wanting to quantify how
+
+00:14:48.147 --> 00:14:51.720 position:63%
+different the patterns in one setting are from those in another.
+
+00:14:52.180 --> 00:14:55.647 position:63%
+Here, that means the patterns of one language compared to that of another,
+
+00:14:55.647 --> 00:14:58.740 position:63%
+but this transitions nicely to our primary application for today,
+
+00:14:58.740 --> 00:15:00.380 position:63%
+which is training language models.
+
+00:15:00.780 --> 00:15:05.130 position:63%
+Here, what you want to quantify is how different a model's understanding of language is
+
+00:15:05.130 --> 00:15:09.580 position:63%
+from the true patterns of language, at least as represented by a bunch of training data.
+
+00:15:10.040 --> 00:15:12.023 position:63%
+This animation I've been flashing, by the way,
+
+00:15:12.023 --> 00:15:15.860 position:63%
+shows the underlying architecture of a transformer It's something a friend of mine made.
+
+00:15:16.260 --> 00:15:19.953 position:63%
+But moving forward, I'm going to switch to something a little bit more schematic,
+
+00:15:19.953 --> 00:15:23.920 position:63%
+simply representing a black box controlled by some large number of tunable parameters.
+
+00:15:25.040 --> 00:15:27.408 position:63%
+I'm assuming most viewers will have some familiarity
+
+00:15:27.408 --> 00:15:29.320 position:63%
+with language models and neural networks.
+
+00:15:29.600 --> 00:15:31.720 position:63%
+These are topics that we have hit on on the channel before.
+
+00:15:32.200 --> 00:15:35.440 position:63%
+But here's a very quick recap of the basics for what you need to know.
+
+00:15:36.060 --> 00:15:38.425 position:63%
+Modern language models divide text into tokens,
+
+00:15:38.425 --> 00:15:40.740 position:63%
+which are typically words or pieces of words.
+
+00:15:41.160 --> 00:15:43.931 position:63%
+And you think of a language model as a function,
+
+00:15:43.931 --> 00:15:47.509 position:63%
+a function that takes as an input any possible piece of text,
+
+00:15:47.509 --> 00:15:52.069 position:63%
+thought of as a sequence of tokens, and it produces as an output a probability
+
+00:15:52.069 --> 00:15:54.320 position:63%
+distribution over all possible tokens.
+
+00:15:54.720 --> 00:15:57.840 position:63%
+And you think of that output as its prediction for what might come next.
+
+00:15:58.560 --> 00:16:02.017 position:63%
+To train one of these models, what you need is a loss function,
+
+00:16:02.017 --> 00:16:06.297 position:63%
+a way to quantify whether the predictions that it makes are generally good or
+
+00:16:06.297 --> 00:16:07.120 position:63%
+generally bad.
+
+00:16:07.540 --> 00:16:11.250 position:63%
+A loose intuition, you might imagine, is the graph of a loss function as
+
+00:16:11.250 --> 00:16:14.960 position:63%
+something like this, some surface where you're hunting for the minimum.
+
+00:16:15.380 --> 00:16:19.937 position:63%
+But you have to take any image like this with a heavy grain of salt because this is a
+
+00:16:19.937 --> 00:16:23.154 position:63%
+graph of a function with two inputs, the variables x and y,
+
+00:16:23.154 --> 00:16:27.443 position:63%
+whereas a true loss function takes as its input the many billions of parameters
+
+00:16:27.443 --> 00:16:29.320 position:63%
+characterizing the language model.
+
+00:16:29.800 --> 00:16:33.480 position:63%
+So the real image we want to look at here would have to live in billions of dimensions.
+
+00:16:34.140 --> 00:16:36.680 position:63%
+Still, it's enough to reference the core idea,
+
+00:16:36.680 --> 00:16:40.490 position:63%
+which is how training looks like tweaking and tuning these models in
+
+00:16:40.490 --> 00:16:45.460 position:63%
+a somewhat automatic way to take steps down this hill, decreasing the value of that loss.
+
+00:16:46.060 --> 00:16:48.452 position:63%
+The automatic process for this tweaking and tuning
+
+00:16:48.452 --> 00:16:50.940 position:63%
+comes down to gradient descent and backpropagation.
+
+00:16:51.320 --> 00:16:53.480 position:63%
+I have done videos on these if you want the details.
+
+00:16:53.820 --> 00:16:56.969 position:63%
+But the point I want to emphasize is that for you, the engineer,
+
+00:16:56.969 --> 00:17:01.300 position:63%
+trying to train a model, once you define a good loss function, you're essentially done.
+
+00:17:01.560 --> 00:17:04.099 position:63%
+The standard machinery of deep learning takes it from there.
+
+00:17:04.460 --> 00:17:08.211 position:63%
+The loss you define is with respect to some big pile of training data,
+
+00:17:08.211 --> 00:17:11.318 position:63%
+which in the language model context would look like many,
+
+00:17:11.318 --> 00:17:14.319 position:63%
+many samples of text typically drawn from the Internet.
+
+00:17:14.920 --> 00:17:19.026 position:63%
+So the key design question for you is what mathematical function can you write
+
+00:17:19.026 --> 00:17:22.447 position:63%
+down describing how well the model performs on all of this data,
+
+00:17:22.447 --> 00:17:26.500 position:63%
+such that the act of minimizing that function is the same thing as improving
+
+00:17:26.500 --> 00:17:27.500 position:63%
+model performance.
+
+00:17:28.440 --> 00:17:32.300 position:63%
+A very nice way to think about the loss function we use in this case is that
+
+00:17:32.300 --> 00:17:36.160 position:63%
+you measure the average information per token from the model's perspective.
+
+00:17:37.000 --> 00:17:37.980 position:63%
+Here's what I mean by that.
+
+00:17:37.980 --> 00:17:40.630 position:63%
+For a given example snippet of text in that data,
+
+00:17:40.630 --> 00:17:45.120 position:63%
+you would compute the probability that the model gives to each new token in there.
+
+00:17:45.640 --> 00:17:48.987 position:63%
+That is, for every initial subsequence of tokens, like this one,
+
+00:17:48.987 --> 00:17:51.549 position:63%
+you have the model predict what would come next,
+
+00:17:51.549 --> 00:17:55.419 position:63%
+and then you look at the true next token, the one that actually showed up
+
+00:17:55.419 --> 00:17:59.288 position:63%
+in this training example, and you consider what probability did the model
+
+00:17:59.288 --> 00:18:01.380 position:63%
+give to that one, that true next token.
+
+00:18:01.920 --> 00:18:04.150 position:63%
+That probability is what I'm representing with the
+
+00:18:04.150 --> 00:18:06.380 position:63%
+little pie charts below each one of these tokens.
+
+00:18:06.380 --> 00:18:09.415 position:63%
+The models are actually specifically designed to give
+
+00:18:09.415 --> 00:18:12.220 position:63%
+you all of these probabilities on a single pass.
+
+00:18:12.920 --> 00:18:16.868 position:63%
+When I say the loss is the average information from the model's perspective,
+
+00:18:16.868 --> 00:18:20.400 position:63%
+what I mean is we take the negative log of all these probabilities.
+
+00:18:21.040 --> 00:18:23.528 position:63%
+As we've discussed multiple times by now, you can
+
+00:18:23.528 --> 00:18:26.320 position:63%
+think of that as measuring how surprising an event is.
+
+00:18:26.720 --> 00:18:30.535 position:63%
+You would expect a smarter model that's really following what's going on to
+
+00:18:30.535 --> 00:18:34.249 position:63%
+generally be unsurprised by what it sees, meaning it gives the true next
+
+00:18:34.249 --> 00:18:38.217 position:63%
+token's higher probabilities, so all these information values would be lower,
+
+00:18:38.217 --> 00:18:41.880 position:63%
+while a randomized or poorly trained model would just be very confused.
+
+00:18:42.080 --> 00:18:45.260 position:63%
+It would give everything a low probability and be surprised all the time.
+
+00:18:45.920 --> 00:18:49.403 position:63%
+Pulling up that graph of the negative log that we were playing with last time,
+
+00:18:49.403 --> 00:18:52.440 position:63%
+this is hopefully very intuitive as a choice for the loss function.
+
+00:18:52.860 --> 00:18:56.675 position:63%
+It's effectively telling you the model is punished, and punished very steeply,
+
+00:18:56.675 --> 00:18:59.658 position:63%
+if it assigns a very low probability to the true next token,
+
+00:18:59.658 --> 00:19:03.668 position:63%
+whereas if that probability is high, that prediction would contribute only a tiny
+
+00:19:03.668 --> 00:19:04.940 position:63%
+amount to the total loss.
+
+00:19:05.340 --> 00:19:09.531 position:63%
+But the thing is, a lot of functions have this same general qualitative shape,
+
+00:19:09.531 --> 00:19:13.076 position:63%
+so a question that I want to be hanging in your mind right now is
+
+00:19:13.076 --> 00:19:16.300 position:63%
+why information specifically would be the best choice here.
+
+00:19:16.640 --> 00:19:20.000 position:63%
+What is it that makes logs special among all the functions with this shape?
+
+00:19:21.300 --> 00:19:23.944 position:63%
+One small nuance is that in machine learning, you almost
+
+00:19:23.944 --> 00:19:26.400 position:63%
+always use the natural log instead of a log base 2.
+
+00:19:26.840 --> 00:19:30.152 position:63%
+This doesn't really matter, the two expressions differ by a constant factor,
+
+00:19:30.152 --> 00:19:33.420 position:63%
+so it's all getting absorbed in something called the learning rate anyway.
+
+00:19:33.420 --> 00:19:36.872 position:63%
+The motive is just that natural logs are a lot cleaner whenever you're
+
+00:19:36.872 --> 00:19:40.324 position:63%
+taking derivatives, and derivatives are the core part of the gradient
+
+00:19:40.324 --> 00:19:44.220 position:63%
+descent algorithm used to concretely decrease the value of this loss function.
+
+00:19:45.820 --> 00:19:47.400 position:63%
+And in some sense, that's it.
+
+00:19:47.520 --> 00:19:49.180 position:63%
+That's really all there is to pre-training.
+
+00:19:49.520 --> 00:19:51.799 position:63%
+All you're doing is looking through each token,
+
+00:19:51.799 --> 00:19:54.998 position:63%
+taking the negative log of the probability the model gives to it,
+
+00:19:54.998 --> 00:19:57.180 position:63%
+and averaging that over every token you see.
+
+00:19:57.580 --> 00:20:00.127 position:63%
+And of course, it's not every token in just one example,
+
+00:20:00.127 --> 00:20:03.083 position:63%
+it's every token in the entirety of the vast, vast training set,
+
+00:20:03.083 --> 00:20:07.040 position:63%
+which you hope represents a significant sample of the language you're trying to model.
+
+00:20:08.340 --> 00:20:09.940 position:63%
+Of course, there really is more to it.
+
+00:20:10.040 --> 00:20:13.129 position:63%
+I've glossed over things like batching or specific optimizers,
+
+00:20:13.129 --> 00:20:17.263 position:63%
+and getting this to run at the mind-boggling scales used in practice is a complete
+
+00:20:17.263 --> 00:20:18.160 position:63%
+engineering feat.
+
+00:20:18.520 --> 00:20:21.457 position:63%
+But at the level of abstraction of just thinking of loss functions,
+
+00:20:21.457 --> 00:20:22.860 position:63%
+it really is remarkably simple.
+
+00:20:23.020 --> 00:20:25.628 position:63%
+It really is just the average information per token,
+
+00:20:25.628 --> 00:20:29.740 position:63%
+assuming all the machinery of deep learning can do its job to minimize this loss,
+
+00:20:29.740 --> 00:20:33.401 position:63%
+hopefully getting it to approach something like the entropy of language,
+
+00:20:33.401 --> 00:20:36.560 position:63%
+what you'd be left with would be a powerful general predictor.
+
+00:20:38.020 --> 00:20:42.753 position:63%
+You might think this loss function would go by a name like information loss, or log loss,
+
+00:20:42.753 --> 00:20:45.306 position:63%
+but in fact, people call it cross-entropy loss,
+
+00:20:45.306 --> 00:20:50.039 position:63%
+which at first might sound really strange, given that nowhere in the explanation have we
+
+00:20:50.039 --> 00:20:52.220 position:63%
+actually used the cross-entropy formula.
+
+00:20:52.960 --> 00:20:57.019 position:63%
+Now there is one very unsatisfying way that this is commonly described,
+
+00:20:57.019 --> 00:20:59.820 position:63%
+where you say, we are calculating cross-entropy,
+
+00:20:59.820 --> 00:21:02.906 position:63%
+but it's between the model's output on a given token,
+
+00:21:02.906 --> 00:21:07.194 position:63%
+and a fully skewed distribution with all the probability mass concentrated
+
+00:21:07.194 --> 00:21:09.080 position:63%
+on just the one true next token.
+
+00:21:09.660 --> 00:21:13.107 position:63%
+If you pull up the formula we had earlier, where we're taking a weighted sum,
+
+00:21:13.107 --> 00:21:15.435 position:63%
+using all these quantities on the right as weights,
+
+00:21:15.435 --> 00:21:17.584 position:63%
+all of the zeros cancel most of the things out,
+
+00:21:17.584 --> 00:21:20.628 position:63%
+and all you're left with is the negative log of the probability the
+
+00:21:20.628 --> 00:21:22.240 position:63%
+model gives to the true next token.
+
+00:21:22.560 --> 00:21:26.080 position:63%
+But if that's all there was to it, this would be very lame, at least in my opinion.
+
+00:21:26.380 --> 00:21:30.121 position:63%
+This does nothing to explain why you're using cross-entropy in the first place,
+
+00:21:30.121 --> 00:21:33.720 position:63%
+and if it all just evaporates away anyway, why not just be straightforward?
+
+00:21:34.100 --> 00:21:36.860 position:63%
+Why not just call it log loss, or information loss?
+
+00:21:37.860 --> 00:21:40.912 position:63%
+Let me show you what I find more satisfying, which is to start by
+
+00:21:40.912 --> 00:21:44.480 position:63%
+explaining why the choice of logarithms here is not really a choice at all.
+
+00:21:44.800 --> 00:21:47.641 position:63%
+Your hand is almost forced into it, and when you see how,
+
+00:21:47.641 --> 00:21:51.480 position:63%
+the formula for cross-entropy just naturally pops right out in front of you.
+
+00:21:52.360 --> 00:21:54.960 position:63%
+So far we've only focused on one example at a time,
+
+00:21:54.960 --> 00:21:57.815 position:63%
+one specific token prediction from one snippet of text,
+
+00:21:57.815 --> 00:22:01.893 position:63%
+and in our framing we want to turn the probability that the model gives to that
+
+00:22:01.893 --> 00:22:05.869 position:63%
+token into some kind of loss, some value, telling the model how bad it should
+
+00:22:05.869 --> 00:22:08.520 position:63%
+feel and how aggressively it should correct itself.
+
+00:22:09.060 --> 00:22:11.342 position:63%
+Now at first, it looks like the only real constraint
+
+00:22:11.342 --> 00:22:13.360 position:63%
+is that this should be a decreasing function.
+
+00:22:13.700 --> 00:22:16.937 position:63%
+You want to assign high loss to low probabilities,
+
+00:22:16.937 --> 00:22:19.720 position:63%
+and low loss to probabilities closer to 1.
+
+00:22:20.140 --> 00:22:23.032 position:63%
+So given the infinite abundance of functions with this rough shape,
+
+00:22:23.032 --> 00:22:25.060 position:63%
+what makes one of them better than the others?
+
+00:22:25.500 --> 00:22:28.107 position:63%
+Let's say we don't know right now, so whatever choice we make,
+
+00:22:28.107 --> 00:22:30.797 position:63%
+we're going to label it as F, and see if we can find some other
+
+00:22:30.797 --> 00:22:33.740 position:63%
+property that we want F to have, something that might force our hand.
+
+00:22:34.600 --> 00:22:37.700 position:63%
+And for this, imagine an example like myName is blank.
+
+00:22:38.200 --> 00:22:41.270 position:63%
+This is a small enough and common enough pattern that you would be likely
+
+00:22:41.270 --> 00:22:44.340 position:63%
+to see many different instances of it show up in your pre-training data.
+
+00:22:44.760 --> 00:22:48.560 position:63%
+What you might imagine is very common names show up multiple times in the data,
+
+00:22:48.560 --> 00:22:50.580 position:63%
+while rare names show up less frequently.
+
+00:22:50.580 --> 00:22:53.711 position:63%
+When you feed in these tokens, myName is, into the model,
+
+00:22:53.711 --> 00:22:57.062 position:63%
+it produces some distribution over all possible next tokens,
+
+00:22:57.062 --> 00:23:00.797 position:63%
+and so let's label the probabilities in the model's distribution of
+
+00:23:00.797 --> 00:23:02.280 position:63%
+outputs with the letter Q.
+
+00:23:03.000 --> 00:23:06.940 position:63%
+Now let me ask you, what is the total loss associated with this prediction?
+
+00:23:07.420 --> 00:23:10.837 position:63%
+If you were just focused on one instance where this pattern shows up in
+
+00:23:10.837 --> 00:23:14.303 position:63%
+the training data, that loss looks like F of Q for whatever your choice
+
+00:23:14.303 --> 00:23:17.720 position:63%
+of the function F is, whether that's a negative log or something else.
+
+00:23:17.720 --> 00:23:22.140 position:63%
+But the key is that this is only one part of the total loss associated with the example.
+
+00:23:22.540 --> 00:23:26.035 position:63%
+Every other instance of this name also contributes that same amount,
+
+00:23:26.035 --> 00:23:29.942 position:63%
+and each instance of every other name also contributes an analogous amount,
+
+00:23:29.942 --> 00:23:34.260 position:63%
+except where you input the probabilities that the model gives to those other names.
+
+00:23:34.620 --> 00:23:37.375 position:63%
+Here, I'll use the letter P to represent the proportion
+
+00:23:37.375 --> 00:23:40.280 position:63%
+of times that a given name shows up in the training data.
+
+00:23:40.820 --> 00:23:44.849 position:63%
+The average value for the loss of the model's output over all of the examples
+
+00:23:44.849 --> 00:23:49.140 position:63%
+that have this pattern looks like a weighted average, weighted by these values P.
+
+00:23:49.860 --> 00:23:52.680 position:63%
+From here, maybe you can start to anticipate the role of cross entropy.
+
+00:23:53.340 --> 00:23:56.675 position:63%
+If you choose to make this function F the negative log of Q,
+
+00:23:56.675 --> 00:24:00.233 position:63%
+then this full expression for the total average loss associated
+
+00:24:00.233 --> 00:24:04.180 position:63%
+with the input text really is exactly the definition of cross entropy.
+
+00:24:04.780 --> 00:24:08.382 position:63%
+Specifically, it's the cross entropy of our model's output
+
+00:24:08.382 --> 00:24:11.860 position:63%
+relative to the statistics represented within the data.
+
+00:24:12.220 --> 00:24:15.580 position:63%
+And remember the one key property of this formula I want you to remember.
+
+00:24:15.580 --> 00:24:18.388 position:63%
+It's something that takes on a minimum exactly when
+
+00:24:18.388 --> 00:24:21.140 position:63%
+all these P and Q values are equal to each other.
+
+00:24:21.620 --> 00:24:25.714 position:63%
+So in this setting, that would mean it's minimized exactly when the distribution your
+
+00:24:25.714 --> 00:24:29.760 position:63%
+model outputs is the same as the statistical distribution represented in your data.
+
+00:24:30.300 --> 00:24:33.720 position:63%
+But the real key point is that this implication goes the other way around.
+
+00:24:33.860 --> 00:24:38.289 position:63%
+If we switch back to writing this per example loss with some generic function F,
+
+00:24:38.289 --> 00:24:43.162 position:63%
+and you say you would like it to be the case that the full average loss over all of the
+
+00:24:43.162 --> 00:24:47.979 position:63%
+examples is minimized only when the model's output matches the statistics that show up
+
+00:24:47.979 --> 00:24:52.851 position:63%
+in the data, there's actually a really nice mathematical argument for why F has to be a
+
+00:24:52.851 --> 00:24:53.460 position:63%
+logarithm.
+
+00:24:54.040 --> 00:24:56.898 position:63%
+I'm hesitant to derail us too much by delving into the details,
+
+00:24:56.898 --> 00:24:59.394 position:63%
+which involves something called a Lagrange multiplier,
+
+00:24:59.394 --> 00:25:01.980 position:63%
+since there's a risk of losing the forest for the trees.
+
+00:25:02.420 --> 00:25:05.759 position:63%
+I know many of you are curious, so I will pull up the details on the screen
+
+00:25:05.759 --> 00:25:09.320 position:63%
+for any multivariable calculus enthusiasts interested in pausing and pondering.
+
+00:25:09.760 --> 00:25:11.780 position:63%
+The high-level idea really is very pretty.
+
+00:25:11.780 --> 00:25:15.605 position:63%
+It's that to minimize our key expression, subject to the condition that the
+
+00:25:15.605 --> 00:25:19.584 position:63%
+sum of all the q values is equal to one, you end up with a problem that looks
+
+00:25:19.584 --> 00:25:23.460 position:63%
+like finding values where two different contours are tangent to each other.
+
+00:25:23.760 --> 00:25:28.443 position:63%
+You compute where that happens by setting a pair of gradient values equal to each other,
+
+00:25:28.443 --> 00:25:32.275 position:63%
+and this, for our specific expressions, will boil down to the condition
+
+00:25:32.275 --> 00:25:36.160 position:63%
+that the derivative of our function F with respect to q has to look like
+
+00:25:36.160 --> 00:25:39.460 position:63%
+some constant over q, and only logarithms have that property.
+
+00:25:39.460 --> 00:25:42.020 position:63%
+Again, I pull this up just for the extra curious.
+
+00:25:42.440 --> 00:25:44.080 position:63%
+The details are not too important.
+
+00:25:44.420 --> 00:25:47.335 position:63%
+The main thing I want you to know is that if you want a loss
+
+00:25:47.335 --> 00:25:50.299 position:63%
+function with the property that it's minimized only when the
+
+00:25:50.299 --> 00:25:53.360 position:63%
+model matches the statistics of the data, your hand is forced.
+
+00:25:53.560 --> 00:25:55.440 position:63%
+You actually have to use the negative log.
+
+00:25:55.700 --> 00:25:58.910 position:63%
+And in this case, the average loss associated with any given
+
+00:25:58.910 --> 00:26:01.960 position:63%
+input text looks exactly like the cross-entropy formula.
+
+00:26:02.960 --> 00:26:05.426 position:63%
+And while I'm here throwing up notes for the extra curious,
+
+00:26:05.426 --> 00:26:08.309 position:63%
+here's another one about overfitting and how magical it is that this
+
+00:26:08.309 --> 00:26:11.820 position:63%
+actually works when you stop and think about the sparsity of the data that we have.
+
+00:26:13.320 --> 00:26:16.656 position:63%
+The last topic I want to hit on in this section is an interesting variant on
+
+00:26:16.656 --> 00:26:20.300 position:63%
+training language models where this cross-entropy formula is used more explicitly.
+
+00:26:21.100 --> 00:26:25.428 position:63%
+And it's a case where each training example gives a much softer tug on the model's
+
+00:26:25.428 --> 00:26:29.440 position:63%
+distributions, one that is not so over-weighted to one specific next token.
+
+00:26:30.200 --> 00:26:31.160 position:63%
+It's something called distillation.
+
+00:26:32.320 --> 00:26:36.646 position:63%
+The setup here is that you might want to train a relatively small model where its
+
+00:26:36.646 --> 00:26:41.240 position:63%
+goal is to approximate the performance of some larger, presumably much smarter model.
+
+00:26:41.900 --> 00:26:45.974 position:63%
+This comes up all the time, because very often after getting some desired performance by
+
+00:26:45.974 --> 00:26:50.094 position:63%
+scaling up all of your parameters, what you would love is to be able to approximate that
+
+00:26:50.094 --> 00:26:54.260 position:63%
+performance with something much smaller and much more efficient to run at inference time.
+
+00:26:54.940 --> 00:26:58.911 position:63%
+The idea is that with a bigger model in hand, you have the ability to do something much,
+
+00:26:58.911 --> 00:27:01.980 position:63%
+much more efficient than normal pre-training with that small model.
+
+00:27:02.340 --> 00:27:06.122 position:63%
+What you do is look through a bunch of data, and as before, at each new token,
+
+00:27:06.122 --> 00:27:10.340 position:63%
+you consider the small model's prediction of what will follow, that full distribution.
+
+00:27:11.040 --> 00:27:14.816 position:63%
+But now, instead of just comparing it to the true next token in the data,
+
+00:27:14.816 --> 00:27:17.350 position:63%
+you compare it to the larger model's prediction,
+
+00:27:17.350 --> 00:27:20.660 position:63%
+its full distribution across all the tokens at that same point.
+
+00:27:21.120 --> 00:27:24.640 position:63%
+You define the loss at this token to be the cross-entropy of
+
+00:27:24.640 --> 00:27:28.160 position:63%
+the small model's distribution relative to the big model's.
+
+00:27:28.740 --> 00:27:31.393 position:63%
+When you think about it, this gives you something much,
+
+00:27:31.393 --> 00:27:34.625 position:63%
+much richer than ordinary pre-training, since pre-training is just
+
+00:27:34.625 --> 00:27:38.580 position:63%
+giving full weight to only one true next token, the one that happens to be there.
+
+00:27:39.040 --> 00:27:42.634 position:63%
+As an analogy, it's the difference between trying to learn chess just by
+
+00:27:42.634 --> 00:27:46.377 position:63%
+watching a game versus having someone better than you talk through all the
+
+00:27:46.377 --> 00:27:50.220 position:63%
+possible good moves and how heavily they would weight them at each new turn.
+
+00:27:51.840 --> 00:27:54.205 position:63%
+Looking back at that My Name is Blank example,
+
+00:27:54.205 --> 00:27:58.370 position:63%
+instead of having to see many thousands or many millions of examples in the data
+
+00:27:58.370 --> 00:28:02.638 position:63%
+before your loss represents the cross-entropy against a reasonable distribution of
+
+00:28:02.638 --> 00:28:06.289 position:63%
+possible names, you can get that same effect just on a single example,
+
+00:28:06.289 --> 00:28:08.860 position:63%
+comparing it against the good model's prediction.
+
+00:28:10.720 --> 00:28:14.440 position:63%
+I think now is a good time to zoom out and look over everything we've built up.
+
+00:28:14.840 --> 00:28:17.362 position:63%
+In the first half, in the context of compression,
+
+00:28:17.362 --> 00:28:21.481 position:63%
+cross-entropy arose very naturally just by asking how well a compression scheme
+
+00:28:21.481 --> 00:28:23.900 position:63%
+optimized for one setting performs in another.
+
+00:28:24.760 --> 00:28:28.739 position:63%
+The mild surprise is that this idea turns out to be much more generally useful,
+
+00:28:28.739 --> 00:28:33.020 position:63%
+as a way to measure how different patterns in one setting are from those in another.
+
+00:28:33.420 --> 00:28:36.900 position:63%
+This is what makes it such a common tool for loss functions in modern machine learning.
+
+00:28:37.520 --> 00:28:41.445 position:63%
+All that said, as stated so far, the way that the formula showed up in the second half,
+
+00:28:41.445 --> 00:28:45.100 position:63%
+for us, feels pretty different from the way that it showed up in the first half.
+
+00:28:45.400 --> 00:28:47.360 position:63%
+It was essentially unrelated to compression.
+
+00:28:47.660 --> 00:28:50.546 position:63%
+The logic actually came from a completely different part of math,
+
+00:28:50.546 --> 00:28:51.700 position:63%
+constrained optimization.
+
+00:28:52.200 --> 00:28:54.360 position:63%
+But I wouldn't be putting these two topics in the same
+
+00:28:54.360 --> 00:28:56.680 position:63%
+video if they didn't have a tighter connection than that.
+
+00:28:56.680 --> 00:28:59.411 position:63%
+In the same way that whenever you see pi show up in math,
+
+00:28:59.411 --> 00:29:03.579 position:63%
+even when it seems unrelated to circles, there's always going to be some connection to
+
+00:29:03.579 --> 00:29:06.885 position:63%
+circles hiding there, I think whenever you see cross-entropy pop up,
+
+00:29:06.885 --> 00:29:09.280 position:63%
+there will be a way to connect it to compression.
+
+00:29:10.300 --> 00:29:13.664 position:63%
+And in the case of language models, we've already teed things up for how
+
+00:29:13.664 --> 00:29:16.982 position:63%
+to make that connection a little bit more tight by describing the loss
+
+00:29:16.982 --> 00:29:20.580 position:63%
+function as the average information per token, from the model's perspective.
+
+00:29:21.640 --> 00:29:24.660 position:63%
+The next step from here is to explain how it's possible
+
+00:29:24.660 --> 00:29:27.240 position:63%
+to turn a general predictor into a compressor.
+
+00:29:27.660 --> 00:29:30.874 position:63%
+For instance, turning a language model, this prediction machine,
+
+00:29:30.874 --> 00:29:32.280 position:63%
+into a language compressor.
+
+00:29:32.640 --> 00:29:35.778 position:63%
+More specifically, one where the number of bits that you use
+
+00:29:35.778 --> 00:29:38.812 position:63%
+to represent a piece of text will approximately match the
+
+00:29:38.812 --> 00:29:42.160 position:63%
+information content of that text, from the model's perspective.
+
+00:29:42.600 --> 00:29:44.620 position:63%
+It's actually very surprising this is even possible.
+
+00:29:44.980 --> 00:29:48.395 position:63%
+There's one very visual and very beautiful compression algorithm showing how
+
+00:29:48.395 --> 00:29:51.720 position:63%
+to do exactly this that you and I are going to dig into in the next part.
+
+00:29:51.940 --> 00:29:56.137 position:63%
+And once you understand this, it makes clear how using cross-entropy loss is
+
+00:29:56.137 --> 00:30:00.720 position:63%
+actually equivalent to training the model to be the best possible text compressor.
+
+00:30:01.320 --> 00:30:05.776 position:63%
+This, in turn, gives us a nice hill to stand on where we can look over the landscape
+
+00:30:05.776 --> 00:30:10.020 position:63%
+and assess that thought-provoking phrase, compression is intelligence, head-on.
+
+00:30:12.100 --> 00:30:14.558 position:63%
+I do want to add one final footnote to this video,
+
+00:30:14.558 --> 00:30:18.393 position:63%
+because it would be a shame not to at least quickly explain a related concept
+
+00:30:18.393 --> 00:30:22.031 position:63%
+called KL divergence, which you also see all the time littered throughout
+
+00:30:22.031 --> 00:30:23.260 position:63%
+machine learning papers.
+
+00:30:23.520 --> 00:30:27.148 position:63%
+Before I jump into that, I want to make a very quick plug for 3b1b talent,
+
+00:30:27.148 --> 00:30:31.560 position:63%
+because there's actually a puzzle on that page that is directly related to KL divergence.
+
+00:30:32.160 --> 00:30:36.189 position:63%
+For context, this is something like a virtual career fair that I've put together this
+
+00:30:36.189 --> 00:30:40.409 position:63%
+year, where the premise is to have a set of partnered organizations that are interesting
+
+00:30:40.409 --> 00:30:43.822 position:63%
+places to work, who are also keen to hire the kinds of people like you,
+
+00:30:43.822 --> 00:30:47.756 position:63%
+people who watch videos about things like the relationship between compression and
+
+00:30:47.756 --> 00:30:48.420 position:63%
+intelligence.
+
+00:30:48.800 --> 00:30:52.139 position:63%
+One of the main features of that page is a set of interviews that I did with
+
+00:30:52.139 --> 00:30:55.521 position:63%
+the various teams, which I think is just a much better way to let you get to
+
+00:30:55.521 --> 00:30:58.860 position:63%
+know the culture of a company than trying to just read a generic jobs page.
+
+00:30:59.160 --> 00:31:02.300 position:63%
+But another thing you'll find is that many companies there have
+
+00:31:02.300 --> 00:31:04.892 position:63%
+featured challenges specifically for this audience,
+
+00:31:04.892 --> 00:31:08.480 position:63%
+where you are often invited to mention your solution in an application.
+
+00:31:08.880 --> 00:31:11.530 position:63%
+Now, this was not at all planned, but by happenstance,
+
+00:31:11.530 --> 00:31:14.622 position:63%
+the challenge that one of the companies, Dopple, put up there,
+
+00:31:14.622 --> 00:31:16.880 position:63%
+happens to use the formula for KL divergence.
+
+00:31:17.380 --> 00:31:20.927 position:63%
+They didn't know I was planning this video, so you can take this as a nice bit of
+
+00:31:20.927 --> 00:31:24.780 position:63%
+evidence that the math I'm teaching you here really does show up out in the real world.
+
+00:31:25.140 --> 00:31:29.660 position:63%
+This is just one example, but you can find a number of other interesting places
+
+00:31:29.660 --> 00:31:34.180 position:63%
+to work with nice puzzles and challenges for you to try out at 3b1b.co/talent.
+
+00:31:35.300 --> 00:31:37.080 position:63%
+Okay, so what is KL divergence?
+
+00:31:37.680 --> 00:31:41.440 position:63%
+Remember that key property of cross entropy that I want you to come away remembering?
+
+00:31:41.740 --> 00:31:45.673 position:63%
+The fact that it takes on a minimal value when p and q are the same,
+
+00:31:45.673 --> 00:31:48.680 position:63%
+and that that minimum is equal to the entropy of p.
+
+00:31:49.140 --> 00:31:51.750 position:63%
+This makes it very natural to want to give a name to
+
+00:31:51.750 --> 00:31:54.260 position:63%
+describe the difference between these two values.
+
+00:31:54.740 --> 00:31:57.353 position:63%
+And indeed, this difference has the special name,
+
+00:31:57.353 --> 00:32:01.460 position:63%
+it is the Kolbach-Leibler divergence, commonly abbreviated to KL divergence.
+
+00:32:02.040 --> 00:32:05.710 position:63%
+In the language of compression, you would think of it as describing how
+
+00:32:05.710 --> 00:32:09.380 position:63%
+many bits per symbol are you wasting by using a poorly optimized code.
+
+00:32:10.020 --> 00:32:13.683 position:63%
+For example, in our robot case, if you take the bits per symbol in the
+
+00:32:13.683 --> 00:32:17.136 position:63%
+unoptimized case minus the bits per symbol in the optimized case,
+
+00:32:17.136 --> 00:32:21.060 position:63%
+that difference gives you the KL divergence between the two distributions.
+
+00:32:22.000 --> 00:32:24.260 position:63%
+It's specifically telling you how wasteful you are.
+
+00:32:24.860 --> 00:32:27.194 position:63%
+In the machine learning setting, KL divergence acts
+
+00:32:27.194 --> 00:32:29.620 position:63%
+as a kind of distance measure between distributions.
+
+00:32:30.060 --> 00:32:33.580 position:63%
+It's zero when both of them are the same, but it grows as they differ.
+
+00:32:33.940 --> 00:32:36.940 position:63%
+It's not exactly a difference though, because it's asymmetric.
+
+00:32:37.200 --> 00:32:42.260 position:63%
+The KL divergence of q relative to p is not the same as that of p relative to q.
+
+00:32:42.620 --> 00:32:44.767 position:63%
+To cap off today, I want to leave you with three
+
+00:32:44.767 --> 00:32:46.780 position:63%
+things to ponder related to this expression.
+
+00:32:47.160 --> 00:32:49.830 position:63%
+The first one is easy, which is how when you see it in practice,
+
+00:32:49.830 --> 00:32:52.542 position:63%
+it often comes up in this more compact form, and I just want you
+
+00:32:52.542 --> 00:32:55.420 position:63%
+to convince yourself that these two expressions really are the same.
+
+00:32:55.760 --> 00:32:58.641 position:63%
+The compact form hides the fact that it's really just a difference
+
+00:32:58.641 --> 00:33:01.260 position:63%
+between cross entropy and entropy, but it is more succinct.
+
+00:33:01.880 --> 00:33:05.540 position:63%
+Secondly, I've been showing this diagram, a variant on our cross entropy diagram.
+
+00:33:05.820 --> 00:33:08.384 position:63%
+I want to see if you can take a moment to convince yourself
+
+00:33:08.384 --> 00:33:10.600 position:63%
+in what sense this is representing our expression.
+
+00:33:11.240 --> 00:33:15.027 position:63%
+And third, I mentioned that when you distill a large model into a smaller one,
+
+00:33:15.027 --> 00:33:18.620 position:63%
+you use the cross entropy between their distributions as a loss function.
+
+00:33:19.040 --> 00:33:22.660 position:63%
+I want you to ask yourself, what would happen if instead you used the KL divergence?
+
+00:33:23.200 --> 00:33:25.941 position:63%
+After all, if the KL divergence is like a distance measure,
+
+00:33:25.941 --> 00:33:27.800 position:63%
+wouldn't this be a more natural choice?
+

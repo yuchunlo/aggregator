@@ -1,0 +1,198 @@
+WEBVTT
+Kind: captions
+
+00:00:00.000 --> 00:00:02.198 position:63%
+There's an old Martin Gardner column where
+
+00:00:02.198 --> 00:00:04.551 position:63%
+he describes an alien visiting Earth who asks
+
+00:00:04.551 --> 00:00:06.852 position:63%
+a professor about the best artifact to bring
+
+00:00:06.852 --> 00:00:09.000 position:63%
+back to understand all of human knowledge.
+
+00:00:09.350 --> 00:00:10.700 position:63%
+The professor offers up an
+
+00:00:10.700 --> 00:00:12.450 position:63%
+encyclopedia with its many volumes.
+
+00:00:12.950 --> 00:00:15.050 position:63%
+The alien says, no no no, this cannot work,
+
+00:00:15.250 --> 00:00:17.650 position:63%
+because his ship is incredibly weight constrained,
+
+00:00:17.950 --> 00:00:20.227 position:63%
+and adding even a nanogram would compromise
+
+00:00:20.227 --> 00:00:22.349 position:63%
+his chances of a successful journey home.
+
+00:00:22.700 --> 00:00:23.599 position:63%
+But he pulls out a thin,
+
+00:00:23.849 --> 00:00:25.400 position:63%
+one meter rod that's part of the ship.
+
+00:00:25.460 --> 00:00:27.747 position:63%
+and says he should be able to record all
+
+00:00:27.747 --> 00:00:29.978 position:63%
+the encyclopedia's contents by making a
+
+00:00:29.978 --> 00:00:32.210 position:63%
+single well positioned mark on that rod.
+
+00:00:32.759 --> 00:00:34.010 position:63%
+The Professor, astounded,
+
+00:00:34.210 --> 00:00:35.710 position:63%
+asks how this could be possible.
+
+00:00:36.310 --> 00:00:37.810 position:63%
+"Very simple," the alien says.
+
+00:00:38.210 --> 00:00:39.964 position:63%
+"Your encyclopedia has fewer than a
+
+00:00:39.964 --> 00:00:42.060 position:63%
+hundred distinct letters and other symbols,
+
+00:00:42.460 --> 00:00:44.087 position:63%
+so let's associate each symbol
+
+00:00:44.087 --> 00:00:45.610 position:63%
+with a unique pair of digits.
+
+00:00:46.010 --> 00:00:48.516 position:63%
+Now we can turn each letter of your encyclopedia
+
+00:00:48.516 --> 00:00:50.459 position:63%
+into the corresponding pair of digits.
+
+00:00:50.612 --> 00:00:52.767 position:63%
+Stack all of those together and put a
+
+00:00:52.767 --> 00:00:54.299 position:63%
+zero point in front of it,
+
+00:00:54.299 --> 00:00:56.512 position:63%
+and we can interpret the result as one
+
+00:00:56.512 --> 00:00:58.724 position:63%
+incredibly precise real number between
+
+00:00:58.724 --> 00:00:59.462 position:63%
+zero and one.
+
+00:01:00.012 --> 00:01:02.056 position:63%
+What I'll do is carefully make a mark
+
+00:01:02.056 --> 00:01:04.262 position:63%
+at exactly this proportion along the rod,
+
+00:01:04.712 --> 00:01:05.412 position:63%
+and when I get home,
+
+00:01:05.612 --> 00:01:07.177 position:63%
+my fellow scientists can carefully
+
+00:01:07.177 --> 00:01:08.162 position:63%
+measure that position,
+
+00:01:08.662 --> 00:01:10.131 position:63%
+and dividing its distance to the
+
+00:01:10.131 --> 00:01:11.512 position:63%
+start by the length of the rod,
+
+00:01:11.762 --> 00:01:13.562 position:63%
+written out with all these digits of precision,
+
+00:01:14.012 --> 00:01:16.112 position:63%
+that will let us recover your full encyclopedia.
+
+00:01:17.460 --> 00:01:19.558 position:63%
+Okay, you don't need me to tell you
+
+00:01:19.558 --> 00:01:21.210 position:63%
+why this anecdote is so absurd.
+
+00:01:21.610 --> 00:01:23.195 position:63%
+It takes only about five letters
+
+00:01:23.195 --> 00:01:24.780 position:63%
+before the precision required is
+
+00:01:24.780 --> 00:01:26.509 position:63%
+already down to the size of an atom.
+
+00:01:26.710 --> 00:01:29.252 position:63%
+And yet, if you modify this story to
+
+00:01:29.252 --> 00:01:30.960 position:63%
+something that seems more reasonable,
+
+00:01:31.259 --> 00:01:32.634 position:63%
+say where the professor is allowed
+
+00:01:32.634 --> 00:01:34.009 position:63%
+to give a hard drive to that alien,
+
+00:01:34.460 --> 00:01:36.275 position:63%
+if you were to ask what is the most
+
+00:01:36.275 --> 00:01:38.040 position:63%
+efficient way to encode all of the
+
+00:01:38.040 --> 00:01:40.310 position:63%
+encyclopedia's contents onto that hard drive,
+
+00:01:40.610 --> 00:01:41.933 position:63%
+how do you compress it down
+
+00:01:41.933 --> 00:01:43.210 position:63%
+to as few bits as possible?
+
+00:01:43.412 --> 00:01:45.092 position:63%
+The aliens' idea with the rod is a
+
+00:01:45.092 --> 00:01:47.012 position:63%
+lot more relevant than you might expect.
+
+00:01:47.362 --> 00:01:49.312 position:63%
+One of the best compression algorithms we have,
+
+00:01:49.462 --> 00:01:50.812 position:63%
+known as an arithmetic coding,
+
+00:01:51.112 --> 00:01:53.623 position:63%
+works basically by associating arbitrarily
+
+00:01:53.623 --> 00:01:55.608 position:63%
+long sequences of text with very,
+
+00:01:55.608 --> 00:01:58.412 position:63%
+very specific real numbers between zero and one.
+
+00:01:58.662 --> 00:02:00.462 position:63%
+It might sound absurd, but it's very beautiful.
+
+00:02:00.862 --> 00:02:02.112 position:63%
+And if you want to learn how it works,
+
+00:02:02.412 --> 00:02:03.353 position:63%
+whenever you're in the mood
+
+00:02:03.353 --> 00:02:04.362 position:63%
+to hop out of the shorts feed,
+
+00:02:04.612 --> 00:02:07.244 position:63%
+take a look at the third video I did in a trilogy
+
+00:02:07.244 --> 00:02:09.562 position:63%
+under the title Compression is Intelligence.
+
