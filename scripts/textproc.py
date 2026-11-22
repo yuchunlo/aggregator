@@ -1346,7 +1346,8 @@ def is_boilerplate(text: str, kind: str, level="sentence") -> bool:
 # ============================================================== extraction
 _ZH_SPLIT = re.compile(r"(?<=[。！？!?；;])\s*")
 _EN_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\u00c0-\u024f\"'(])")
-_BULLET = re.compile(r"(?<=[\u4e00-\u9fff%）。，、])\s*[-–—•·]\s*(?=[\u4e00-\u9fff\dA-Za-z])")
+_BULLET = re.compile(r"(?<=[\u4e00-\u9fff%）。，、])\s*[-–—•]\s*(?=[\u4e00-\u9fff\dA-Za-z])"
+                     r"|(?:(?<=[%）。，、])\s*|(?<=[\u4e00-\u9fff])[ \t]*\n\s*)·\s*(?=[\u4e00-\u9fff\dA-Za-z])")
 # Keeps each terminator (and trailing space) with its sentence: pieces re-join exactly.
 SENT_RE = re.compile(r"(?<=[。！？；;])(?![」』”\"'）)])\s*"
                      r"|(?<=[.!?])\s+(?=[A-Z0-9\u00c0-\u024f\u4e00-\u9fff\"'(])")

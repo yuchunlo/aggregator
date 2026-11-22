@@ -1967,6 +1967,26 @@ def check_subtitle_from_info_json():
             ds.run_cmd = fake([(1, False), (0, True)])
             ds.fetch_track(None, "https://youtu.be/xxxxxxxxxxx", out_dir, item, "en", True, "en", info, 5)
             eq((len(calls), calls[1][-2:]), (2, ["--", "https://www.youtube.com/watch?v=xxxxxxxxxxx"]), "failed info-json run retried from the url")
+            calls.clear()
+            (out_dir / f"{item}.en.en.vtt").unlink()
+
+            def empty(results):
+                def run(cmd, timeout):
+                    calls.append(cmd)
+                    write = results.pop(0)
+                    if write:
+                        (out_dir / f"{item}.en.en.vtt").write_text("WEBVTT")
+                        return 0, "", ""
+                    return 1, "", "ERROR: Did not get any data blocks"
+                return run
+            ds.run_cmd = empty([False, False])
+            rc, _, err = ds.fetch_track(None, "https://youtu.be/xxxxxxxxxxx", out_dir, item, "en", True, "en", info, 5)
+            eq((len(calls), ds.empty_track(err), any(not list(out_dir.glob("*.vtt")) for _ in [0])), (2, True, True),
+               "empty track: tried twice, reported as empty for the ASR fallback")
+            eq(any("player_client" in x or x == "--user-agent" for c in calls for x in c), False,
+               "subtitles use yt-dlp's own client choice")
+            eq(ds.empty_track("ERROR: Did not get any data blocks"), True, "empty track recognized")
+            eq(ds.empty_track("[info] title: Did not get any data blocks"), False, "only ERROR lines count")
         finally:
             ds.run_cmd = real
 

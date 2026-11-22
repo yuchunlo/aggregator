@@ -46,7 +46,9 @@ from store import (youtube_watch_url, BLANK_SUMMARY, UTC, choose_track, prune_su
 # The JS challenge solver comes from the pinned yt-dlp-ejs package (yt-dlp[default]);
 # `--remote-components ejs:github` would run unpinned code fetched at runtime.
 BASE_ARGS = ["--no-progress", "--socket-timeout", "30"]
-SUB_ARGS = ["--user-agent", net.UA, "--extractor-args", "youtube:player_client=web", "--ignore-no-formats"]
+# Probe and subtitles use yt-dlp's own client choice, like the first audio way:
+# a pinned client is the one YouTube refuses first (for captions: empty answers).
+SUB_ARGS = ["--ignore-no-formats"]
 # Ways to get a video's audio, tried in order until one downloads (youtube_audio).
 # A stream url that extracts fine can still be refused when fetched (HTTP 403),
 # and which player client and protocol YouTube refuses changes every few
@@ -611,18 +613,25 @@ def remove_orphans(out_dir: Path, ids: set) -> int:
     return len(orphans)
 
 
+# yt-dlp's words when a subtitle url answers 200 with an empty body (YouTube's
+# answer to a timedtext request it will not serve). Only ERROR lines.
+EMPTY_TRACK = re.compile(r"^ERROR: .*Did not get any data blocks", re.M)
+
+
+def empty_track(stderr: str) -> bool:
+    return bool(EMPTY_TRACK.search(stderr or ""))
+
+
 def fetch_track(cookies, url, out_dir: Path, item_id, orig, manual, lang, info_file, timeout):
-    """Write the chosen subtitle track. From the probe's info JSON first
-    (--load-info-json: no second extraction); once more from the url if that
-    fails for another reason than "no such track" (e.g. a stale PO token).
-    Returns (rc, stdout, stderr) of the last attempt."""
+    """Write the chosen subtitle track: from the probe's info JSON (no second
+    extraction), then once from the url (fresh extraction, e.g. for a stale
+    PO token) unless the first run settled it. (rc, stdout, stderr) of the last run."""
     args = [*SUB_ARGS, "--skip-download", "--write-sub" if manual else "--write-auto-sub",
             "--sub-langs", lang, "--sub-format", "vtt",
-            # no remote field in the filename: orig is safe_lang'd
-            "-o", str(out_dir / f"{item_id}.{orig or 'und'}.%(ext)s")]
+            "-o", str(out_dir / f"{item_id}.{orig or 'und'}.%(ext)s")]   # orig is safe_lang'd
     rc, out, err = run_cmd(ytdlp(cookies, None, "--load-info-json", str(info_file), *args), timeout)
-    got = rc == 0 and any(out_dir.glob(f"{item_id}*.vtt"))
-    if got or cookies_rejected(err) or "no subtitles for the requested languages" in (out + err).lower():
+    if (rc == 0 and any(out_dir.glob(f"{item_id}*.vtt"))) or cookies_rejected(err) \
+            or "no subtitles for the requested languages" in (out + err).lower():
         return rc, out, err
     discard(out_dir, item_id)
     return run_cmd(ytdlp(cookies, url, *args), timeout)
@@ -730,6 +739,11 @@ def main(argv=None, limits: Limits | None = None) -> int:
             n["succeeded"] += 1
             prune_subtitles(out_dir, item_id)
         elif rc == 0 and "no subtitles for the requested languages" in log:
+            dirty |= fallback()
+        elif empty_track(err):
+            # Empty twice (info JSON and a fresh extraction): as good as no captions.
+            discard(out_dir, item_id)
+            print(f"[EMPTY] {item_id}: subtitle track came back empty -> ASR")
             dirty |= fallback()
         elif closed(item, item_id, err, out_dir, n):
             dirty = True
