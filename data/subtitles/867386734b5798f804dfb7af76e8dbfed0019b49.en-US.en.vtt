@@ -1,0 +1,530 @@
+WEBVTT
+Kind: captions
+
+00:00:00.100 --> 00:00:05.200 position:63%
+Power bills just had the fastest&nbsp;
+period of price growth on record. And,&nbsp;&nbsp;
+
+00:00:05.200 --> 00:00:08.400 position:63%
+it’s because of demand… that doesn’t even exist?
+
+00:00:08.400 --> 00:00:12.000 position:63%
+On America’s largest power grid, $21.3 billion,&nbsp;&nbsp;
+
+00:00:12.700 --> 00:00:16.400 position:63%
+almost half of what customers paid&nbsp;
+to reserve three years of power,&nbsp;&nbsp;
+
+00:00:16.400 --> 00:00:22.500 position:63%
+was for data centers… that hadn’t been built&nbsp;
+yet. And many of them likely never will.
+
+00:00:22.500 --> 00:00:28.300 position:63%
+But that’s just the beginning. Data center&nbsp;
+developers have asked for 83% of everything&nbsp;&nbsp;
+
+00:00:28.300 --> 00:00:33.800 position:63%
+America’s power plants can produce. Less&nbsp;
+than a third of it will likely ever get used.
+
+00:00:33.800 --> 00:00:36.600 position:63%
+Data centers completely broke how the US grids&nbsp;&nbsp;
+
+00:00:36.600 --> 00:00:40.800 position:63%
+works. And now US power is&nbsp;
+in the midst of a crisis.
+
+00:00:40.800 --> 00:00:44.700 position:63%
+So how does a data center&nbsp;
+that doesn’t exist… or will&nbsp;&nbsp;
+
+00:00:44.700 --> 00:00:49.000 position:63%
+never exist end up on your power&nbsp;
+bill? How did this even happen?
+
+00:00:56.800 --> 00:01:01.400 position:63%
+The most important thing to understand is&nbsp;
+that power doesn’t get charged the way you&nbsp;&nbsp;
+
+00:01:01.400 --> 00:01:07.900 position:63%
+probably expect. Most people assume their power&nbsp;
+bill… is just the power they used. But, a big,&nbsp;&nbsp;
+
+00:01:07.900 --> 00:01:13.200 position:63%
+growing chunk of it, is from something called&nbsp;
+capacity. And it’s actually pretty simple.
+
+00:01:13.200 --> 00:01:18.100 position:63%
+On your power bill, you pay for three important&nbsp;
+costs, which are usually the biggest. First,&nbsp;&nbsp;
+
+00:01:18.100 --> 00:01:24.600 position:63%
+the delivery, like the cost of poles, wires, and&nbsp;
+local lines, Second, the power you actually use,&nbsp;&nbsp;
+
+00:01:24.600 --> 00:01:29.800 position:63%
+and a third charge, which is a surprising&nbsp;
+amount of your bill: capacity charges.
+
+00:01:29.800 --> 00:01:35.300 position:63%
+So… what the heck is this “capacity”?&nbsp;
+Well, it shows us how power bills have&nbsp;&nbsp;
+
+00:01:35.300 --> 00:01:39.700 position:63%
+skyrocketed… by reserving power&nbsp;
+for demand… that doesn’t exist.
+
+00:01:39.700 --> 00:01:45.000 position:63%
+Demand for power fluctuates. The hottest day of&nbsp;
+the year, when everyone’s using their AC units,&nbsp;&nbsp;
+
+00:01:45.000 --> 00:01:50.400 position:63%
+will use far more power than any regular day.&nbsp;
+Same goes for the coldest day. But, you still&nbsp;&nbsp;
+
+00:01:50.400 --> 00:01:55.200 position:63%
+need to have power capacity at the plants,&nbsp;
+for when that sudden spike in energy comes.
+
+00:01:55.200 --> 00:01:59.893 position:63%
+So, people pay for that extra capacity, to have&nbsp;
+power plants running, even if much of their&nbsp;&nbsp;
+
+00:01:59.893 --> 00:02:06.493 position:63%
+capacity, isn’t used much of the year. So, a&nbsp;
+capacity charge. But what’s really interesting,&nbsp;&nbsp;
+
+00:02:06.493 --> 00:02:10.893 position:63%
+is how that price is set, which comes&nbsp;
+with a problem we’re discovering now.
+
+00:02:10.893 --> 00:02:15.893 position:63%
+On the eastern grid, it’s set by a company&nbsp;
+called PJM, which runs the power grid for about&nbsp;&nbsp;
+
+00:02:15.893 --> 00:02:22.393 position:63%
+67 million people in 13 states and Washington&nbsp;
+DC. It’s the nation’s largest grid operator.
+
+00:02:22.393 --> 00:02:26.993 position:63%
+PJM forecasts how much power the grid&nbsp;
+will need on its busiest day. Then it&nbsp;&nbsp;
+
+00:02:26.993 --> 00:02:31.093 position:63%
+holds an auction to buy capacity&nbsp;
+from power companies. Basically,&nbsp;&nbsp;
+
+00:02:31.093 --> 00:02:36.093 position:63%
+a promise from power plants to be available&nbsp;
+that day, and each plant names its price.
+
+00:02:36.093 --> 00:02:40.993 position:63%
+PJM accepts the offers from cheapest to most&nbsp;
+expensive, until the supply they forecast is&nbsp;&nbsp;
+
+00:02:40.993 --> 00:02:48.393 position:63%
+met. So, Plant A offers 40 units at $50. Plant&nbsp;
+B offers 40 at $150. Plant C offers 40 at $325.
+
+00:02:48.393 --> 00:02:54.293 position:63%
+If PJM needs 100 units, it buys 40 units from&nbsp;
+Plant A, 40 units from Plant B, and 20 units&nbsp;&nbsp;
+
+00:02:54.293 --> 00:02:59.993 position:63%
+from Plant C, to reach 100. Each gets paid at&nbsp;
+the price of the highest accepted bid. So A,&nbsp;&nbsp;
+
+00:02:59.993 --> 00:03:05.593 position:63%
+B, and C get paid at a rate of $325, and&nbsp;
+that cost goes onto everyone’s power bill.
+
+00:03:05.593 --> 00:03:10.593 position:63%
+So in a way, you’re paying for the power you use,&nbsp;
+but also, paying power companies to have extra&nbsp;&nbsp;
+
+00:03:10.593 --> 00:03:15.993 position:63%
+capacity available, even if it’s not used most of&nbsp;
+the the time. You don’t want to not have power,&nbsp;&nbsp;
+
+00:03:15.993 --> 00:03:20.093 position:63%
+when demand spikes. Otherwise you&nbsp;
+get a blackout. Which is much worse.
+
+00:03:20.093 --> 00:03:23.193 position:63%
+But, this capacity cost has been exploding.
+
+00:03:23.193 --> 00:03:28.993 position:63%
+The 2023 PJM capacity price by&nbsp;
+auction was about $29 per MW per day,&nbsp;&nbsp;
+
+00:03:28.993 --> 00:03:35.393 position:63%
+But in the following auction, the auction&nbsp;
+price jumped almost ten times, to about $269!
+
+00:03:35.393 --> 00:03:40.593 position:63%
+This was so high, that, after Pennsylvania&nbsp;
+Governor Josh Shapiro filed a complaint with&nbsp;&nbsp;
+
+00:03:40.593 --> 00:03:45.493 position:63%
+the federal energy regulator, a price ceiling&nbsp;
+was set, with minor adjustments each year. And,&nbsp;&nbsp;
+
+00:03:45.493 --> 00:03:49.593 position:63%
+it’s a good thing they did, because&nbsp;
+the capacity prices continued to grow,&nbsp;&nbsp;
+
+00:03:49.593 --> 00:03:53.793 position:63%
+and in 2026, it was the third auction&nbsp;
+in a row to reach the price cap.
+
+00:03:53.793 --> 00:03:58.693 position:63%
+But, it gets worse. Included in&nbsp;
+that price is PJM’s safety cushion,&nbsp;&nbsp;
+
+00:03:58.693 --> 00:04:03.294 position:63%
+as they aim to have roughly 20% more power&nbsp;
+available than it forecasts for the busiest&nbsp;&nbsp;
+
+00:04:03.294 --> 00:04:08.294 position:63%
+hour. This is to prevent any blackouts if&nbsp;
+actual demand goes beyond the forecast.
+
+00:04:08.294 --> 00:04:12.494 position:63%
+Well, both the December 2025&nbsp;
+auction, and the July 2026 auction,&nbsp;&nbsp;
+
+00:04:12.494 --> 00:04:16.394 position:63%
+were short of this cushion. The&nbsp;
+first time this has happened.
+
+00:04:16.394 --> 00:04:21.394 position:63%
+Even paying the highest price allowed, PJM&nbsp;
+couldn't find enough power plants to cover its&nbsp;&nbsp;
+
+00:04:21.394 --> 00:04:26.494 position:63%
+own forecast with a safety margin. The grid&nbsp;
+has less room for a heat wave or cold snap.
+
+00:04:26.494 --> 00:04:32.294 position:63%
+So why have capacity prices skyrocketed? Why is&nbsp;
+there a sudden need for all this power capacity?…
+
+00:04:33.194 --> 00:04:36.494 position:63%
+Data centers. A whole lot of data centers.
+
+00:04:36.494 --> 00:04:40.094 position:63%
+But, the problem isn’t necessarily&nbsp;
+the data centers themselves,&nbsp;&nbsp;
+
+00:04:40.094 --> 00:04:41.994 position:63%
+but how they’ve broken the existing system,&nbsp;&nbsp;
+
+00:04:41.994 --> 00:04:48.794 position:63%
+altogether. Much of this capacity comes from data&nbsp;
+centers that don’t exist, or never will exist.
+
+00:04:56.694 --> 00:05:00.994 position:63%
+In Northern Virginia, where there’s a huge&nbsp;
+cluster of data centers, the busiest summer&nbsp;&nbsp;
+
+00:05:00.994 --> 00:05:08.094 position:63%
+day of 2025’s actual use was 23% higher&nbsp;
+than in 2019. Winter was also 45% higher.
+
+00:05:08.094 --> 00:05:15.994 position:63%
+But that’s the actual use. And… 23%? Even&nbsp;
+45%? That doesn’t explain the massive jump&nbsp;&nbsp;
+
+00:05:15.994 --> 00:05:22.194 position:63%
+in capacity prices. What does, though, is how&nbsp;
+PJM forecasts what will be needed down the line.
+
+00:05:22.194 --> 00:05:28.694 position:63%
+Across three auctions, 45% of what customers&nbsp;
+paid for standby power, $21.3 billion, was for&nbsp;&nbsp;
+
+00:05:28.694 --> 00:05:34.894 position:63%
+data centers that only existed in the forecast.&nbsp;
+That’s almost half. Almost half the standby bill&nbsp;&nbsp;
+
+00:05:34.894 --> 00:05:40.194 position:63%
+was for buildings that weren't there. And those&nbsp;
+are charges… that end up on people’s bills.
+
+00:05:40.194 --> 00:05:44.794 position:63%
+“This is not something the data centers&nbsp;
+are actually paying themselves. This&nbsp;&nbsp;
+
+00:05:44.794 --> 00:05:48.894 position:63%
+is a cost being imposed on all&nbsp;
+customers in the PJM footprint.”
+
+00:05:48.894 --> 00:05:52.394 position:63%
+So, how the heck are data centers&nbsp;
+increasing the cost… if they don’t&nbsp;&nbsp;
+
+00:05:52.394 --> 00:05:56.094 position:63%
+exist? Well, it comes down to how&nbsp;
+the queue for utilities works.
+
+00:05:56.094 --> 00:05:59.894 position:63%
+A developer who’s planning one data&nbsp;
+center, wants to get it done as fast&nbsp;&nbsp;
+
+00:05:59.894 --> 00:06:04.094 position:63%
+as possible. But connecting to the&nbsp;
+grid, is actually the slowest part.&nbsp;&nbsp;
+
+00:06:04.094 --> 00:06:08.095 position:63%
+Building it can be done in a year, but&nbsp;
+connecting it can take multiple years.
+
+00:06:08.096 --> 00:06:11.796 position:63%
+So, developers ask a bunch&nbsp;
+of utility companies at once,&nbsp;&nbsp;
+
+00:06:11.796 --> 00:06:16.496 position:63%
+to see who can connect them the fastest. This&nbsp;
+is called “service territory shopping.” It&nbsp;&nbsp;
+
+00:06:16.496 --> 00:06:19.796 position:63%
+also helps figure out who’s the&nbsp;
+cheapest, and provides backups.
+
+00:06:20.596 --> 00:06:23.696 position:63%
+“The data center people are&nbsp;
+shopping these projects around,&nbsp;&nbsp;
+
+00:06:23.696 --> 00:06:27.496 position:63%
+and maybe they approach five or more&nbsp;
+utilities. They’re only going to build&nbsp;&nbsp;
+
+00:06:27.496 --> 00:06:31.696 position:63%
+one data center. But if all five utilities&nbsp;
+think that interest is going to lead to a&nbsp;&nbsp;
+
+00:06:31.696 --> 00:06:35.096 position:63%
+data center, they’re going to build&nbsp;
+way more capacity than is needed.”
+
+00:06:36.296 --> 00:06:41.496 position:63%
+It’s not just speed, though. It’s also to hold&nbsp;
+a place in the queue to be connected. So, a data&nbsp;&nbsp;
+
+00:06:41.496 --> 00:06:46.696 position:63%
+center, sitting in line to be connected, which&nbsp;
+doesn’t really exist… drives up power prices…
+
+00:06:46.696 --> 00:06:47.196 position:63%
+Yeah.
+
+00:06:47.496 --> 00:06:51.796 position:63%
+Now, imagine not just one developer doing&nbsp;
+that… but a lot of data centers doing this,&nbsp;&nbsp;
+
+00:06:51.796 --> 00:06:55.896 position:63%
+across a state. Suddenly, you have&nbsp;
+all these requests, from data centers,&nbsp;&nbsp;
+
+00:06:55.896 --> 00:07:01.496 position:63%
+to all these utility providers… and it starts&nbsp;
+to look like a surge in need for capacity. So,&nbsp;&nbsp;
+
+00:07:01.496 --> 00:07:06.296 position:63%
+the grid needs to ensure they can produce&nbsp;
+enough power, and change the future forecast.
+
+00:07:06.296 --> 00:07:11.496 position:63%
+This has become a huge problem. But&nbsp;
+these aren’t public requests. They’re&nbsp;&nbsp;
+
+00:07:11.496 --> 00:07:15.796 position:63%
+made privately to different providers, who&nbsp;
+might not validate with one another. So,&nbsp;&nbsp;
+
+00:07:15.796 --> 00:07:19.796 position:63%
+the big picture looks like there’s a&nbsp;
+sudden, colossal wave of new demand…&nbsp;&nbsp;
+
+00:07:19.796 --> 00:07:24.296 position:63%
+even if there isn’t. And the sheer&nbsp;
+scale of this, is kind of mind-boggling.
+
+00:07:24.296 --> 00:07:29.896 position:63%
+Across the US, data center developers&nbsp;
+have asked for 1,066 gigawatts of power.
+
+00:07:29.896 --> 00:07:33.096 position:63%
+… that is 83% of the combined output,&nbsp;&nbsp;
+
+00:07:33.096 --> 00:07:41.396 position:63%
+of every power plant in the US. 83%! Over 80%&nbsp;
+of all the commercial power the US can produce.
+
+00:07:41.396 --> 00:07:48.296 position:63%
+In reality, only about 28% of that demand, will&nbsp;
+actually be used. And this is hugely inflating the&nbsp;&nbsp;
+
+00:07:48.296 --> 00:07:54.596 position:63%
+overall forecast of data center demand. But even&nbsp;
+if they’re not real, they get added to the cost.
+
+00:07:54.596 --> 00:07:58.796 position:63%
+From the last three capacity auctions, the&nbsp;
+costs related to data center forecasts,&nbsp;&nbsp;
+
+00:07:58.796 --> 00:08:04.396 position:63%
+not existing data centers, were&nbsp;
+$21.3 billion. 45% of the total cost.
+
+00:08:04.396 --> 00:08:09.797 position:63%
+So, what are we doing about it? Well,&nbsp;
+there’s some good news… and some bad news.
+
+00:08:17.297 --> 00:08:20.097 position:63%
+If you’ve watched this far, consider subscribing!&nbsp;&nbsp;
+
+00:08:20.097 --> 00:08:22.997 position:63%
+It helps the channel and means&nbsp;
+you won’t miss future videos.
+
+00:08:23.697 --> 00:08:28.397 position:63%
+American Electric Power Ohio, or “AEP,”&nbsp;
+the state's largest power company,&nbsp;&nbsp;
+
+00:08:28.397 --> 00:08:32.897 position:63%
+got requests from 50 data center customers,&nbsp;
+wanting to draw a combined 30 gigawatts at&nbsp;&nbsp;
+
+00:08:32.897 --> 00:08:36.897 position:63%
+once. Roughly three times New York&nbsp;
+City’s peak electricity demand.
+
+00:08:37.497 --> 00:08:38.497 position:63%
+Insane.
+
+00:08:38.497 --> 00:08:43.497 position:63%
+So in July 2025, Ohio regulators&nbsp;
+made one simple change. Before,&nbsp;&nbsp;
+
+00:08:43.497 --> 00:08:48.197 position:63%
+a developer could ask for power, and just sit&nbsp;
+on the waiting list, without signing anything,&nbsp;&nbsp;
+
+00:08:48.197 --> 00:08:52.997 position:63%
+or paying anything. They were only charged&nbsp;
+once they formally signed a contract. So,&nbsp;&nbsp;
+
+00:08:52.997 --> 00:08:56.497 position:63%
+waiting in line for multiple utility&nbsp;
+companies didn't cost anything.
+
+00:08:56.497 --> 00:09:00.697 position:63%
+Now, every data center on the list had&nbsp;
+to commit by a deadline and commit to 12&nbsp;&nbsp;
+
+00:09:00.697 --> 00:09:06.997 position:63%
+years of power. And pay for 85% of the power&nbsp;
+they reserved, whether they used it or not.
+
+00:09:06.997 --> 00:09:09.297 position:63%
+After the change, the 30 requested gigawatts,&nbsp;&nbsp;
+
+00:09:09.297 --> 00:09:14.397 position:63%
+dropped down to just 5.6. Roughly&nbsp;
+80% of the waiting list disappeared.
+
+00:09:14.997 --> 00:09:19.897 position:63%
+It’s not just Ohio either. Utility providers&nbsp;
+“serving eight of the 10 largest data centre&nbsp;&nbsp;
+
+00:09:19.897 --> 00:09:24.497 position:63%
+hotspots — including Virginia, Illinois&nbsp;
+and Texas — [are] overhauling their pricing&nbsp;&nbsp;
+
+00:09:24.497 --> 00:09:27.897 position:63%
+structures and setting stringent&nbsp;
+rules for prospective projects.”
+
+00:09:27.897 --> 00:09:30.797 position:63%
+We’re also seeing new power&nbsp;
+capacity being approved,&nbsp;&nbsp;
+
+00:09:30.797 --> 00:09:35.997 position:63%
+like under Georgia Power. But even if they&nbsp;
+primarily serve data centers, “the costs of&nbsp;&nbsp;
+
+00:09:35.997 --> 00:09:40.597 position:63%
+providing service to new data centers will&nbsp;
+not be passed on to current ratepayers.”
+
+00:09:40.597 --> 00:09:44.297 position:63%
+Even if “projected data center&nbsp;
+demand does not materialize.”
+
+00:09:44.297 --> 00:09:50.697 position:63%
+Which is fantastic. But, there’s still a problem.&nbsp;
+Prices unfortunately won’t come down soon.
+
+00:09:50.697 --> 00:09:56.997 position:63%
+PJM forecasts capacity prices three years ahead&nbsp;
+of time. In July 2026… the forecast is for June&nbsp;&nbsp;
+
+00:09:56.997 --> 00:10:03.197 position:63%
+2028 through to May 2029. Even though the rules&nbsp;
+for data center requests are being tackled now,&nbsp;&nbsp;
+
+00:10:03.197 --> 00:10:06.697 position:63%
+there is still this long tail to deal&nbsp;
+with, for a few more years at least.
+
+00:10:06.697 --> 00:10:11.798 position:63%
+Data centers are a new problem for the grid&nbsp;
+to manage. But even if a huge chunk of it&nbsp;&nbsp;
+
+00:10:11.798 --> 00:10:16.598 position:63%
+is just requests, there’s still a huge gap&nbsp;
+between what we need, and where we are now.
+
+00:10:16.598 --> 00:10:20.598 position:63%
+There’s a major difference between&nbsp;
+data centers and homes. Homes spike,&nbsp;&nbsp;
+
+00:10:20.598 --> 00:10:23.998 position:63%
+though at consistent periods.&nbsp;
+Certain times of the day,&nbsp;&nbsp;
+
+00:10:23.998 --> 00:10:28.698 position:63%
+and during certain seasons. From when everyone&nbsp;
+gets home from work, until they head to bed.
+
+00:10:28.698 --> 00:10:33.098 position:63%
+But data centers run flat out, at all times. 24/7.
+
+00:10:33.098 --> 00:10:36.598 position:63%
+This has “shifted our risk into&nbsp;
+the winter period even more,&nbsp;&nbsp;
+
+00:10:36.598 --> 00:10:39.998 position:63%
+because it’s sort of bringing the&nbsp;
+winter peak closer to the summer peak.”
+
+00:10:39.998 --> 00:10:45.798 position:63%
+AI is impacting all kinds of industries&nbsp;
+and businesses, and not just the grid.&nbsp;&nbsp;
+
+00:10:45.798 --> 00:10:49.998 position:63%
+Small businesses, for example, seem to&nbsp;
+be obsessed with using it. For posters,&nbsp;&nbsp;
+
+00:10:49.998 --> 00:10:53.998 position:63%
+menus, and social media. And a&nbsp;
+lot of it doesn't look great.
+
+00:10:53.998 --> 00:10:59.198 position:63%
+So, why are these AI posters everywhere?&nbsp;
+Even the ones that look… awful.
+
+00:10:59.198 --> 00:11:01.198 position:63%
+To find out, watch this video next.
+
