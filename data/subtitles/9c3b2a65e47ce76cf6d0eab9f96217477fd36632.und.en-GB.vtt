@@ -1,0 +1,1571 @@
+WEBVTT
+Kind: captions
+
+00:00:00.060 --> 00:00:04.820 position:63%
+[trumpet music]
+
+00:00:04.860 --> 00:00:09.450 position:63%
+I previously made a video about
+the fair share sequence, AKA Thue Morse,
+
+00:00:09.660 --> 00:00:13.230 position:63%
+MATT: the absolute fairest way to
+share things between two people.
+
+00:00:13.360 --> 00:00:15.280 position:63%
+But this was back in 2015...
+[laughs]
+
+00:00:15.320 --> 00:00:20.370 position:63%
+MATT: when I still had hair, and since then, there have been some amazing developments.
+
+00:00:20.500 --> 00:00:22.470 position:63%
+So I asked my friend Sophie...
+
+00:00:22.700 --> 00:00:24.270 position:63%
+SOPHIE: Hi. I'm Matt's friend, Sophie.
+
+00:00:24.540 --> 00:00:27.060 position:63%
+MATT: to join me to explore
+the new state of the art.
+
+00:00:27.100 --> 00:00:32.810 position:63%
+And first of all, we had to recap
+what even counts as fair sharing.
+
+00:00:33.060 --> 00:00:35.470 position:63%
+- I'd love to go first.
+- So I'm gonna label you Person A.
+
+00:00:35.660 --> 00:00:37.980 position:63%
+- Fantastic.
+- Keep this nice and clear. There you go.
+
+00:00:38.540 --> 00:00:40.370 position:63%
+MATT: So if you wanna choose
+something from the plate.
+
+00:00:41.140 --> 00:00:43.500 position:63%
+SOPHIE: Right. So I get first choice.
+
+00:00:43.540 --> 00:00:45.920 position:63%
+I am going to choose the orange thing.
+
+00:00:45.960 --> 00:00:47.390 position:63%
+MATT: Oh, that might be the best thing.
+
+00:00:47.540 --> 00:00:48.760 position:63%
+We don't know. I'm gonna...
+
+00:00:48.800 --> 00:00:49.600 position:63%
+- Well, we agree on
+- We probably agree
+
+00:00:50.120 --> 00:00:51.970 position:63%
+- is the best thing
+- we probably agree
+
+00:00:52.040 --> 00:00:53.140 position:63%
+- I think...
+- ranking of the things.
+
+00:00:53.180 --> 00:00:56.210 position:63%
+- Yeah.
+- Okay. I'm gonna pick the red thing.
+
+00:00:57.080 --> 00:00:58.500 position:63%
+SOPHIE: Ooh, the red
+thing. So it's my turn.
+
+00:00:58.540 --> 00:01:03.130 position:63%
+Wow, this is what it all comes down to
+because if we continued in this pattern,
+
+00:01:03.960 --> 00:01:05.210 position:63%
+MATT: I don't think it's gonna be fair.
+
+00:01:06.680 --> 00:01:08.280 position:63%
+- Maybe not.
+- And why would that be?
+
+00:01:08.620 --> 00:01:11.170 position:63%
+So if we run out of things, I could
+end up with just more things than you.
+
+00:01:11.220 --> 00:01:11.700 position:63%
+MATT: That's a good point.
+
+00:01:11.740 --> 00:01:15.550 position:63%
+For an unknown number of things,
+either we end up with the same number...
+
+00:01:15.860 --> 00:01:17.000 position:63%
+- Right.
+- or you end up with one more.
+
+00:01:17.040 --> 00:01:18.280 position:63%
+- Exactly.
+- That's not fair.
+
+00:01:18.340 --> 00:01:20.200 position:63%
+- Great for me, but not fair.
+- Not fair.
+
+00:01:20.900 --> 00:01:22.690 position:63%
+SOPHIE: But then there's another
+way it's not fair as well.
+
+00:01:22.740 --> 00:01:25.180 position:63%
+If, for example,
+we have the same number of things...
+
+00:01:25.220 --> 00:01:25.520 position:63%
+MATT: Yep.
+
+00:01:25.320 --> 00:01:27.920 position:63%
+I'm still getting the first choice
+out of the top two.
+
+00:01:27.960 --> 00:01:28.680 position:63%
+MATT: Oh, yeah.
+
+00:01:28.720 --> 00:01:30.860 position:63%
+SOPHIE: And the first choice
+out of third and fourth.
+
+00:01:30.900 --> 00:01:32.260 position:63%
+I shouldn't be saying this.
+
+00:01:32.300 --> 00:01:34.550 position:63%
+- I'm really...
+- No, but thank you for bringing it up.
+
+00:01:34.780 --> 00:01:40.410 position:63%
+MATT: So ABABAB is unfair
+if these are ranked.
+
+00:01:40.580 --> 00:01:40.880 position:63%
+SOPHIE: Yep.
+
+00:01:40.740 --> 00:01:43.140 position:63%
+MATT: And it's even unfair if
+they're all of equal value.
+
+00:01:43.180 --> 00:01:43.700 position:63%
+SOPHIE: Right.
+
+00:01:43.740 --> 00:01:46.030 position:63%
+MATT: Because on average, you're
+gonna get half a thing more than me.
+
+00:01:46.100 --> 00:01:46.620 position:63%
+SOPHIE: Absolutely.
+
+00:01:46.660 --> 00:01:50.250 position:63%
+Okay, so new plan.
+I go second, and I go third.
+
+00:01:50.860 --> 00:01:54.020 position:63%
+So now I got one more.
+There you are. Now it's your go.
+
+00:01:54.060 --> 00:01:55.420 position:63%
+- Okay, now it is my go.
+- Yep.
+
+00:01:55.460 --> 00:01:57.310 position:63%
+SOPHIE: I'm going to take this thing.
+
+00:01:58.120 --> 00:02:02.130 position:63%
+Now, we won't go into the full maths
+of this, but we could keep doing
+
+00:02:02.540 --> 00:02:05.330 position:63%
+- Right.
+- ABBA. It's actually not perfectly fair.
+
+00:02:05.600 --> 00:02:08.130 position:63%
+MATT: What you need to do
+is do ABBA and then do BAAB.
+
+00:02:08.300 --> 00:02:10.140 position:63%
+SOPHIE: Right, to make
+
+00:02:10.560 --> 00:02:11.060 position:63%
+MATT: it
+
+00:02:11.100 --> 00:02:11.820 position:63%
+- better.
+- Balances it out.
+
+00:02:11.860 --> 00:02:12.640 position:63%
+SOPHIE: So it's my go now.
+
+00:02:12.680 --> 00:02:15.200 position:63%
+Because that BAAB cancels out
+the advantages
+
+00:02:15.240 --> 00:02:15.740 position:63%
+- No.
+- of ABBA.
+
+00:02:15.780 --> 00:02:17.300 position:63%
+- It's your go now.
+- It's my go now.
+
+00:02:17.340 --> 00:02:18.620 position:63%
+- BAAB. Oh, yeah.
+- BAAB.
+
+00:02:18.660 --> 00:02:19.530 position:63%
+MATT: Great. Yep, got it.
+
+00:02:20.220 --> 00:02:23.640 position:63%
+But then after we've done ABBA BAAB,
+we don't alternate that.
+
+00:02:23.680 --> 00:02:25.760 position:63%
+- No, then we do BAAB ABBA.
+- We do BAAB ABBA.
+
+00:02:25.800 --> 00:02:27.790 position:63%
+It's the same sequence,
+but on the sequence.
+
+00:02:28.220 --> 00:02:32.270 position:63%
+MATT: And then we flip that entire
+thing and do that again, and it
+
+00:02:32.600 --> 00:02:34.500 position:63%
+never repeats and never ends.
+
+00:02:34.540 --> 00:02:35.640 position:63%
+So you're just taking things.
+
+00:02:35.680 --> 00:02:36.490 position:63%
+I'm not paying attention.
+
+00:02:36.720 --> 00:02:40.600 position:63%
+So if you follow this, and I'll put a
+chunk of it in the description if you need
+
+00:02:40.640 --> 00:02:46.440 position:63%
+to grab it, the ABBA BAAB Thue Morse
+sequence is the fairest way for two
+
+00:02:46.480 --> 00:02:48.160 position:63%
+- people to pick from things.
+- Yes.
+
+00:02:48.200 --> 00:02:53.000 position:63%
+MATT: And you can see that on a plot where
+ABABAB always has A either equal or in
+
+00:02:53.040 --> 00:02:57.590 position:63%
+front, whereas Thue Morse, if you
+alternate and stop anywhere at random,
+
+00:02:57.760 --> 00:03:00.840 position:63%
+MATT: it's equally likely
+A or B will be in front.
+
+00:03:00.880 --> 00:03:02.820 position:63%
+And not just where all
+things are equally good;
+
+00:03:02.860 --> 00:03:05.100 position:63%
+we could have them
+decrease at a linear rate,
+
+00:03:05.140 --> 00:03:07.930 position:63%
+and Thue Morse is still
+the provably optimal way,
+
+00:03:08.100 --> 00:03:12.390 position:63%
+so if you stop at any random point, it's
+equally likely one person is in front.
+
+00:03:12.840 --> 00:03:15.010 position:63%
+It's such a good sequence to celebrate.
+
+00:03:15.080 --> 00:03:18.550 position:63%
+Here are Sophie's top n
+facts about Thue Morse.
+
+00:03:19.100 --> 00:03:23.700 position:63%
+SOPHIE: Before we carry on, I just wanna
+say as Business Sophie that this video is
+
+00:03:23.740 --> 00:03:27.020 position:63%
+sponsored by boot.dev, a
+fantastic and interactive-
+
+00:03:27.060 --> 00:03:29.860 position:63%
+Give me that. This is my channel.
+You don't get to sell out.
+
+00:03:29.900 --> 00:03:32.510 position:63%
+That's my job, right? Don't reframe.
+I can make this work.
+
+00:03:32.780 --> 00:03:36.800 position:63%
+MATT: Yes, boot.dev is a fantastic and
+interactive way to learn modern software
+
+00:03:36.840 --> 00:03:39.520 position:63%
+developer skills, and basically,
+instantly be better [laughs]
+
+00:03:39.560 --> 00:03:40.840 position:63%
+MATT: at programming than me.
+
+00:03:40.880 --> 00:03:42.740 position:63%
+I mean, I like to mess around.
+Ooh, Learn Docker.
+
+00:03:42.780 --> 00:03:45.260 position:63%
+MATT: Okay, that's gonna be
+our lucky dip for this promo.
+
+00:03:45.300 --> 00:03:46.450 position:63%
+Let's check out Learn Docker.
+
+00:03:46.620 --> 00:03:49.940 position:63%
+I've been messing around with
+Docker on an old Mac Mini I've got.
+
+00:03:49.980 --> 00:03:52.720 position:63%
+But here, you could learn
+how to do it properly.
+
+00:03:52.760 --> 00:03:53.820 position:63%
+Let's just check out the course.
+
+00:03:53.860 --> 00:03:55.660 position:63%
+Oh, look at this. This is great.
+
+00:03:55.700 --> 00:03:59.680 position:63%
+This is how you get proper
+software developer skills,
+
+00:03:59.720 --> 00:04:01.310 position:63%
+not just my hobbyist ones.
+
+00:04:01.520 --> 00:04:04.200 position:63%
+Sure, learning to code can
+be a type of enjoyable,
+
+00:04:04.240 --> 00:04:07.270 position:63%
+but it's definitely not easy,
+and that's kinda the point.
+
+00:04:07.620 --> 00:04:12.100 position:63%
+That's why there are jobs for good
+software devs who have put the time and
+
+00:04:12.140 --> 00:04:14.010 position:63%
+effort in to learn the skills properly.
+
+00:04:14.360 --> 00:04:16.220 position:63%
+And if you do wanna
+learn some proper skills,
+
+00:04:16.260 --> 00:04:20.400 position:63%
+use my promo code STANDUPMATHS and then
+Black Friday Cyber Monday,
+
+00:04:20.440 --> 00:04:26.060 position:63%
+MATT: but abbreviated, to get 45%
+off up to and including the end of
+
+00:04:26.100 --> 00:04:30.200 position:63%
+November, and after that, a
+mere 25% off your first payment.
+
+00:04:30.240 --> 00:04:34.650 position:63%
+And of course, all of this comes with
+their 30-day money-back guarantee.
+
+00:04:34.900 --> 00:04:38.780 position:63%
+Huge thanks to boot.dev for
+sponsoring the videos on my channel.
+
+00:04:38.820 --> 00:04:41.840 position:63%
+Do use the code STANDUPMATHS
+for 45% off your first payment,
+
+00:04:41.880 --> 00:04:43.760 position:63%
+and check out the QR code.
+
+00:04:43.800 --> 00:04:46.120 position:63%
+Head on over. Support the channel.
+Thanks, everyone.
+
+00:04:46.920 --> 00:04:48.240 position:63%
+SOPHIE: Business Sophie
+would've done that better.
+
+00:04:48.280 --> 00:04:51.840 position:63%
+[upbeat music]
+
+00:04:51.880 --> 00:04:57.130 position:63%
+One way to generate the Thue Morse
+sequence is to take the digits in binary
+
+00:04:57.220 --> 00:05:01.930 position:63%
+SOPHIE: of increasing numbers and just
+add the digits and look at it modulo 2,
+
+00:05:02.220 --> 00:05:03.710 position:63%
+and this will give the sequence.
+
+00:05:05.540 --> 00:05:07.830 position:63%
+One way to generate the
+sequence is iteratively.
+
+00:05:08.180 --> 00:05:09.410 position:63%
+So you'll start with A,
+
+00:05:10.060 --> 00:05:16.070 position:63%
+and then in each iteration, you'll replace
+every A with AB and every B with BA.
+
+00:05:19.140 --> 00:05:22.450 position:63%
+In a rowing boat, a lot of rowers
+will row with just one oar,
+
+00:05:22.580 --> 00:05:25.390 position:63%
+SOPHIE: either on their left
+side or their right side,
+
+00:05:25.500 --> 00:05:29.320 position:63%
+and the Thue Morse sequence gives us
+the optimal configuration of left and
+
+00:05:29.360 --> 00:05:30.160 position:63%
+SOPHIE: right-siders.
+
+00:05:32.580 --> 00:05:38.320 position:63%
+So if you take the Thue Morse sequence
+and look at the As or Bs
+
+00:05:38.360 --> 00:05:41.980 position:63%
+in the cube-number positions,
+so we'll start at zero,
+
+00:05:42.020 --> 00:05:44.570 position:63%
+SOPHIE: you are equally
+likely to have an A or B.
+
+00:05:46.800 --> 00:05:51.080 position:63%
+A really cool fact about the sequence
+is if you take any two distinct positive
+
+00:05:51.120 --> 00:05:56.240 position:63%
+integers, alpha and beta, and you
+construct a continued fraction according
+
+00:05:56.280 --> 00:06:00.960 position:63%
+to the Thue Morse sequence,
+then the resulting fraction is always
+
+00:06:01.000 --> 00:06:04.950 position:63%
+transcendental. So that means it's never
+a solution to a polynomial equation.
+
+00:06:05.040 --> 00:06:08.880 position:63%
+There are some really cool summation
+results we can get from the Thue Morse
+
+00:06:08.920 --> 00:06:14.040 position:63%
+sequence. So if instead of looking at
+As and Bs we consider zeros and ones,
+
+00:06:14.250 --> 00:06:18.550 position:63%
+and we consider the nth element of the
+Thue Morse sequence with the first element
+
+00:06:18.590 --> 00:06:19.580 position:63%
+SOPHIE: being t0,
+
+00:06:20.270 --> 00:06:26.120 position:63%
+we'll find that we can use the sequence
+to find a sum equalling pi squared,
+
+00:06:26.250 --> 00:06:30.610 position:63%
+and another one equalling 8 times
+the Riemann zeta function at 3.
+
+00:06:30.650 --> 00:06:34.710 position:63%
+And there's a more complicated formula
+for the Riemann zeta function at any
+
+00:06:34.750 --> 00:06:37.330 position:63%
+odd integer.
+Mentioned in Matt's first video,
+
+00:06:37.370 --> 00:06:39.620 position:63%
+that I'm gonna reiterate here
+'cause it is very cool.
+
+00:06:39.750 --> 00:06:41.800 position:63%
+If you were to take
+the Thue Morse sequence,
+
+00:06:42.030 --> 00:06:46.450 position:63%
+and whenever you get an A
+you rotate half a circle, so pi radians,
+
+00:06:46.490 --> 00:06:51.690 position:63%
+SOPHIE: and whenever you get a B, you walk one unit and then rotate a sixth of a circle,
+
+00:06:51.730 --> 00:06:55.860 position:63%
+so pi over 3 radians,
+you end up tending to the Koch snowflake.
+
+00:06:56.490 --> 00:07:00.730 position:63%
+As a final fun fact, I think we might be
+mispronouncing the Thue Morse sequence for
+
+00:07:00.770 --> 00:07:01.700 position:63%
+SOPHIE: the entire video.
+
+00:07:01.770 --> 00:07:06.120 position:63%
+Some sources say that it's not Thue,
+it's actually Thue, but who's taking note?
+
+00:07:07.290 --> 00:07:10.130 position:63%
+Right. We all agree Thue Morse
+sequence is incredible.
+
+00:07:10.170 --> 00:07:14.040 position:63%
+MATT: But now we need to generalise
+this sequence to more people.
+
+00:07:14.310 --> 00:07:18.560 position:63%
+Now, very recently someone emailed in
+to the podcast I do with Bec Hill,
+
+00:07:18.630 --> 00:07:24.220 position:63%
+A Problem Squared, and they asked if
+they've got 14 people in their fantasy
+
+00:07:24.290 --> 00:07:29.100 position:63%
+MATT: sport league, what is the fairest
+order for them to select from the draft
+
+00:07:29.790 --> 00:07:35.310 position:63%
+in? And it turns out there is one way you
+can define the Thue Morse sequence which
+
+00:07:35.350 --> 00:07:39.360 position:63%
+MATT: does generalise, and it
+preserves those properties,
+
+00:07:39.670 --> 00:07:43.990 position:63%
+and it's through the lens of
+imagining it as a kind of duel.
+
+00:07:44.030 --> 00:07:47.850 position:63%
+[gentle music]
+
+00:07:47.890 --> 00:07:49.560 position:63%
+Here's a new way to frame the problem.
+
+00:07:49.950 --> 00:07:53.340 position:63%
+You and I are having some
+kind of duel competition.
+
+00:07:53.650 --> 00:07:55.510 position:63%
+I'm gonna go with darts. There you are.
+
+00:07:55.690 --> 00:07:57.950 position:63%
+And can you see in
+[laughs]
+
+00:07:57.990 --> 00:08:00.300 position:63%
+MATT: the vast distance
+a hypothetical dartboard?
+
+00:08:00.470 --> 00:08:00.970 position:63%
+SOPHIE: Yes.
+
+00:08:01.010 --> 00:08:02.950 position:63%
+So [laughs]
+here's the game.
+
+00:08:02.990 --> 00:08:04.090 position:63%
+MATT: Don't throw that. [laughs]
+
+00:08:04.130 --> 00:08:06.880 position:63%
+The game is first person
+to get a bullseye wins.
+
+00:08:06.990 --> 00:08:07.630 position:63%
+SOPHIE: Okay.
+
+00:08:07.670 --> 00:08:10.300 position:63%
+Now, this could be playing golf,
+hole in one,
+
+00:08:10.690 --> 00:08:12.270 position:63%
+- Right,
+- shooting basketball half-court.
+
+00:08:12.310 --> 00:08:14.320 position:63%
+MATT: Something with a small
+probability of success.
+
+00:08:14.570 --> 00:08:16.290 position:63%
+But there is an advantage to going first,
+
+00:08:16.330 --> 00:08:17.690 position:63%
+- Of course.
+- 'cause you might get it first.
+
+00:08:17.730 --> 00:08:19.070 position:63%
+SOPHIE: Right, and then
+you don't even get a turn.
+
+00:08:19.110 --> 00:08:21.780 position:63%
+MATT: Bingo. So there's like a
+1% chance you get it, let's say.
+
+00:08:21.830 --> 00:08:22.770 position:63%
+SOPHIE: Let's say 2%, come on.
+
+00:08:22.810 --> 00:08:24.800 position:63%
+MATT: 99%. Okay, 2% chance you get it;
+
+00:08:25.410 --> 00:08:26.980 position:63%
+98% chance I get it.
+
+00:08:27.210 --> 00:08:30.120 position:63%
+So the rule is we take
+turns throwing the darts,
+
+00:08:30.210 --> 00:08:34.420 position:63%
+and at each point we calculate
+whoever has the smallest probability
+
+00:08:35.090 --> 00:08:38.410 position:63%
+of having won already gets to go next.
+
+00:08:38.450 --> 00:08:39.250 position:63%
+SOPHIE: Right.
+
+00:08:39.850 --> 00:08:42.130 position:63%
+MATT: Which sounds a bit
+ridiculous, but it kinda works.
+
+00:08:42.170 --> 00:08:44.450 position:63%
+SOPHIE: And all this is
+determined beforehand, right?
+
+00:08:44.490 --> 00:08:46.370 position:63%
+It's not dependent on what's
+
+00:08:46.410 --> 00:08:47.440 position:63%
+- No,
+- happened during a game.
+
+00:08:47.670 --> 00:08:49.310 position:63%
+SOPHIE: Predetermined
+based on the probabilities.
+
+00:08:49.350 --> 00:08:53.100 position:63%
+MATT: Yeah. In fact, you can
+pre-crunch every single outcome
+
+00:08:53.170 --> 00:08:53.470 position:63%
+SOPHIE: Right
+
+00:08:53.250 --> 00:08:57.410 position:63%
+MATT: by looking back and saying, what are
+the probabilities A and B are both won,
+
+00:08:57.450 --> 00:08:58.560 position:63%
+and picking the smaller one.
+
+00:08:58.850 --> 00:09:01.720 position:63%
+So at the very beginning, you've
+got a 2% chance of winning.
+
+00:09:01.810 --> 00:09:02.570 position:63%
+SOPHIE: Yep.
+
+00:09:02.610 --> 00:09:06.560 position:63%
+MATT: But on the second go, I've
+got a 0% chance of having won,
+
+00:09:07.250 --> 00:09:10.300 position:63%
+and you've got a 2% chance of
+having won, so I get to go next.
+
+00:09:10.570 --> 00:09:15.240 position:63%
+But my probabilities are now where
+there's a 98% times 2% chance I have won,
+
+00:09:15.490 --> 00:09:16.050 position:63%
+SOPHIE: Right
+
+00:09:16.090 --> 00:09:18.580 position:63%
+MATT: which is still a
+little bit smaller than 2%.
+
+00:09:18.810 --> 00:09:19.130 position:63%
+SOPHIE: Yes.
+
+00:09:19.170 --> 00:09:20.000 position:63%
+MATT: So I get to go again.
+
+00:09:20.830 --> 00:09:21.230 position:63%
+SOPHIE: Okay.
+
+00:09:21.270 --> 00:09:26.440 position:63%
+MATT: And I then have a 98% squared
+plus 98% cubed chance of having one
+
+00:09:26.930 --> 00:09:27.230 position:63%
+SOPHIE: Right
+
+00:09:26.950 --> 00:09:30.730 position:63%
+MATT: which has just tipped over bigger than two, so now you get to have the next go.
+
+00:09:30.770 --> 00:09:31.470 position:63%
+SOPHIE: Okay.
+
+00:09:31.510 --> 00:09:35.520 position:63%
+MATT: And we both build up these
+long series of probabilities.
+
+00:09:36.050 --> 00:09:38.330 position:63%
+SOPHIE: And then it goes me, you, you, me.
+
+00:09:38.370 --> 00:09:41.760 position:63%
+Would you believe it generates
+the Thue Morse sequence?
+
+00:09:41.830 --> 00:09:42.970 position:63%
+- Brilliant.
+- It's so great.
+
+00:09:43.010 --> 00:09:46.410 position:63%
+And more importantly, can be generalised.
+And it works.
+
+00:09:46.450 --> 00:09:50.990 position:63%
+The duel method does generalise for any
+number of players in a fair share
+
+00:09:51.030 --> 00:09:56.790 position:63%
+Thue Morse sequence. This was first
+pitched in 2013 by Joshua Cooper and Aaron
+
+00:09:56.830 --> 00:10:02.780 position:63%
+MATT: Dutle in a paper called
+Greedy Galois Games, and it's great.
+
+00:10:03.090 --> 00:10:05.600 position:63%
+It works. I actually first came across it,
+
+00:10:05.690 --> 00:10:10.340 position:63%
+it was an answer on Math Stack Exchange
+by user
+
+00:10:10.390 --> 00:10:16.420 position:63%
+MATT: kram1032, and not only did they
+explain the duel concept, but they also
+
+00:10:17.110 --> 00:10:21.500 position:63%
+provided some Python code.
+So I just downloaded that and used it,
+
+00:10:22.270 --> 00:10:23.180 position:63%
+MATT: and it works great.
+
+00:10:23.530 --> 00:10:26.150 position:63%
+So now, as well as the
+classic n equals 2 case,
+
+00:10:26.190 --> 00:10:28.890 position:63%
+I could say about n equals
+3 for three people choosing.
+
+00:10:28.930 --> 00:10:32.730 position:63%
+We've got four people choosing,
+five, and I could just keep going,
+
+00:10:32.770 --> 00:10:35.280 position:63%
+and here's the one that was requested, 14.
+
+00:10:35.370 --> 00:10:38.250 position:63%
+Although it kinda looks like alphabet
+soup at this point, and you might think,
+
+00:10:38.290 --> 00:10:41.390 position:63%
+"Ah, surely there's a neat way to
+visualise this in a way that makes it
+
+00:10:41.430 --> 00:10:42.270 position:63%
+easier to use," [laughs]
+
+00:10:42.310 --> 00:10:46.300 position:63%
+and don't worry.
+That is a problem that solved itself.
+
+00:10:46.490 --> 00:10:50.170 position:63%
+MATT: So I used Kram's code to work
+out the sequence for 14 players.
+
+00:10:50.210 --> 00:10:53.560 position:63%
+We recorded the podcast episode with
+that solution, had a lot of fun,
+
+00:10:53.850 --> 00:10:59.370 position:63%
+released that, accidentally opened
+the door for listeners coming up with
+
+00:10:59.410 --> 00:11:04.930 position:63%
+audio and visual demonstrations
+of how it works in practice.
+
+00:11:04.970 --> 00:11:08.190 position:63%
+Kinda regret that.
+I don't wanna relive all the remixes.
+
+00:11:08.230 --> 00:11:09.460 position:63%
+MATT: I'll link to the episode below.
+
+00:11:09.670 --> 00:11:11.170 position:63%
+You can check it out on your own time.
+
+00:11:11.210 --> 00:11:15.200 position:63%
+But there was one visualisation that
+I thought was particularly neat.
+
+00:11:15.590 --> 00:11:17.340 position:63%
+So this is the visualiser
+that Damien made.
+
+00:11:17.790 --> 00:11:20.020 position:63%
+We'll put it on, do you fancy
+the blues scale?
+
+00:11:20.070 --> 00:11:20.610 position:63%
+SOPHIE: Oh, yeah.
+
+00:11:20.650 --> 00:11:25.450 position:63%
+and we'll speed it up a little, and
+this is what it does.
+
+00:11:25.490 --> 00:11:27.250 position:63%
+[upbeat music]
+It's kinda fun.
+
+00:11:27.550 --> 00:11:28.620 position:63%
+- Funky.
+- It's kinda funky.
+
+00:11:28.790 --> 00:11:33.770 position:63%
+MATT: And you can see it going around
+the circle, which I think is quite neat,
+
+00:11:33.810 --> 00:11:39.890 position:63%
+but it kind of makes it a little hard
+to follow, I found, some of the logic.
+
+00:11:39.930 --> 00:11:42.060 position:63%
+MATT: So what I'm gonna do is stop that.
+
+00:11:42.690 --> 00:11:43.680 position:63%
+I took Damien's code,
+
+00:11:44.030 --> 00:11:47.100 position:63%
+- Okay
+- me and a robot friend of mine
+
+00:11:47.790 --> 00:11:50.160 position:63%
+MATT: altered it a
+little to make it linear,
+
+00:11:51.110 --> 00:11:52.260 position:63%
+and now it looks like this.
+
+00:11:52.470 --> 00:11:53.270 position:63%
+SOPHIE: Okay.
+
+00:11:53.390 --> 00:11:54.190 position:63%
+MATT: So,
+
+00:11:54.910 --> 00:11:56.420 position:63%
+how many notes would you like?
+
+00:11:56.830 --> 00:11:58.510 position:63%
+SOPHIE: Should we do eight,
+just make it a scale?
+
+00:11:58.550 --> 00:11:59.470 position:63%
+MATT: Eight in the major scale?
+
+00:11:59.510 --> 00:11:59.810 position:63%
+SOPHIE: Right.
+
+00:11:59.510 --> 00:12:00.500 position:63%
+MATT: Yeah, right. Cool.
+
+00:12:00.710 --> 00:12:01.890 position:63%
+And I, I've got it linear.
+
+00:12:01.930 --> 00:12:02.410 position:63%
+I'll set it going.
+
+00:12:02.450 --> 00:12:03.370 position:63%
+[upbeat music playing]
+
+00:12:03.410 --> 00:12:04.360 position:63%
+And now it goes...
+
+00:12:04.570 --> 00:12:06.510 position:63%
+I think it's easier to
+kinda follow the sequence.
+
+00:12:06.550 --> 00:12:07.330 position:63%
+SOPHIE: Right.
+
+00:12:07.370 --> 00:12:11.140 position:63%
+MATT: And I've got it to change
+colour each time it finishes a round,
+
+00:12:11.370 --> 00:12:14.940 position:63%
+because once it gets more chaotic, it's hard to keep track of when you've finished.
+
+00:12:16.370 --> 00:12:18.470 position:63%
+'Cause there's always this
+whole permutation on n.
+
+00:12:18.510 --> 00:12:21.480 position:63%
+It's hard to keep track of when
+it switches to the next one.
+
+00:12:22.150 --> 00:12:22.950 position:63%
+So there you go.
+
+00:12:23.210 --> 00:12:26.580 position:63%
+But what's particularly interesting
+about this, now it's not chaotic,
+
+00:12:27.510 --> 00:12:29.700 position:63%
+but it's a little hard to
+see the logic behind this.
+
+00:12:30.130 --> 00:12:31.420 position:63%
+At the very beginning,
+
+00:12:32.730 --> 00:12:34.020 position:63%
+it's surprisingly straightforward.
+
+00:12:34.330 --> 00:12:38.530 position:63%
+When I set this going at the beginning,
+you'll see first of all it counts all the
+
+00:12:38.570 --> 00:12:39.400 position:63%
+way up.
+
+00:12:39.750 --> 00:12:40.890 position:63%
+Then it comes all the way back down again.
+
+00:12:40.930 --> 00:12:43.890 position:63%
+Then does it in the other
+direction, and then back up again.
+
+00:12:43.930 --> 00:12:45.330 position:63%
+Okay. After that it gets more complicated.
+
+00:12:45.370 --> 00:12:48.280 position:63%
+So apparently just that
+beginning is called snake draft.
+
+00:12:48.570 --> 00:12:49.810 position:63%
+- What's...
+- Or serpentine draft.
+
+00:12:49.850 --> 00:12:50.650 position:63%
+MATT: Okay, what's that?
+
+00:12:50.790 --> 00:12:54.170 position:63%
+So my board game nerd friends
+are like, "Oh yeah, snake draft."
+
+00:12:54.210 --> 00:12:57.510 position:63%
+That's where you go all the
+way through all the players,
+
+00:12:57.550 --> 00:12:59.450 position:63%
+and then you come all the way back up again, and you just go backwards and forwards.
+
+00:12:59.490 --> 00:13:00.540 position:63%
+Oh, snaking. Yeah, yeah.
+
+00:13:00.770 --> 00:13:02.080 position:63%
+Well, it's easy to do.
+
+00:13:02.190 --> 00:13:03.420 position:63%
+Yeah. And the issue
+
+00:13:03.530 --> 00:13:03.830 position:63%
+[laughs]
+
+00:13:03.730 --> 00:13:06.960 position:63%
+with some of the generalised
+Thue Morse sequences for higher
+
+00:13:07.910 --> 00:13:09.940 position:63%
+Right unless you've got it
+written out on a big bit of paper,
+
+00:13:10.650 --> 00:13:11.550 position:63%
+it's real hard to follow.
+
+00:13:11.590 --> 00:13:14.260 position:63%
+Yeah. Snake draft, easy, up and
+down, up and down, up and down.
+
+00:13:14.430 --> 00:13:18.080 position:63%
+So I thought we might do,
+like, an easy version of
+
+00:13:18.770 --> 00:13:21.290 position:63%
+Thue-Morse. A middle
+ground between the two.
+
+00:13:21.330 --> 00:13:21.630 position:63%
+In the style.
+
+00:13:21.510 --> 00:13:22.490 position:63%
+In the middle ground, yeah, yeah.
+
+00:13:22.530 --> 00:13:24.980 position:63%
+Between snake and full Thue.
+
+00:13:25.250 --> 00:13:28.840 position:63%
+So if you watch, you get snake in
+one direction all the way down.
+
+00:13:29.030 --> 00:13:29.900 position:63%
+Yeah All the way back.
+
+00:13:30.230 --> 00:13:31.810 position:63%
+That's easy. And then you
+do it from the other end,
+
+00:13:31.850 --> 00:13:33.310 position:63%
+all the way up and all
+the way back down again.
+
+00:13:33.350 --> 00:13:35.360 position:63%
+Sure. Okay. Then middle out.
+
+00:13:35.530 --> 00:13:36.880 position:63%
+Okay. Outside back in.
+
+00:13:37.610 --> 00:13:38.840 position:63%
+Then it starts getting chaotic.
+
+00:13:38.930 --> 00:13:43.490 position:63%
+But what you can actually do is snake
+all the way down and back.
+
+00:13:43.530 --> 00:13:45.710 position:63%
+MATT: Then the other
+direction, up and down.
+
+00:13:45.750 --> 00:13:48.130 position:63%
+Right. Then do middle out, back in.
+
+00:13:48.170 --> 00:13:53.610 position:63%
+And then do out, in, out.
+
+00:13:53.650 --> 00:13:57.750 position:63%
+Yeah. And if not, it's fair enough that
+that order is not gonna be why you're
+
+00:13:57.790 --> 00:14:00.330 position:63%
+MATT: Oh, yeah. You got
+other issues to blame. Right,
+
+00:14:00.370 --> 00:14:02.080 position:63%
+Than the order you
+picked in at that point.
+
+00:14:02.390 --> 00:14:06.490 position:63%
+So I wanna call that hydra draft.
+Because multiple snakes.
+
+00:14:06.530 --> 00:14:07.420 position:63%
+MATT: We got four snakes.
+
+00:14:07.470 --> 00:14:08.530 position:63%
+- Nice.
+- Yes. So there you are.
+
+00:14:08.570 --> 00:14:10.960 position:63%
+If you just want a practical
+solution, hydra draft.
+
+00:14:11.150 --> 00:14:13.920 position:63%
+First of all, everyone picks an order
+and then you reverse that.
+
+00:14:13.990 --> 00:14:15.850 position:63%
+Then you do the same thing from
+the back to the front,
+
+00:14:15.890 --> 00:14:17.540 position:63%
+MATT: reverse it back down to the back.
+
+00:14:17.650 --> 00:14:20.960 position:63%
+Then you go from the middle out,
+reverse that from out back in again.
+
+00:14:21.070 --> 00:14:24.840 position:63%
+Then the same thing but this time it's
+out to in, and then in to out.
+
+00:14:25.010 --> 00:14:28.170 position:63%
+MATT: And that's our attempt to make this
+as fair as possible while being easy to
+
+00:14:28.210 --> 00:14:30.520 position:63%
+remember, but just how fair is it?
+
+00:14:30.810 --> 00:14:35.120 position:63%
+This is a plot of hydra draft showing the
+percentage advantage of whichever player
+
+00:14:35.450 --> 00:14:38.610 position:63%
+has the greatest advantage compared to
+the player with the absolute worst.
+
+00:14:38.650 --> 00:14:40.450 position:63%
+MATT: And you can see in the first pass,
+
+00:14:40.490 --> 00:14:44.310 position:63%
+that's all the way up through everyone,
+then the first player's just got a great
+
+00:14:44.350 --> 00:14:47.950 position:63%
+advantage. Then the second half is when
+you go the reverse order all the way back.
+
+00:14:47.990 --> 00:14:49.750 position:63%
+It brings it back to not quite perfect.
+
+00:14:49.790 --> 00:14:52.590 position:63%
+And then outside in, inside
+out, inside out, outside in.
+
+00:14:52.630 --> 00:14:56.620 position:63%
+So that's all four waves back and
+forth, and you can see it's not bad.
+
+00:14:56.870 --> 00:15:00.270 position:63%
+But what if we compare it to good
+old snake draft, just back and forth,
+
+00:15:00.310 --> 00:15:00.850 position:63%
+back and forth?
+
+00:15:00.890 --> 00:15:03.660 position:63%
+Well, the first two are indistinguishable
+because they're identical,
+
+00:15:03.890 --> 00:15:04.780 position:63%
+MATT: and that makes sense.
+
+00:15:05.010 --> 00:15:07.250 position:63%
+And then you can see there is some drift.
+
+00:15:07.290 --> 00:15:08.090 position:63%
+Oh, and this is what we're looking at.
+
+00:15:08.130 --> 00:15:11.970 position:63%
+In terms of percentages, snake draft
+is just about 4%,
+
+00:15:12.010 --> 00:15:14.130 position:63%
+MATT: whereas hydra
+draft is just under 1%.
+
+00:15:14.170 --> 00:15:19.130 position:63%
+It's not bad, but what about the reigning
+unbeatable champ of Thue-Morse?
+
+00:15:19.170 --> 00:15:20.660 position:63%
+MATT: Well, it's the same as hydra draft.
+
+00:15:20.870 --> 00:15:23.200 position:63%
+I mean, in fact it's
+identical for most of it.
+
+00:15:23.370 --> 00:15:25.910 position:63%
+At the end here it
+drifts ever so slightly.
+
+00:15:25.950 --> 00:15:27.350 position:63%
+They're barely different.
+
+00:15:27.390 --> 00:15:30.620 position:63%
+And I have to admit that technically if
+these were items of equal value,
+
+00:15:30.990 --> 00:15:32.310 position:63%
+MATT: all three would
+be indistinguishable.
+
+00:15:32.350 --> 00:15:35.230 position:63%
+In fact, if they were linear decrease,
+you wouldn't see a difference.
+
+00:15:35.270 --> 00:15:40.100 position:63%
+I've had to go for a quadratic drop-off in
+quality to get this tiny difference here.
+
+00:15:40.270 --> 00:15:42.840 position:63%
+And if we do it for more
+rounds, so let's reset.
+
+00:15:42.950 --> 00:15:43.330 position:63%
+There we go.
+
+00:15:43.370 --> 00:15:47.460 position:63%
+Twice as many rounds just between
+Thue-Morse and hydra draft,
+
+00:15:47.690 --> 00:15:50.880 position:63%
+again it only just starts
+to drift at the very end.
+
+00:15:51.050 --> 00:15:53.600 position:63%
+And for you pedants, because
+it's a quadratic drop-off,
+
+00:15:53.910 --> 00:15:57.530 position:63%
+it's even closer back here just because
+the quadratic thing rescales all the
+
+00:15:57.570 --> 00:16:00.250 position:63%
+values. Eh, the point is
+it's very, very close.
+
+00:16:00.290 --> 00:16:01.090 position:63%
+In fact, here's,
+
+00:16:01.190 --> 00:16:01.490 position:63%
+[laughs]
+
+00:16:01.450 --> 00:16:05.720 position:63%
+here's the first 24 rounds
+or 12 back-and-forths,
+
+00:16:05.890 --> 00:16:07.590 position:63%
+and you can see only at the end there.
+
+00:16:07.630 --> 00:16:10.060 position:63%
+Now, this is a fraction of a % difference.
+
+00:16:10.290 --> 00:16:14.920 position:63%
+Hydra draft stays very close
+to the ideal Thue-Morse.
+
+00:16:15.170 --> 00:16:18.630 position:63%
+So there you are, hydra draft
+for all your fair sharing needs.
+
+00:16:18.670 --> 00:16:21.560 position:63%
+And if you really wanna
+follow the details exactly,
+
+00:16:21.930 --> 00:16:29.030 position:63%
+I have taken Kram's code, and Claude and
+I have exported a PDF for
+
+00:16:29.350 --> 00:16:32.620 position:63%
+MATT: any number of people that
+you want a fair share between,
+
+00:16:32.990 --> 00:16:35.430 position:63%
+as long as that number is 24 or smaller.
+
+00:16:35.470 --> 00:16:37.400 position:63%
+You can do it yourself if you want.
+
+00:16:37.530 --> 00:16:40.630 position:63%
+And that's really where
+this video should end.
+
+00:16:40.670 --> 00:16:42.510 position:63%
+We have the practical solution.
+
+00:16:42.550 --> 00:16:43.680 position:63%
+Although that said,
+
+00:16:44.410 --> 00:16:48.360 position:63%
+I would like to point out one quick
+quirk behind how the code actually works,
+
+00:16:48.410 --> 00:16:50.700 position:63%
+'cause it's not using
+the duel probabilities.
+
+00:16:50.890 --> 00:16:54.340 position:63%
+Very interesting. If you read through
+Kram's answer on Stack Exchange,
+
+00:16:54.450 --> 00:16:59.550 position:63%
+you will see lots of mentions of 1 minus
+epsilon, and then to various powers,
+
+00:16:59.590 --> 00:17:04.620 position:63%
+and we were very quick to switch
+from 2% accurate to 98% inaccurate,
+
+00:17:04.770 --> 00:17:08.070 position:63%
+but that working out is raising
+two things in brackets to a power,
+
+00:17:08.110 --> 00:17:11.670 position:63%
+and of course you're gonna
+get binomial coefficients.
+
+00:17:11.710 --> 00:17:15.110 position:63%
+And down here it gets
+very Pascal's triangly,
+
+00:17:15.150 --> 00:17:17.930 position:63%
+and that's what Kram
+actually uses in their code,
+
+00:17:17.970 --> 00:17:22.670 position:63%
+because the duel method we were looking at
+only gives you the sequence in the limit,
+
+00:17:22.710 --> 00:17:23.990 position:63%
+whereas this gives it straight away.
+
+00:17:24.030 --> 00:17:27.790 position:63%
+So that's how you write your code, and
+you can see here binomial coefficient.
+
+00:17:27.830 --> 00:17:32.500 position:63%
+And you take, for all players, the
+indexes of all their turns so far,
+
+00:17:32.830 --> 00:17:34.620 position:63%
+and then you gradually ratchet up.
+
+00:17:34.730 --> 00:17:38.790 position:63%
+Column just means you increase
+values until you break all ties,
+
+00:17:38.830 --> 00:17:40.470 position:63%
+and I'm not doing the explanation justice.
+
+00:17:40.510 --> 00:17:41.330 position:63%
+You can check it out.
+
+00:17:41.370 --> 00:17:44.130 position:63%
+But it's a quick deterministic
+way to get the actual sequence,
+
+00:17:44.170 --> 00:17:49.340 position:63%
+and because additional choose functions
+go up to higher order polynomials,
+
+00:17:49.490 --> 00:17:53.360 position:63%
+you're basically ratcheting up how
+fast the value of the things drops off,
+
+00:17:53.470 --> 00:17:57.390 position:63%
+and the higher order ones become
+less and less likely tiebreakers,
+
+00:17:57.430 --> 00:17:58.720 position:63%
+so it prioritises linear.
+
+00:17:58.850 --> 00:18:03.200 position:63%
+It's very clever, and I'll link to it if
+you wanna grab Kram's code and calculate
+
+00:18:03.350 --> 00:18:04.640 position:63%
+some sequences for yourself.
+
+00:18:04.750 --> 00:18:08.160 position:63%
+When you do actually work them out,
+you quickly realise, at least I did,
+
+00:18:08.470 --> 00:18:11.500 position:63%
+N equals 2 goes on forever, never repeats.
+
+00:18:12.150 --> 00:18:13.100 position:63%
+N equals 3
+
+00:18:13.890 --> 00:18:17.120 position:63%
+starts for a bit and then
+falls into a repeating pattern.
+
+00:18:17.470 --> 00:18:20.570 position:63%
+N equals 4 starts for a bit,
+falls into a repeating pattern.
+
+00:18:20.610 --> 00:18:22.720 position:63%
+In fact, for any number,
+
+00:18:23.310 --> 00:18:27.200 position:63%
+and I've checked up to 24, which I'm
+pretty sure is the biggest number,
+
+00:18:27.770 --> 00:18:32.700 position:63%
+this always happens, and I do
+not understand that pattern.
+
+00:18:32.930 --> 00:18:33.810 position:63%
+Are you ready to be angry?
+
+00:18:33.850 --> 00:18:34.550 position:63%
+[laughs]
+
+00:18:34.590 --> 00:18:37.330 position:63%
+Always. Spoiler, we both
+ended up pretty angry.
+
+00:18:37.370 --> 00:18:39.570 position:63%
+If you wanna see it, it's
+on the second channel,
+
+00:18:39.610 --> 00:18:44.410 position:63%
+because I showed Sophie in great detail
+how while the case for N equals 2 never
+
+00:18:44.450 --> 00:18:47.360 position:63%
+repeats, the other ones all
+do fall into looping patterns,
+
+00:18:47.470 --> 00:18:50.030 position:63%
+but we could not work out why or how
+
+00:18:50.070 --> 00:18:50.370 position:63%
+[laughs]
+
+00:18:50.110 --> 00:18:52.280 position:63%
+or what the structure is
+or how to predict them.
+
+00:18:52.350 --> 00:18:54.640 position:63%
+It's infuriating and intriguing.
+
+00:18:54.750 --> 00:18:55.770 position:63%
+Link in the description.
+
+00:18:55.810 --> 00:18:56.490 position:63%
+Check it out.
+
+00:18:56.530 --> 00:18:57.670 position:63%
+If you work out an answer,
+
+00:18:57.710 --> 00:18:58.350 position:63%
+[laughs]
+
+00:18:58.390 --> 00:18:59.190 position:63%
+we wanna hear it.
+
+00:18:59.310 --> 00:19:00.150 position:63%
+That's the video.
+
+00:19:00.190 --> 00:19:02.000 position:63%
+Thank you so much for watching.
+
+00:19:02.050 --> 00:19:05.920 position:63%
+Huge thanks to Sophie
+Maclean, who, I'll link.
+
+00:19:06.250 --> 00:19:08.590 position:63%
+She's done a whole bunch
+of Numberphile videos.
+
+00:19:08.630 --> 00:19:10.600 position:63%
+I'm pretty sure Brady's
+made a playlist of those.
+
+00:19:11.070 --> 00:19:11.750 position:63%
+I'll link to that.
+
+00:19:11.790 --> 00:19:13.750 position:63%
+You can check out her
+excellent Numberphile work.
+
+00:19:13.790 --> 00:19:14.590 position:63%
+Wow.
+
+00:19:14.830 --> 00:19:16.820 position:63%
+Wow, maybe one day I'll
+get to go on Numberphile.
+
+00:19:17.450 --> 00:19:18.250 position:63%
+We can dream.
+
+00:19:18.370 --> 00:19:22.130 position:63%
+I'll also link to the podcast I do
+with Bec Hill, A Problem Squared.
+
+00:19:22.170 --> 00:19:24.180 position:63%
+We've done over 100 episodes.
+
+00:19:24.510 --> 00:19:27.260 position:63%
+Start, I'd say, randomly
+somewhere in the middle.
+
+00:19:27.790 --> 00:19:29.330 position:63%
+Enjoy. Link to it below.
+
+00:19:29.370 --> 00:19:31.300 position:63%
+And I will link to Damien's visualiser.
+
+00:19:31.750 --> 00:19:33.400 position:63%
+I'm not gonna host mine,
+
+00:19:34.030 --> 00:19:37.200 position:63%
+but I will link to the HTML file below.
+
+00:19:37.290 --> 00:19:39.800 position:63%
+So if you wanna check it
+out, you can download it,
+
+00:19:40.550 --> 00:19:44.860 position:63%
+open it in a browser of
+your choice, and enjoy.
+
+00:19:45.750 --> 00:19:48.360 position:63%
+- When we try to solve this...
+- Yeah - I tried to solve it first.
+
+00:19:48.910 --> 00:19:50.400 position:63%
+- Okay.
+- You're gonna try and solve it second.
+
+00:19:50.750 --> 00:19:52.120 position:63%
+MATT: - Yeah. And then you
+try and solve it third.
+
+00:19:52.910 --> 00:19:53.990 position:63%
+- Right, and then you solve it fourth
+- And then I try and solve it fourth.
+
+00:19:54.030 --> 00:19:55.330 position:63%
+- Yeah.
+- Yeah, and then whether you will...
+
+00:19:55.370 --> 00:19:56.400 position:63%
+- You know, it's...
+- Right, okay.
+
