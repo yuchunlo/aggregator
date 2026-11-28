@@ -1362,6 +1362,7 @@ def check_download_resume():
     real = (net.public_addrs, net.DOWNLOAD_STALL, net.time.sleep, net.DOWNLOAD_MIN_CHUNK, net.DOWNLOAD_TRIES)
     net.public_addrs = lambda h, p: ["127.0.0.1"] if h == "t.test" else real[0](h, p)
     net.DOWNLOAD_STALL, net.DOWNLOAD_MIN_CHUNK = 1, 10_000
+    net.time.sleep = lambda s: None             # retry backoff: what is tested is the order, not the wait
     try:
         with tempfile.TemporaryDirectory() as d:
             dest = Path(d) / "a.m4a"
@@ -1398,7 +1399,6 @@ def check_download_resume():
             why = net.save(base + "/never", dest, 3, 10**6)
             eq((why.startswith("timed out after 3s (0.0 MB in "), dest.exists()), (True, False),
                f"out of time says so, with the progress made: {why}")
-            net.time.sleep = lambda s: None
             n0, net.DOWNLOAD_TRIES = len(seen), 3
             why = net.save("http://t.test:1/closed", dest, 30, 10**6)
             eq((why.startswith("gave up after 3 attempts without progress"), dest.exists(), len(seen) - n0),
@@ -1950,6 +1950,7 @@ def check_audio_down():
         calls.append(cmd)
         return 1, "", reload if any("player_client=tv" in x for x in cmd) else nf.format("x")
     real, ds.run_cmd = ds.run_cmd, run
+    real_transcribe = ds.transcribe
     ds._no_streams_run[0], ds._audio_worked[:] = 0, []
     try:
         with tempfile.TemporaryDirectory() as d:
@@ -1960,19 +1961,24 @@ def check_audio_down():
                 except ds.NoStreams:
                     pass
             eq(ds._no_streams_run[0], ds.AUDIO_DOWN_AFTER, "no streams counted per video")
+            # asr's own decision only: no whisper, no real download.
             a, n = ds.Limits(), Counter()
             budget = ds.Budget(a)
             budget.refuse = lambda dur: None
-            calls.clear()
-            item = {"id": "a" * 40}
+            started = []
+
+            def transcribe(fetch_, out_dir, item_id, *rest):
+                started.append(item_id)
+                raise RuntimeError("stub")
+            ds.transcribe = transcribe
+            ds.asr({"id": "a" * 40}, None, 60, a, budget, Path(d), n, fetch)
+            item = {"id": "b" * 40}
             ds.asr(item, None, 60, a, budget, Path(d), n, fetch)
-            eq((calls, n["deferred"], "summary" in item), ([], 1, False), "audio down: no download, kept pending")
-            got = []
-            ds.asr(item, None, 60, a, budget, Path(d), n, lambda d, t: got.append(1) or (_ for _ in ()).throw(RuntimeError("x")),
-                   is_podcast=True)
-            eq(got, [1], "podcasts still downloaded")
+            eq((started, n["deferred"], "summary" in item), ([], 2, False), "audio down: no download, kept pending")
+            ds.asr({"id": "c" * 40}, None, 60, a, budget, Path(d), n, fetch, is_podcast=True)
+            eq(started, ["c" * 40], "podcasts still downloaded")
     finally:
-        ds.run_cmd = real
+        ds.run_cmd, ds.transcribe = real, real_transcribe
         ds._no_streams_run[0], ds._audio_worked[:] = 0, []
 
 
