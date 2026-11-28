@@ -74,6 +74,15 @@ AUDIO_LADDER = (
 )
 AUDIO_MIN_ATTEMPT = 45       # seconds: less than this left of the timeout starts no further attempt
 _audio_worked: list = []     # the way that downloaded the last video: tried first for the next (this process only)
+# Every way failing with "no streams at all" is yt-dlp failing, not the video:
+# YouTube's player changed and the JS challenge solver fails, so only
+# storyboard images are extracted. After AUDIO_DOWN_AFTER such videos in a row
+# the rest of the run downloads no audio (items stay pending): each further
+# video would only cost four more extractions and raise the bot score.
+NO_STREAMS = re.compile(r"^ERROR: \[youtube\] [\w-]+: (?:Requested format is not available"
+                        r"|The page needs to be reloaded)", re.M)
+AUDIO_DOWN_AFTER = 3
+_no_streams_run: list = [0]  # consecutive videos whose every way found no streams
 # live_status values whose video has no finished recording yet (a scheduled
 # stream or premiere, or one still on air): nothing to fetch -- no captions,
 # and the audio download fails ("Premieres in 31 hours") -- until it ends.
@@ -206,6 +215,10 @@ RESTRICTED = (
 def restricted(stderr: str) -> str | None:
     """Why the video is closed to us for good, or None."""
     return next((why for why, rx in RESTRICTED if rx.search(stderr or "")), None)
+
+
+class NoStreams(RuntimeError):
+    """No way found any audio stream: yt-dlp's extraction is broken this run."""
 
 
 class Restricted(RuntimeError):
@@ -457,7 +470,7 @@ def youtube_audio(cookies: Path, url: str):
     the way that worked goes first for the rest of the run: the failing ways
     cost their requests and their share of the timeout once, not per video."""
     def fetch(d: Path, timeout: float) -> Path:
-        deadline, tried = time.monotonic() + timeout, []
+        deadline, tried, all_no_streams = time.monotonic() + timeout, [], True
         for name, args in sorted(AUDIO_LADDER, key=lambda way: way[0] not in _audio_worked):
             left = deadline - time.monotonic()
             if tried and left < AUDIO_MIN_ATTEMPT:
@@ -472,13 +485,18 @@ def youtube_audio(cookies: Path, url: str):
                 if tried:
                     print(f"[AUDIO] {name} worked after: {'; '.join(tried)}")
                 _audio_worked[:] = [name]
+                _no_streams_run[0] = 0
                 return files[0]
             if rc is None:
                 tried.append(f"{name}: timed out")
                 break
             tried.append(f"{name}: {why_failed(err)}")
+            all_no_streams &= bool(NO_STREAMS.search(err or ""))
             if cookies_rejected(err):
                 break
+        if all_no_streams and len(tried) == len(AUDIO_LADDER):
+            _no_streams_run[0] += 1
+            raise NoStreams("no audio streams from any client: " + "; ".join(tried))
         raise RuntimeError("audio download failed: " + "; ".join(tried))
     return fetch
 
@@ -540,6 +558,8 @@ def asr(item, orig, duration, a, budget, out_dir, n, fetch, is_podcast=False) ->
     over the cap, and every run-level failure, stays pending."""
     item_id = item["id"]
     refused = budget.refuse(duration)
+    if not refused and not is_podcast and _no_streams_run[0] >= AUDIO_DOWN_AFTER:
+        refused = "YouTube audio extraction broken this run (yt-dlp outdated?)", False
     if refused:
         why, permanent = refused
         blank = permanent and not is_podcast
@@ -755,6 +775,9 @@ def main(argv=None, limits: Limits | None = None) -> int:
     if cookies_expired or n["probed"]:
         record_status(status_file, "cookies", "expired" if cookies_expired else "ok",
                       datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
+    if _no_streams_run[0] >= AUDIO_DOWN_AFTER:
+        print("::warning::YouTube gave no audio streams to any client: the JS challenge solver is likely "
+              "outdated; update yt-dlp[default] in requirements.txt")
     print(f"[MEDIA] done {dict(n)} ({budget})")
     if args.no_summarize:
         if dirty:

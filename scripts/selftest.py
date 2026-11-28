@@ -1938,6 +1938,44 @@ def check_members_only():
             sys.modules.pop("faster_whisper", None)
 
 
+def check_audio_down():
+    """Every audio way finding no streams, video after video, is yt-dlp broken
+    (outdated JS challenge solver): after AUDIO_DOWN_AFTER videos the run
+    downloads no more YouTube audio; podcasts and a working video are unaffected."""
+    nf = "ERROR: [youtube] {}: Requested format is not available. Use --list-formats"
+    reload = "ERROR: [youtube] x: The page needs to be reloaded."
+    calls = []
+
+    def run(cmd, timeout):
+        calls.append(cmd)
+        return 1, "", reload if any("player_client=tv" in x for x in cmd) else nf.format("x")
+    real, ds.run_cmd = ds.run_cmd, run
+    ds._no_streams_run[0], ds._audio_worked[:] = 0, []
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            fetch = ds.youtube_audio(None, "https://youtu.be/xxxxxxxxxxx")
+            for _ in range(ds.AUDIO_DOWN_AFTER):
+                try:
+                    fetch(Path(d), 600)
+                except ds.NoStreams:
+                    pass
+            eq(ds._no_streams_run[0], ds.AUDIO_DOWN_AFTER, "no streams counted per video")
+            a, n = ds.Limits(), Counter()
+            budget = ds.Budget(a)
+            budget.refuse = lambda dur: None
+            calls.clear()
+            item = {"id": "a" * 40}
+            ds.asr(item, None, 60, a, budget, Path(d), n, fetch)
+            eq((calls, n["deferred"], "summary" in item), ([], 1, False), "audio down: no download, kept pending")
+            got = []
+            ds.asr(item, None, 60, a, budget, Path(d), n, lambda d, t: got.append(1) or (_ for _ in ()).throw(RuntimeError("x")),
+                   is_podcast=True)
+            eq(got, [1], "podcasts still downloaded")
+    finally:
+        ds.run_cmd = real
+        ds._no_streams_run[0], ds._audio_worked[:] = 0, []
+
+
 def check_subtitle_from_info_json():
     """One extraction per video: the subtitle comes from the probe's info JSON;
     the url is tried again only when that fails for another reason."""
@@ -2285,8 +2323,14 @@ MUTATIONS = (
      '*(["--", youtube_watch_url(url)] if url else [])',
      "*([youtube_watch_url(url)] if url else [])"),
     ("C36", "check_audio_ladder", "media.py",
-     'tried.append(f"{name}: {why_failed(err)}")\n            if cookies_rejected(err):',
-     'tried.append(f"{name}: {why_failed(err)}")\n            if True:'),
+     '            if cookies_rejected(err):\n                break\n        if all_no_streams',
+     '            if True:\n                break\n        if all_no_streams'),
+    ("C38", "check_audio_down", "media.py",
+     'if not refused and not is_podcast and _no_streams_run[0] >= AUDIO_DOWN_AFTER:',
+     'if False:'),
+    ("C38", "check_audio_down", "media.py",
+     'all_no_streams &= bool(NO_STREAMS.search(err or ""))',
+     'all_no_streams = False'),
     ("C36", "check_audio_ladder", "media.py",
      '("not available in the runner\'s country",',
      '("not available in the runner\'s country" * 0,'),
@@ -2476,6 +2520,10 @@ CONTRACTS = (
      'podcast audio downloads resume a broken or stalled transfer from the bytes on disk (a server ignoring Range starts the file over), in bounded ranges of half what the broken connection delivered, remembered per host, retry a refused plain client once with the browser fingerprint, and report why they failed; past the run time limit no further ASR job starts',
      'a long episode never arrives in one piece, or crawls at one stall per MiB on a CDN that goes silent after a fixed amount per connection, and stays pending for good, with a log line that fits every cause; slow downloads run the job into its timeout and nothing is committed',
      ('check_download_resume', 'check_audio_ladder',)),
+    ('C38',
+     'when every audio way finds no streams (Requested format is not available / The page needs to be reloaded) for AUDIO_DOWN_AFTER videos in a row, the rest of the run downloads no YouTube audio, keeps those items pending and leaves a ::warning:: to update yt-dlp; podcasts are unaffected',
+     'an outdated JS challenge solver costs four extractions per video for every pending video, every day, raising the bot score, while the log looks like a series of per-video failures',
+     ('check_audio_down',)),
 )
 
 
